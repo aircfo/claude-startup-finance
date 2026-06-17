@@ -1,0 +1,14 @@
+{
+  "name": "startup-finance",
+  "displayName": "(Un)official Claude for Startup Finance",
+  "description": "Connectors for Stripe, Ramp, Mercury, and QuickBooks plus cross-tool finance skills (runway & burn, revenue reconciliation, board metrics). Unofficial — not affiliated with or endorsed by those companies or Anthropic.",
+  "version": "0.1.0",
+  "author": {
+    "name": "airCFO",
+    "email": "alex@aircfo.com"
+  },
+  "homepage": "https://github.com/aircfo/claude-startup-finance",
+  "repository": "https://github.com/aircfo/claude-startup-finance",
+  "license": "MIT",
+  "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "quickbooks"]
+}

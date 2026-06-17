@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "stripe": {
+      "type": "http",
+      "url": "https://mcp.stripe.com"
+    },
+    "ramp": {
+      "type": "http",
+      "url": "https://mcp.ramp.com/mcp"
+    },
+    "mercury": {
+      "type": "http",
+      "url": "https://mcp.mercury.com/mcp"
+    },
+    "quickbooks": {
+      "type": "http",
+      "url": "https://qbo-mcp-production-5667.up.railway.app/mcp"
+    }
+  }
+}
