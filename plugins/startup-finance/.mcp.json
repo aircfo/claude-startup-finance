@@ -6,7 +6,7 @@
     },
     "ramp": {
       "type": "http",
-      "url": "https://mcp.ramp.com/mcp"
+      "url": "https://ramp-mcp-remote.ramp.com/mcp"
     },
     "mercury": {
       "type": "http",

@@ -10,7 +10,7 @@
       "name": "startup-finance",
       "source": "./plugins/startup-finance",
       "description": "Bundles Stripe, Ramp, Mercury, and QuickBooks connectors with an onboarding skill that maps them into one finance profile, plus cross-tool skills: runway & burn, revenue reconciliation, and a board-metrics pack.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "category": "finance",
       "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "quickbooks"]
     }
