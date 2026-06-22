@@ -10,6 +10,9 @@ Tie Stripe activity to the revenue recorded in QuickBooks and explain any differ
 ## When to use this
 Trigger when the user wants to compare Stripe to their books, tie out revenue, or chase down why the two don't match — typically during month-end close, board prep, or audit prep.
 
+## Step 0 — Load the finance profile
+Read `finance-profile.md` first (the company's semantic map). It gives you the prebuilt bridge structure: which Stripe revenue maps to which QBO revenue account, how processing fees and refunds book, the recognition method (cash vs. ratable), and how deferred revenue, annual prepays, and coupons are treated — so you reconcile against known mappings instead of rediscovering them each time. If it doesn't exist, run the `onboarding` skill first.
+
 ## Data to gather (for the same period — confirm the month or range with the user first)
 1. **Stripe**: gross volume, refunds, disputes, processing fees, and **net** payout volume for the period.
 2. **QuickBooks**: recognized revenue for the period (P&L revenue accounts), plus any deferred-revenue movement if the company recognizes ratably.

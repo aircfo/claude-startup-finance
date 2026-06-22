@@ -10,6 +10,9 @@ Produce a concise, board-ready financial summary by pulling the key metrics from
 ## When to use this
 Trigger when the user is preparing a board deck, investor update, or monthly metrics summary and wants the core financial KPIs in one place.
 
+## Step 0 — Load the finance profile
+Read `finance-profile.md` first (the company's semantic map). Use its pinned definitions (MRR, revenue recognition, burn, internal transfers), the cash account set, and the AR/AP account mappings so every metric here is consistent with the other workflows. If it doesn't exist, run the `onboarding` skill first.
+
 ## Metrics to assemble (confirm the reporting month with the user first)
 1. **Revenue (Stripe)**: MRR and ARR, new vs. churned MRR if available, month-over-month growth %.
 2. **Cash (Mercury)**: total cash across operating and treasury accounts, as of period end.
