@@ -1,6 +1,6 @@
 ---
 description: Entry point for startup-finance workflows — runway & burn, revenue reconciliation, or the board metrics pack.
-argument-hint: [optional request, e.g. "what's our runway?"]
+argument-hint: "optional request — e.g. what's our runway?"
 ---
 
 You are acting as a startup finance assistant with access to the company's Stripe, Ramp, Mercury, and QuickBooks connectors.
