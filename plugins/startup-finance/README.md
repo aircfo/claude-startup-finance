@@ -38,11 +38,9 @@ The shipped workflows are starting points — every finance team runs its own. T
 
 You only correct the judgment calls (departments, treasury-as-investing, and the like). The blank template and full column spec live in [`templates/`](./templates/).
 
-## Slash command
+## Using it
 
-- `/finance` — entry point that routes you to the workflow you want.
-
-Run **finance-context-builder** first — every other skill reads the profile it produces. Each skill triggers automatically from what you ask, and is invocable by name too (e.g. `/finance-context-builder`).
+Just ask in plain English — the right skill runs automatically (e.g. "what's our runway?" → `runway-and-burn`). Each skill is also invocable by name (e.g. `/finance-context-builder`). **Run finance-context-builder first** — every other skill reads the profile it produces.
 
 ## Disclaimer
 

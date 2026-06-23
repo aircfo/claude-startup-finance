@@ -30,10 +30,7 @@ On first use, Claude will walk you through logging into **your own** Stripe, Ram
 - **Board metrics** — ARR/MRR, cash, burn, runway, and AR/AP aging in one board-ready summary.
 - **Build your own** — two meta-skills, **finance-skill-builder** and **finance-skill-tuner**, help you turn *your* workflows into reusable skills (and fix them when they misbehave). They write skills into your own workspace, never the plugin, so they survive updates.
 
-**Slash command:**
-- `/finance` — pick a workflow, or pass a request directly (e.g. `/finance what's our runway?`).
-
-Run **finance-context-builder** first — the other workflows read the profile it produces. Skills trigger automatically from what you ask, and each is invocable by name too.
+**How to use:** just ask in plain English ("what's our runway?") and the right skill runs automatically; each skill is also invocable by name (e.g. `/runway-and-burn`). Run **finance-context-builder** first — the other workflows read the profile it produces.
 
 ## First run — build your finance context
 
@@ -71,7 +68,6 @@ claude-startup-finance/
         ├── .mcp.json                 # connector wiring
         ├── skills/                   # finance-context-builder + the finance workflows
         ├── templates/                # fillable mapping tables (your reporting framework)
-        ├── commands/                 # /finance entry point
         └── README.md
 ```
 
