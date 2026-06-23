@@ -1,8 +1,8 @@
 {
   "name": "startup-finance",
-  "displayName": "(Un)official Claude for Startup Finance",
-  "description": "Connectors for Stripe, Ramp, Mercury, and QuickBooks plus a finance-context builder skill that maps them into one finance profile, and cross-tool finance skills (runway & burn, revenue reconciliation, board metrics). Unofficial — not affiliated with or endorsed by those companies or Anthropic.",
-  "version": "0.3.0",
+  "displayName": "airCFO · Claude for Startup Finance",
+  "description": "Connectors for Stripe, Ramp, Mercury, and QuickBooks plus a finance-context builder skill that maps them into one finance profile, cross-tool finance skills (runway & burn, revenue reconciliation, board metrics), and meta-skills that help you author and refine your own workflow skills. Unofficial — not affiliated with or endorsed by those companies or Anthropic.",
+  "version": "0.4.0",
   "author": {
     "name": "airCFO",
     "email": "alex@aircfo.com"

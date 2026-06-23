@@ -15,25 +15,34 @@ You authenticate into **your own** accounts on first use. No API keys or secrets
 
 ## Skills
 
-- **finance-context-builder** — build the company's finance semantic map (`finance-profile.md`): draft the P&L and balance-sheet maps from your QuickBooks Account List (you review), then resolve how Mercury, Ramp, and Stripe accounts map onto the GL. **Run this first.**
+- **finance-context-builder** — build the company's finance semantic map (`finance-profile.md`): draft an account map (`account-map.csv`) from your QuickBooks Account List (you review), then resolve how Mercury, Ramp, and Stripe accounts map onto the GL. **Run this first.**
 - **runway-and-burn** — net monthly burn and months of cash (Mercury + Ramp, offset by revenue).
 - **revenue-reconciliation** — tie Stripe revenue to QuickBooks recognized revenue and explain the gap.
 - **board-metrics** — a board-ready KPI pack (ARR/MRR, cash, burn, runway, AR/AP aging).
 
 Every workflow reads `finance-profile.md` first, so they all share one consistent model of the company.
 
-## Reporting framework (the P&L and balance-sheet maps)
+### Build your own
 
-`finance-context-builder` drafts two maps straight from your QuickBooks Account List, then has you review them:
+The shipped workflows are starting points — every finance team runs its own. Two **meta-skills** let you turn *your* workflow into a reusable skill that follows the same house conventions (loads the finance profile first, read-only, computation-checked math, confirms the period, paste-ready output):
 
-- **P&L map** — each income-statement account → its `class` (Revenue / COGS / Expense / Other Income / Other Expense, from the QBO account type) and `department` (parsed from the account name).
-- **Balance-sheet map** — each balance-sheet account → its `bs_group` (current / non-current assets, current / non-current liabilities, equity — from the QBO account type) and its cash-flow `cf_section` and `cf_line`.
+- **finance-skill-builder** — author a new skill, either by capturing a workflow you just ran in the conversation ("save what we just did") or through a short interview ("build me a skill for our monthly flux review"). Writes it to your own workspace (`.claude/skills/` in the project, or `~/.claude/skills/` to use everywhere) — never into the installed plugin, so it survives updates.
+- **finance-skill-tuner** — fix a skill that isn't behaving: won't trigger, fires when it shouldn't, skips a confirmation, or returns the wrong format. It diagnoses the cause and explains the fix in plain language.
 
-You only correct the judgment calls (parsed departments, treasury-as-investing, and the like). Blank-header templates and the full column spec live in [`templates/`](./templates/).
+## Reporting framework (the account map)
+
+`finance-context-builder` drafts a single **account map** (`account-map.csv`) straight from your QuickBooks Account List — one row per account — then has you review it:
+
+- **Income-statement accounts** → a `class` (Revenue / COGS / Expense / Other Income / Other Expense, from the QBO account type) and a `department` (classified with judgment — from the name, the parent account, or what the account is for).
+- **Balance-sheet accounts** → a `bs_group` (current / non-current assets, current / non-current liabilities, equity) and a cash-flow `cf_section` and `cf_line`.
+
+You only correct the judgment calls (departments, treasury-as-investing, and the like). The blank template and full column spec live in [`templates/`](./templates/).
 
 ## Slash command
 
 - `/finance` — entry point that routes you to the workflow you want.
+
+Run **finance-context-builder** first — every other skill reads the profile it produces. Each skill triggers automatically from what you ask, and is invocable by name too (e.g. `/finance-context-builder`).
 
 ## Disclaimer
 

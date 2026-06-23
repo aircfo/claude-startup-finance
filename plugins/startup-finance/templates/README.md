@@ -1,48 +1,38 @@
-# Mapping tables — your reporting framework
+# Mapping table — your account map
 
-Two maps turn the raw QuickBooks general ledger into your management financials. The `finance-context-builder` skill **drafts both of them automatically from your QuickBooks Account List**, then walks you through the judgment calls — you don't fill them from scratch. The confirmed maps get baked into `finance-profile.md`, which every finance workflow reads.
+One table turns the raw QuickBooks general ledger into your management financials: `account-map.csv` classifies every GL account. The `finance-context-builder` skill **drafts it automatically from your QuickBooks Account List**, then walks you through the judgment calls — you don't fill it from scratch. The confirmed map lives in your airCFO Finance Context folder and every finance workflow reads it (via `finance-profile.md`).
 
-QuickBooks owns the account list and the dollar amounts; these maps decide how each account classifies and rolls up.
+QuickBooks owns the account list and the dollar amounts; this table decides how each account classifies and rolls up.
 
-## The two maps
+## `account-map.csv`
+`account_number, account_name, account_type, class, department, bs_group, cf_section, cf_line`
 
-Both live in `finance/mappings/` and are keyed on **`account_number` + `account_name`** (matched against QuickBooks exactly).
+One row per GL account, keyed on **`account_number` + `account_name`** (matched against QuickBooks exactly). Each account fills only the columns that apply to it — income-statement accounts fill `class` + `department`; balance-sheet accounts fill `bs_group` + `cf_section` + `cf_line`; the rest stay blank.
 
-### `pnl-mapping.csv` — income statement
-`account_number, account_name, class, department`
+**Income-statement accounts**
+- **`class`** — `Revenue`, `COGS`, `Expense`, `Other Income`, or `Other Expense`. Filled *deterministically* from the QuickBooks account type, so it rarely needs correction.
+- **`department`** — the cost-center, classified with judgment (account name → parent account → what the account is for; e.g. "Advertising & Paid Media" → `Marketing`, "Legal Fees" → `G&A`). Genuine G&A is booked to G&A; only irregular or unclear accounts are left blank and flagged. The column most worth a review.
 
-- **`class`** — one of `Revenue`, `COGS`, `Expense`, `Other Income`, `Other Expense`. The skill fills this *deterministically* from the QuickBooks account type (Income → Revenue, Cost of Goods Sold → COGS, and so on), so it rarely needs correction.
-- **`department`** — the cost-center. The skill *classifies* this with judgment — from the account name, its parent account, or what the account is for (e.g. "Advertising & Paid Media" → `Marketing`, "Legal Fees" → `G&A`). Genuine G&A is booked to G&A; only accounts that look irregular or whose purpose is unclear are left blank and flagged. It's the column most worth a review.
+**Balance-sheet accounts**
+- **`bs_group`** — `Current Assets`, `Non-current Assets`, `Current Liabilities`, `Non-current Liabilities`, or `Equity`. Filled *deterministically* from the account type.
+- **`cf_section`** — `Operating`, `Investing`, or `Financing`.
+- **`cf_line`** — the cash-flow line the account's period-over-period movement feeds.
 
-| account_number | account_name | class | department |
-| --- | --- | --- | --- |
-| 4000 | Subscription Revenue | Revenue | |
-| 5000 | Stripe Processing Fees | COGS | |
-| 6010 | Salaries & Wages — Engineering | Expense | Engineering |
-| 6400 | Advertising & Paid Media | Expense | Marketing |
-| 7100 | Legal Fees | Expense | G&A |
+Filled from standard indirect-method rules; review the judgment calls — most often a **treasury / investment** account QuickBooks lists as a current asset but that you may want under **Non-current Assets** and **Investing**. Cash/bank and retained-earnings get a `bs_group` but blank `cf_section`/`cf_line`.
 
-### `balance-sheet-mapping.csv` — balance-sheet grouping + cash-flow classification
-`account_number, account_name, bs_group, cf_section, cf_line`
+Example (abridged):
 
-- **`bs_group`** — one of `Current Assets`, `Non-current Assets`, `Current Liabilities`, `Non-current Liabilities`, `Equity`. The skill fills this *deterministically* from the QuickBooks account type.
-- **`cf_section`** — one of `Operating`, `Investing`, `Financing`.
-- **`cf_line`** — the cash-flow line that the account's period-over-period movement feeds.
-
-The skill fills all three from standard rules by account type; review the judgment calls — most often a **treasury / investment** account that QuickBooks lists as a current asset but that you may want under **Non-current Assets** and **Investing**.
-
-| account_number | account_name | bs_group | cf_section | cf_line |
-| --- | --- | --- | --- | --- |
-| 1010 | Operating Checking | Current Assets | | |
-| 1200 | Accounts Receivable | Current Assets | Operating | Change in accounts receivable |
-| 2300 | Deferred Revenue | Current Liabilities | Operating | Change in deferred revenue |
-| 2000 | Accounts Payable | Current Liabilities | Operating | Change in accounts payable |
-| 1020 | Treasury | Non-current Assets | Investing | Treasury / investments |
-| 3000 | Preferred Stock — Series A | Equity | Financing | Equity issuance |
-
-> Every balance-sheet account gets a `bs_group`. Cash / bank accounts and retained-earnings / accumulated-deficit are left with **blank `cf_section` / `cf_line`** — the first *is* the ending cash the statement explains, the second rolls from net income.
+| account_number | account_name | account_type | class | department | bs_group | cf_section | cf_line |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 4000 | Subscription Revenue | Income | Revenue | | | | |
+| 6010 | Salaries & Wages — Engineering | Expense | Expense | Engineering | | | |
+| 6400 | Advertising & Paid Media | Expense | Expense | Marketing | | | |
+| 1010 | Operating Checking | Bank | | | Current Assets | | |
+| 1200 | Accounts Receivable | Accounts Receivable | | | Current Assets | Operating | Change in accounts receivable |
+| 2300 | Deferred Revenue | Other Current Liability | | | Current Liabilities | Operating | Change in deferred revenue |
+| 1020 | Treasury | Other Current Asset | | | Non-current Assets | Investing | Treasury / investments |
 
 ## Notes
-- `class` here means the **P&L statement section** — it is *not* QuickBooks "class tracking."
+- `class` means the **P&L statement section** — it is *not* QuickBooks "class tracking."
 - The column names above are the contract the `finance-context-builder` skill reads. Rename a column and you must tell Claude to update the skill.
-- These are blank templates that ship with the plugin. Your filled-in copies belong in your working directory's `finance/mappings/`, not here.
+- This is a blank-header template that ships with the plugin. Your actual map lives in your airCFO Finance Context folder (default `~/Desktop/airCFO Finance Context/account-map.csv`), written by the skill — not here.

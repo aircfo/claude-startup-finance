@@ -1,37 +1,58 @@
 ---
 name: finance-context-builder
-description: Build the company's finance semantic map — a persistent profile that resolves how Stripe, Ramp, Mercury, and QuickBooks accounts relate. It drafts the P&L and balance-sheet maps automatically from the QuickBooks Account List, then has you review them. Use on first-time setup, or when someone says "set up the finance plugin," "onboard my company," "build my finance profile," "map my accounts across systems," "create the semantic layer," or when another finance workflow can't find finance-profile.md.
+description: Build the company's finance context — an airCFO Finance Context folder (default on the Desktop) holding a finance-profile.md semantic map that resolves how Stripe, Ramp, Mercury, and QuickBooks accounts relate. It first invites the finance pro to share any docs or notes about their business, then drafts an account map from the QuickBooks Account List for review. Use on first-time setup or to refresh, or when someone says "set up the finance plugin," "build my finance context," "build my finance profile," "map my accounts across systems," "add this to my finance context," or when another finance workflow can't find finance-profile.md.
 ---
 
-# Finance Context Builder — build the company semantic map
+# Finance Context Builder — build the company's finance context
 
-Produce `finance-profile.md`: the single map every other finance workflow reads first, so Claude reasons across Stripe, Ramp, Mercury, and QuickBooks with one shared model instead of re-deriving the topology every conversation.
+Produce the **airCFO Finance Context**: a folder the finance pro can open anytime (default `~/Desktop/airCFO Finance Context/`) holding `finance-profile.md` (the semantic map), `account-map.csv` (how every account classifies), the source docs they've shared, and a changelog. Every other finance workflow reads the profile first, so Claude reasons across Stripe, Ramp, Mercury, and QuickBooks with one shared model — grounded in how *this* company actually reports.
 
 ## What this produces
-`finance-profile.md` at the working-directory root, plus an `@finance-profile.md` reference in `CLAUDE.md` so it loads in every session. The profile binds two layers:
+An **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/`; confirm the location with the user on the first run):
 
-- **Reporting framework** — two maps that turn the raw general ledger into management financials:
-  - **P&L map** — every income-statement account → its `class` (Revenue / COGS / Expense / Other Income / Other Expense) and `department`.
-  - **Balance-sheet map** — every balance-sheet account → its `bs_group` (Current Assets / Non-current Assets / Current Liabilities / Non-current Liabilities / Equity), and its cash-flow `cf_section` (Operating / Investing / Financing) and `cf_line`.
+```
+~/Desktop/airCFO Finance Context/
+├── finance-profile.md     # the semantic map (narrative + summary) — the main read
+├── account-map.csv        # every GL account × its classification — the editable source of truth
+├── context/               # source docs the pro shares (written here after they're ingested)
+└── CHANGELOG.md           # dated log of what changed each run
+```
+
+Also add an `@import` to the profile in `CLAUDE.md` (absolute path) so it loads in every session. The profile binds three layers:
+- **Business context (from the pro)** — what's true and unique about this company, captured from whatever docs and notes they share.
+- **Reporting framework** — the account map (below).
 - **Money-flow graph (discovered)** — how each Mercury account, Ramp clearing account, and Stripe payout/revenue stream maps onto a QuickBooks GL account.
 
-Together: any transaction → GL account → its statement classification and dimensions.
+`account-map.csv` is the canonical, spreadsheet-editable classification; `finance-profile.md` is the human-readable layer that **references** it — never duplicate the full per-account table in the profile.
 
 ## Principles
-- **Draft, then confirm.** This skill builds a *first draft* of both maps from the QuickBooks Account List, then has the human review it — it never finalizes a mapping without confirmation.
-- **QuickBooks is the source of truth for the account list and the amounts.** The maps decide how those accounts classify and roll up.
+- **Draft, then confirm.** Build a *first draft* of the account map from the QuickBooks Account List, then have the human review it — never finalize a mapping without confirmation.
+- **QuickBooks is the source of truth for the account list and the amounts.** The map decides how those accounts classify and roll up.
 - **Read-only** against every connector.
+- **The folder is the finance pro's.** Keep it human-readable and easy to open; never move or delete files in `context/` without asking.
 
 ## Build sequence
 
-### 1 · Detect connected systems
-Check which of QuickBooks, Mercury, Ramp, and Stripe are authenticated. QuickBooks is required to draft the maps — if it isn't connected, stop and ask the user to connect it (it's the canonical chart of accounts).
+### 1 · Locate or create the airCFO Finance Context folder
+On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (let the user pick another spot); create it with the structure above. On later runs, use the existing folder.
 
-### 2 · Pull the QuickBooks Account List
+### 2 · Gather the finance pro's context (in the session)
+Before touching the numbers, invite the pro to tell you — **right here in the conversation** — what's important or unique about their business. They can paste it, attach a file, or just talk it through; *they* decide what matters. Offer a few examples to prompt them, but don't run a questionnaire:
+
+> "Tell me what would help me understand your business — paste it here, attach a file, or just talk it through. A few ideas (include whatever *you* think matters):
+> - your monthly reporting package, board deck, or KPI dashboard (the most useful single thing);
+> - an SOP or two — your month-end close checklist, your revenue-recognition policy;
+> - or a few sentences (a ramble is fine) on your revenue model, the metrics you live by, how you think about departments, or anything unusual about your books."
+
+Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the profile's **Business context** section, citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they share nothing, proceed; they can add context later just by telling you.
+
+### 3 · Pull the QuickBooks Account List
 Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **AccountType**, **DetailType (subtype)**, the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
 
-### 3 · Draft the P&L map
-For every account whose type is an income-statement type, write a row to `finance/mappings/pnl-mapping.csv`:
+### 4 · Draft the account map
+Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. Columns: `account_number, account_name, account_type, class, department, bs_group, cf_section, cf_line`. Each account fills only the columns that apply to it; the rest stay blank.
+
+**Income-statement accounts** (Income / COGS / Expense / Other Income / Other Expense) get `class` + `department`:
 
 - **`class`** — deterministic, from the QuickBooks AccountType:
 
@@ -43,15 +64,14 @@ For every account whose type is an income-statement type, write a row to `financ
   | Other Income | Other Income |
   | Other Expense | Other Expense |
 
-- **`department`** — make a judgment call and classify every account you reasonably can, working down this list and stopping at the first that fits:
+- **`department`** — make a judgment call and classify every account you reasonably can, working down this list and stopping at the first that fits. Lean on the pro's context docs (their reporting package often names the canonical departments):
   1. **In the account name** — a department after a dash / em-dash or an embedded keyword (e.g. "Salaries & Wages — Engineering" → `Engineering`).
   2. **Parent account** — if the account is a QBO sub-account, use its parent (header) account's name when that reads like a department or function (e.g. children of a "Marketing" parent → `Marketing`).
   3. **Judgment from what the account is for** — assign the owning team from the account's purpose. For example: advertising, paid media, events, conferences, marketing agency, content, brand, website, demand gen → **Marketing**; sales commissions, CRM, sales tooling → **Sales**; hosting, cloud / infrastructure, engineering tools, R&D → **Engineering**; support / success tooling → **Customer Success**; rent, insurance, legal, audit, accounting, bank & merchant fees, office supplies, company-wide software → **G&A**.
 
   **G&A is a legitimate home** for genuinely general-and-administrative accounts — book those there. The only accounts to leave blank (and flag for review) are ones that look **irregular** or whose purpose you genuinely can't determine — don't force a guess there, and don't use G&A as a catch-all for accounts you simply couldn't place.
 
-### 4 · Draft the balance-sheet map
-For every balance-sheet account, write a row to `finance/mappings/balance-sheet-mapping.csv`:
+**Balance-sheet accounts** get `bs_group` + `cf_section` + `cf_line`:
 
 - **`bs_group`** — deterministic, from the QuickBooks AccountType:
 
@@ -84,12 +104,12 @@ For every balance-sheet account, write a row to `finance/mappings/balance-sheet-
   | Equity — common / preferred / APIC | Financing | Equity issuance |
   | Equity — retained earnings / accumulated deficit | — *(blank: rolls from net income)* | — |
 
-### 5 · Review the drafts with the human (the gate)
-Present both drafts, separated by confidence:
+### 5 · Review the draft with the human (the gate)
+Present the account map, separated by confidence:
 - **Deterministic** (class and `bs_group` from AccountType; AR / AP / deferred-revenue → Operating) — show for a quick confirm.
 - **Heuristic — needs review**: the `department` calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place), plus the judgment calls — a treasury / investment account that QuickBooks lists as a current asset but that you may want under **Non-current Assets** and **Investing**, contra accounts, and anything whose name fights its type.
 
-Don't finalize until the human signs off. Save their corrections back to the two CSVs.
+Don't finalize until the human signs off. Save their corrections back to `account-map.csv`.
 
 ### 6 · Map the other systems onto the GL (money-flow graph)
 For each connected system, bind its money containers to GL accounts (match on names, last-4, amounts; confirm anything low-confidence):
@@ -98,32 +118,42 @@ For each connected system, bind its money containers to GL accounts (match on na
 - **Stripe** — the payout destination → which Mercury account → which GL account; how gross revenue, processing fees, and refunds book; the recognition method and treatment of annual prepays, coupons, and trials.
 
 ### 7 · Capture conventions
-Pin: fiscal year, accounting basis (cash/accrual), reporting currency, the internal-transfer rule (excluded from burn), the treasury-vs-operating split, the materiality threshold, the MRR and revenue-recognition definitions, and the close cadence.
+Pin: fiscal year, accounting basis (cash/accrual), reporting currency, the internal-transfer rule (excluded from burn), the treasury-vs-operating split, the materiality threshold, the MRR and revenue-recognition definitions, and the close cadence. Some of these may already be answered by the context docs from step 2 — don't re-ask what they already told you.
 
-### 8 · Write
-On confirmation, write `finance-profile.md` (schema below) and add `@finance-profile.md` to `CLAUDE.md` (create it if absent; never duplicate the line). Record provenance: as-of date, connectors read, and a changelog entry.
+### 8 · Write the airCFO Finance Context
+- Write `finance-profile.md` (schema below) and `account-map.csv` into the folder; make sure the docs the pro shared are saved in `context/`.
+- Append a dated entry to `CHANGELOG.md` describing what changed.
+- Add or update the `@import` to the profile in `CLAUDE.md` (absolute path; create `CLAUDE.md` if absent, never duplicate the line).
+- Record provenance: as-of date, connectors read, and the docs ingested.
 
-## Re-running (refresh)
-A re-run re-pulls the Account List and diffs against the saved maps: it **keeps human-confirmed rows**, drafts only genuinely new accounts, and flags accounts that disappeared or changed type. New accounts are marked "needs review."
+## Updating & adding context over time
+This skill is **build-or-refresh** — run it again anytime to refresh:
+- **New context anytime** — the pro shares more in the session (or says *"add this to my finance context"*); ingest it, persist it to `context/`, fold it into the **Business context** section, and note it in the changelog.
+- **Refresh the map** — re-pull the Account List and diff against `account-map.csv`: keep human-confirmed rows, draft only genuinely new accounts, and flag accounts that disappeared or changed type.
+- **Always** append a dated `CHANGELOG.md` entry describing what changed, and update the profile's as-of date.
 
-## The maps (schema)
-Both live in `finance/mappings/`, keyed on `account_number` + `account_name` (must match QuickBooks exactly). Blank-header templates ship in the plugin's `templates/`.
-- `pnl-mapping.csv` — `account_number, account_name, class, department`
-- `balance-sheet-mapping.csv` — `account_number, account_name, bs_group, cf_section, cf_line`
+## The account map (schema)
+`account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on `account_number` + `account_name` (must match QuickBooks exactly). A blank-header template ships in the plugin's `templates/`.
 
-`class` ∈ {Revenue, COGS, Expense, Other Income, Other Expense}. `bs_group` ∈ {Current Assets, Non-current Assets, Current Liabilities, Non-current Liabilities, Equity}. `cf_section` ∈ {Operating, Investing, Financing}.
+`account_number, account_name, account_type, class, department, bs_group, cf_section, cf_line`
+
+- `class` ∈ {Revenue, COGS, Expense, Other Income, Other Expense} — income-statement accounts only.
+- `department` — income-statement accounts (cost-center).
+- `bs_group` ∈ {Current Assets, Non-current Assets, Current Liabilities, Non-current Liabilities, Equity} — balance-sheet accounts only.
+- `cf_section` ∈ {Operating, Investing, Financing} and `cf_line` — balance-sheet accounts (blank for cash and retained earnings).
 
 ## `finance-profile.md` schema
-1. **Header** — company, as-of date, connectors read, accounting basis, fiscal year, currency.
-2. **Reporting framework** — where the two maps live + a coverage summary (X of Y accounts classified; how many departments still blank).
-3. **Account map** — master table: GL account | type | class | department | bs_group | cf_section | cf_line | also-appears-as (Mercury / Ramp / Stripe).
+1. **Header** — company, as-of date, connectors read, docs ingested, accounting basis, fiscal year, currency.
+2. **Business context** — what's true and unique about the company, distilled from the docs and notes the pro shared (reporting structure, KPI definitions, revenue model, departments, quirks). Cite the source file in `context/` for each point.
+3. **Reporting framework** — points to `account-map.csv` and gives a coverage summary (X of Y accounts classified, the department breakdown, anything left blank/flagged). Do **not** duplicate the full per-account table here.
 4. **Money-flow** — short narrative + table: Stripe → bank → GL, Ramp → clearing → GL, Mercury accounts → GL.
 5. **Conventions** — the pinned definitions.
 6. **Entity aliases** — customer (Stripe ↔ QBO) and vendor (Ramp ↔ QBO) matches, each with a confidence flag. Grows over time.
 7. **Open questions** — unresolved or low-confidence items, each with a suggested next step.
-8. **Provenance & changelog**.
+8. **Provenance & changelog** — mirrors `CHANGELOG.md`.
 
 ## Never
 - Never store secrets, tokens, or full account numbers — names, last-4, and internal IDs only.
 - Never write to a connected system.
-- Never finalize the draft maps or overwrite human-confirmed rows without confirmation.
+- Never finalize the account map or overwrite human-confirmed rows without confirmation.
+- Never move or delete files the pro placed in `context/` without asking.
