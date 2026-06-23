@@ -18,7 +18,7 @@ An **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/
 └── CHANGELOG.md           # dated log of what changed each run
 ```
 
-Each finance workflow reads this profile at its own Step 0 — so it loads when finance work actually runs, not globally on every session. The profile binds three layers:
+Each finance workflow reads this profile at its own Step 0 — so it loads when finance work actually runs, not globally on every session. The profile follows the **14-section template** (schema below; a fill-in skeleton ships in `templates/finance-profile-template.md`) and is populated from three input layers:
 - **Business context (from the pro)** — what's true and unique about this company, captured from whatever docs and notes they share.
 - **Reporting framework** — the account map (below).
 - **Money-flow graph (discovered)** — how each Mercury account, Ramp clearing account, and Stripe payout/revenue stream maps onto a QuickBooks GL account.
@@ -27,6 +27,7 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 
 ## Principles
 - **Draft, then confirm.** Build a *first draft* of the account map from the QuickBooks Account List, then have the human review it — never finalize a mapping without confirmation.
+- **Fill or placeholder — never guess.** Draft the profile from what you actually know (the context docs + the system analysis); mark every gap with an explicit `[PLACEHOLDER: …]` and surface it for the human — never invent a value to fill a section.
 - **QuickBooks is the source of truth for the account list and the amounts.** The map decides how those accounts classify and roll up.
 - **Read-only** against every connector.
 - **The folder is the finance pro's.** Keep it human-readable and easy to open; never move or delete files in `context/` without asking.
@@ -44,7 +45,7 @@ Before touching the numbers, invite the pro to tell you — **right here in the 
 > - an SOP or two — your month-end close checklist, your revenue-recognition policy;
 > - or a few sentences (a ramble is fine) on your revenue model, the metrics you live by, how you think about departments, or anything unusual about your books."
 
-Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the profile's **Business context** section, citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they share nothing, proceed; they can add context later just by telling you.
+Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the relevant profile sections (Business Model, KPI Definitions, the cash / revenue / spend / people rules, Known Exceptions), citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they share nothing, proceed; they can add context later just by telling you.
 
 ### 3 · Pull the QuickBooks Account List
 Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **Type**, **Detail Type**, the account **description** (if any), the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
@@ -107,14 +108,30 @@ For each connected system, bind its money containers to GL accounts (match on na
 ### 7 · Capture conventions
 Pin: fiscal year, accounting basis (cash/accrual), reporting currency, the internal-transfer rule (excluded from burn), the treasury-vs-operating split, the materiality threshold, the MRR and revenue-recognition definitions, and the close cadence. Some of these may already be answered by the context docs from step 2 — don't re-ask what they already told you.
 
-### 8 · Write the airCFO Finance Context
-- Write `finance-profile.md` (schema below) and `account-map.csv` into the folder; make sure the docs the pro shared are saved in `context/`.
-- Append a dated entry to `CHANGELOG.md` describing what changed.
-- Record provenance: as-of date, connectors read, and the docs ingested.
+### 8 · Draft the profile from the template (fill what you know, placeholder the rest)
+Start from the **finance-profile template** (`templates/finance-profile-template.md`; the 14 sections are detailed under the schema below) and write a *first draft* of `finance-profile.md`. Fill every section you can from two sources: the **context docs** the pro shared (step 2) and the **system analysis** (steps 3–7 — the account map, the money-flow graph, and the pinned conventions).
+
+Wherever you don't yet know something, **don't guess and don't silently drop the line** — leave an explicit placeholder so the gap is visible:
+
+> `[PLACEHOLDER: <what's needed, and why it matters>]`
+
+A section may come out fully filled, partly filled, or all placeholder — that's expected on a first run; the profile fills in over time.
+
+### 9 · Surface the gaps and invite input (the gate before finalizing)
+Show the pro **which sections still contain placeholders**, as a short checklist (section → what's missing). Then offer the choice — don't force it:
+
+> "Here's your draft profile. These sections are still incomplete: [list]. Want to fill any in now? Paste it, point me at a doc, or just tell me — or we can finalize as-is and complete them later. Placeholders stay in the file, so nothing gets silently assumed."
+
+Fold in whatever they give you, re-surface anything still open, and repeat until they're ready. Anything left unfilled is mirrored into **Open Questions** (§13) with a suggested next step, so the uncertainty stays visible.
+
+### 10 · Finalize & write the airCFO Finance Context
+- Write `finance-profile.md` and `account-map.csv` into the folder; make sure the docs the pro shared are saved in `context/`. Remaining placeholders stay in the file and are listed in Open Questions.
+- Append a dated entry to `CHANGELOG.md` describing what changed and what's still open.
+- Record provenance (§14): as-of date, connectors read, docs ingested, and which sections remain placeholder.
 
 ## Updating & adding context over time
 This skill is **build-or-refresh** — run it again anytime to refresh:
-- **New context anytime** — the pro shares more in the session (or says *"add this to my finance context"*); ingest it, persist it to `context/`, fold it into the **Business context** section, and note it in the changelog.
+- **New context anytime** — the pro shares more in the session (or says *"add this to my finance context"*); ingest it, persist it to `context/`, fold it into the relevant profile sections (**replacing any matching placeholders**), and note it in the changelog.
 - **Refresh the map** — re-pull the Account List and diff against `account-map.csv`: keep human-confirmed rows, draft only genuinely new accounts, and flag accounts that disappeared or changed type.
 - **Always** append a dated `CHANGELOG.md` entry describing what changed, and update the profile's as-of date.
 
@@ -130,14 +147,22 @@ This skill is **build-or-refresh** — run it again anytime to refresh:
 - `description` — a short, plain-language note on what the account is for.
 
 ## `finance-profile.md` schema
-1. **Header** — company, as-of date, connectors read, docs ingested, accounting basis, fiscal year, currency.
-2. **Business context** — what's true and unique about the company, distilled from the docs and notes the pro shared (reporting structure, KPI definitions, revenue model, departments, quirks). Cite the source file in `context/` for each point.
-3. **Reporting framework** — points to `account-map.csv` and gives a coverage summary (X of Y accounts classified, the department breakdown, anything left blank/flagged). Do **not** duplicate the full per-account table here.
-4. **Money-flow** — short narrative + table: Stripe → bank → GL, Ramp → clearing → GL, Mercury accounts → GL.
-5. **Conventions** — the pinned definitions.
-6. **Entity aliases** — customer (Stripe ↔ QBO) and vendor (Ramp ↔ QBO) matches, each with a confidence flag. Grows over time.
-7. **Open questions** — unresolved or low-confidence items, each with a suggested next step.
-8. **Provenance & changelog** — mirrors `CHANGELOG.md`.
+`finance-profile.md` is a **semantic control file, not a data dump** — it holds definitions, mappings, conventions, and judgment calls so every workflow reasons with the same financial brain. It *references* `account-map.csv` (never duplicates it). A fill-in skeleton ships in `templates/finance-profile-template.md`; draft from it, filling what you know and placeholdering the rest (steps 8–10). The 14 sections:
+
+1. **Company Snapshot** — legal name, fiscal year, accounting basis (cash/accrual), reporting currency, current stage, primary business model, as-of date, connected systems read.
+2. **Business Model** — plain-English how the company makes money (subscription / services / usage / marketplace / hardware / transaction fees / hybrid) and the main operating drivers (customers, units, headcount, usage, gross margin, sales cycle, seasonality).
+3. **KPI Definitions** — the company's canonical definition for every metric it lives by ("when we say X, here's exactly how we calculate it"): e.g. revenue, bookings, billings, gross / contribution margin, gross / net burn, runway, CAC, LTV, active customers, retention, utilization, pipeline, ARR / MRR — whichever apply.
+4. **Source-of-Truth Map** — which system owns which number (e.g. cash → Mercury, recognized revenue → QBO, subscription detail → Stripe, card/vendor spend → Ramp, payroll/headcount → Rippling, forecast → planning tool), and which sources are authoritative vs. directional.
+5. **Chart of Accounts / Reporting Framework** — points to `account-map.csv` (no full table): P&L categories, departments / cost centers, balance-sheet groups, cash-flow classifications, accounts needing review, and accounts intentionally excluded from certain metrics.
+6. **Cash, Burn, and Runway Rules** — which bank accounts count as cash; whether treasury/investment counts as runway cash; gross-burn and net-burn definitions; internal-transfer exclusions; treatment of financing inflows; default lookback window; trailing-average vs. current run-rate.
+7. **Revenue and Collections Rules** — how revenue is recognized; how collections differ from revenue; refund / credit treatment; deferred revenue; non-core revenue; AR / collections conventions; customer aliases across systems.
+8. **Spend, AP, and Vendor Rules** — vendor aliases across Ramp / QBO; recurring-vendor list; one-time vs. recurring; card vs. bills vs. payroll; capitalization rules (if any); excluded / non-operating spend.
+9. **People and Payroll Model** — headcount source of truth; departments; loaded-payroll assumptions; contractor treatment; commissions / bonuses; hiring-plan source.
+10. **Planning and Forecast Assumptions** — current budget / forecast source; approved hiring plan; revenue-forecast logic; major planned investments; fundraising assumptions; board-approved plan vs. latest estimate.
+11. **Reporting Cadence and Materiality** — monthly close cadence; board / investor cadence; materiality threshold; variance-explanation threshold; preferred output style.
+12. **Known Exceptions and Judgment Calls** — the "don't rediscover this every time" list (e.g. "this savings account counts as runway cash"; "this vendor maps to COGS, not G&A"; "Stripe dashboard MRR ≠ board MRR because of trials/prepaids"; "this legal bill is one-time, exclude from run-rate burn").
+13. **Open Questions** — anything unresolved, each with a suggested next step (this is where unfilled placeholders land, so uncertainty stays visible).
+14. **Provenance and Changelog** — last updated, systems read, docs ingested, what changed, what still needs confirmation.
 
 ## Never
 - Never store secrets, tokens, or full account numbers — names, last-4, and internal IDs only.

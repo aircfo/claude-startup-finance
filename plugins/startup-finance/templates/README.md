@@ -33,3 +33,6 @@ Example (abridged):
 - `cf_section` / `cf_line` are **balance-sheet only** — they map each account's *change* to the indirect-method cash-flow statement. P&L accounts leave them blank.
 - The column names above are the contract the `finance-context-builder` skill reads. Rename a column and you must tell Claude to update the skill.
 - This is a blank-header template that ships with the plugin. Your actual map lives in your airCFO Finance Context folder (default `~/Desktop/airCFO Finance Context/account-map.csv`), written by the skill — not here.
+
+## `finance-profile-template.md`
+The folder's other template is the **finance-profile skeleton** — the 14-section structure the `finance-context-builder` skill drafts your `finance-profile.md` from (Company Snapshot, Business Model, KPI Definitions, Source-of-Truth Map, Reporting Framework, the cash / revenue / spend / people rules, Planning, Cadence & Materiality, Known Exceptions, Open Questions, Provenance). The skill fills what it can from your context docs and a read-only pass over your systems, and leaves a `[PLACEHOLDER: …]` wherever it doesn't yet know — so you can see and fill the gaps before finalizing. It's a starting skeleton; your real profile lives in the airCFO Finance Context folder.
