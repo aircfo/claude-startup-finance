@@ -10,7 +10,7 @@ In Claude Code:
 
 ```
 /plugin marketplace add aircfo/claude-startup-finance
-/plugin install startup-finance@aircfo-startup-finance
+/plugin install startup-finance@claude-startup-finance
 ```
 
 On first use, Claude will walk you through logging into **your own** Stripe, Ramp, Mercury, and QuickBooks accounts in your browser. Authentication is per-user and handled by each provider's OAuth — no API keys live in this repo, and nothing is shared with airCFO.
@@ -54,7 +54,7 @@ It's read-only against your systems, confirms anything uncertain before saving, 
 This plugin uses explicit versioning. To get the latest version:
 
 ```
-/plugin marketplace update aircfo-startup-finance
+/plugin marketplace update claude-startup-finance
 ```
 
 ## Repository layout
