@@ -10,20 +10,31 @@ Write a new finance workflow skill into the user's own workspace, so a finance p
 The hard part of authoring a skill isn't the markdown — it's pinning down the tacit steps a finance person runs on autopilot. This skill does that extraction for them, then bakes in the non-negotiables so they never have to know those rules exist.
 
 ## What this produces
-A new skill at `.claude/skills/<name>/SKILL.md` in the current working directory — committable to the company's finance repo, and it loads automatically in that project. Offer `~/.claude/skills/<name>/` instead if the user wants it available in every project, not just this one.
+A complete, house-style `SKILL.md`, **presented in the chat** for the finance pro to take — they can download it or drop it into their own skills folder. Don't write it to their disk for them; hand over the finished file and tell them exactly where it goes:
+- **`~/.claude/skills/<name>/SKILL.md`** — available in every project (the usual home for a personal workflow).
+- **`.claude/skills/<name>/SKILL.md`** in a project — scoped to that repo and committable to the company's finance repo.
 
-Whichever location, the new skill inherits the house rubric below whether or not the user mentions any of it.
+Either way, the skill inherits the house rubric below whether or not the user mentions any of it.
 
 ## The house rubric (always injected)
 Every finance skill this builder writes must:
 1. **Load `finance-profile.md` as Step 0** — read the company's semantic map before pulling data, so the skill never re-derives the account topology, the operating-vs-treasury split, or the pinned definitions. If the profile is missing, the skill tells the user to run `finance-context-builder` first.
 2. **Be read-only** against every connector — never write to QuickBooks, Stripe, Ramp, or Mercury.
 3. **Use a computation step for aggregates** — never eyeball totals across many transactions.
-4. **Confirm the reporting period** before pulling data, and **state the as-of date** in the output.
-5. **Show its work** — the inputs and sub-totals behind any headline number.
-6. **Never store secrets** — names, last-4, and internal IDs only.
+4. **Cite the source of every figure** — name the connector, report, and pull date behind each number, so it traces back to the system of record.
+5. **Tie out to a control total** — where a control exists, reconcile to it (detail sums to the summary; a cross-system tie like Stripe ↔ QBO) and report the match or the variance. Never present a number that doesn't foot.
+6. **Flag gaps, never fabricate** — if a figure can't be sourced or reconciled, flag it as an open item with a suggested next step; never fill the hole with a plausible-looking guess.
+7. **Show its work** — the inputs and sub-totals behind any headline number.
+8. **Confirm the reporting period** before pulling data, and **state the as-of date** in the output.
+9. **Never store secrets** — names, last-4, and internal IDs only.
 
 The user supplies *their* logic; the builder wraps it in these guardrails.
+
+## The build sequence
+Always run in this order — **scope → dry-run → deliver**:
+1. **Scope** the workflow (via an on-ramp below): pin the trigger, inputs, logic, gates, and output shape.
+2. **Dry-run** the drafted logic against the live connectors for a real recent period — *before* writing anything — and confirm with the user that the output is correct and ties out.
+3. **Deliver** the finished `SKILL.md` in chat for the user to save — don't write it to disk for them.
 
 ## Two on-ramps
 
@@ -46,7 +57,17 @@ Use when there's no prior run to capture. Ask in small clusters — not all at o
 5. **Output** — "What does the finished thing look like? Paste an example if you have one." → output template.
 6. **Guardrails** — "Anything it should never do?" → Never rules, on top of the defaults.
 
-## Skill template (what gets written)
+## Dry-run before you write it (don't skip this)
+A finance pro won't trust a skill whose math they've never seen work — so once the workflow is scoped, **run it**, don't just describe it:
+- Execute the drafted logic against the **live connectors** for a concrete recent period (read-only).
+- Show the user the actual output and **how each figure ties out** to its source.
+- Refine the logic with them until the result is right. *This* validated run is what the `SKILL.md` will encode.
+
+On-ramp A (capture): the analysis already ran, so re-run the **generalized** version (period and figures parameterized) to confirm it reproduces what you just did. On-ramp B (interview): this is the skill's first real execution — treat a wrong or unverifiable result as a sign the logic isn't pinned down yet.
+
+Only once the dry-run is correct and the user has confirmed it do you write up the file.
+
+## Skill template (what you'll hand over)
 Mirror the built-in skills exactly:
 
 ```markdown
@@ -75,6 +96,9 @@ Read `finance-profile.md` first (the company's semantic map). <Name the specific
 <What to confirm with the human before finalizing.>
 
 ## Always
+- Cite the source of every figure (connector, report, pull date).
+- Tie out to a control total where one exists; report the match or the variance.
+- Flag anything you can't source or reconcile as an open item — never fabricate.
 - Use a computation step for aggregates.
 - State the reporting period and as-of date.
 - Show your work.
@@ -87,18 +111,21 @@ Read `finance-profile.md` first (the company's semantic map). <Name the specific
 - Never store secrets, tokens, or full account numbers.
 ```
 
-## Before writing — the quality bar
+## Before you hand it over — the quality bar
 - **Name**: kebab-case, distinct from existing skills. Check `.claude/skills/`, `~/.claude/skills/`, and the plugin's own skills so the new one doesn't collide with or shadow another.
 - **The description is the make-or-break field** — it's the only thing Claude sees when deciding whether to trigger this skill. Spend real effort here: lead with what it does, then several concrete trigger phrases in the user's own words. A vague description is the #1 reason a skill never fires.
 - **Steps must be deterministic** — a stranger could follow them and reach the same answer. If a step is fuzzy, ask; don't paper over it.
-- Show the full draft and get an explicit yes before writing the file.
+- **The dry-run passed** and the user confirmed the numbers tie out — never hand over logic you haven't watched work.
+- Show the full draft and get an explicit yes before you hand over the file.
 
-## After writing
-- Confirm the path, and tell the user it loads automatically next session (project skill) or in every project (personal skill).
-- Offer to **test it now** against the connectors for a recent period, so they watch it work before relying on it.
+## Deliver the skill (in chat)
+Present the finished `SKILL.md` **in the chat** — as a copy-ready block or a downloadable file — so the finance pro can take it. Don't write it to their disk for them.
+- Tell them where to save it: `~/.claude/skills/<name>/SKILL.md` (every project) or `.claude/skills/<name>/SKILL.md` (this project, committable to the finance repo), and that it loads automatically once saved.
+- Remind them the dry-run they just watched is the behavior the skill will repeat.
 - If it misbehaves later, point them to `finance-skill-tuner`.
 
 ## Never
-- Never write the new skill into the installed plugin directory — it belongs in the user's workspace, where it survives plugin updates.
+- Never write the skill to disk on the user's behalf — present it in chat so they choose where it lives; in particular never write into the installed plugin directory (it would be lost on update).
+- Never ship a skill you haven't dry-run — logic that was never executed is a guess, not a workflow.
 - Never invent the user's logic — if a step is unclear, ask. A wrong skill is worse than no skill.
-- Read-only against all connectors, including during any test run.
+- Read-only against all connectors, including during the dry-run.
