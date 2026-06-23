@@ -15,7 +15,7 @@ You authenticate into **your own** accounts on first use. No API keys or secrets
 
 ## Skills
 
-- **onboarding** — build the company's finance semantic map (`finance-profile.md`): draft the P&L and balance-sheet maps from your QuickBooks Account List (you review), then resolve how Mercury, Ramp, and Stripe accounts map onto the GL. **Run this first.**
+- **finance-context-builder** — build the company's finance semantic map (`finance-profile.md`): draft the P&L and balance-sheet maps from your QuickBooks Account List (you review), then resolve how Mercury, Ramp, and Stripe accounts map onto the GL. **Run this first.**
 - **runway-and-burn** — net monthly burn and months of cash (Mercury + Ramp, offset by revenue).
 - **revenue-reconciliation** — tie Stripe revenue to QuickBooks recognized revenue and explain the gap.
 - **board-metrics** — a board-ready KPI pack (ARR/MRR, cash, burn, runway, AR/AP aging).
@@ -24,7 +24,7 @@ Every workflow reads `finance-profile.md` first, so they all share one consisten
 
 ## Reporting framework (the P&L and balance-sheet maps)
 
-`onboarding` drafts two maps straight from your QuickBooks Account List, then has you review them:
+`finance-context-builder` drafts two maps straight from your QuickBooks Account List, then has you review them:
 
 - **P&L map** — each income-statement account → its `class` (Revenue / COGS / Expense / Other Income / Other Expense, from the QBO account type) and `department` (parsed from the account name).
 - **Balance-sheet map** — each balance-sheet account → its `bs_group` (current / non-current assets, current / non-current liabilities, equity — from the QBO account type) and its cash-flow `cf_section` and `cf_line`.

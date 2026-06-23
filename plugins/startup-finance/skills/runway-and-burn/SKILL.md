@@ -11,7 +11,7 @@ Calculate net monthly burn and months of cash runway across the startup's bank a
 Trigger when the user asks about runway, burn rate, months of cash, cash-out date, or needs a burn update for a board meeting or fundraise.
 
 ## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). It tells you which Mercury accounts are operating vs. treasury, which count as cash for runway, what the company treats as an internal transfer (excluded from burn), and the pinned burn definition — so you don't re-derive the topology or guess. If it doesn't exist, run the `onboarding` skill first (or tell the user to): without it, the operating-vs-treasury split and the internal-transfer exclusions are guesswork.
+Read `finance-profile.md` first (the company's semantic map). It tells you which Mercury accounts are operating vs. treasury, which count as cash for runway, what the company treats as an internal transfer (excluded from burn), and the pinned burn definition — so you don't re-derive the topology or guess. If it doesn't exist, run the `finance-context-builder` skill first (or tell the user to): without it, the operating-vs-treasury split and the internal-transfer exclusions are guesswork.
 
 ## Data to gather
 1. **Current cash** — from **Mercury**: sum the available balance across all operating and treasury accounts. This is the numerator for runway.

@@ -1,9 +1,9 @@
 ---
-name: onboarding
+name: finance-context-builder
 description: Build the company's finance semantic map — a persistent profile that resolves how Stripe, Ramp, Mercury, and QuickBooks accounts relate. It drafts the P&L and balance-sheet maps automatically from the QuickBooks Account List, then has you review them. Use on first-time setup, or when someone says "set up the finance plugin," "onboard my company," "build my finance profile," "map my accounts across systems," "create the semantic layer," or when another finance workflow can't find finance-profile.md.
 ---
 
-# Finance Onboarding — build the company semantic map
+# Finance Context Builder — build the company semantic map
 
 Produce `finance-profile.md`: the single map every other finance workflow reads first, so Claude reasons across Stripe, Ramp, Mercury, and QuickBooks with one shared model instead of re-deriving the topology every conversation.
 
@@ -18,7 +18,7 @@ Produce `finance-profile.md`: the single map every other finance workflow reads 
 Together: any transaction → GL account → its statement classification and dimensions.
 
 ## Principles
-- **Draft, then confirm.** Onboarding builds a *first draft* of both maps from the QuickBooks Account List, then has the human review it — it never finalizes a mapping without confirmation.
+- **Draft, then confirm.** This skill builds a *first draft* of both maps from the QuickBooks Account List, then has the human review it — it never finalizes a mapping without confirmation.
 - **QuickBooks is the source of truth for the account list and the amounts.** The maps decide how those accounts classify and roll up.
 - **Read-only** against every connector.
 
@@ -28,7 +28,7 @@ Together: any transaction → GL account → its statement classification and di
 Check which of QuickBooks, Mercury, Ramp, and Stripe are authenticated. QuickBooks is required to draft the maps — if it isn't connected, stop and ask the user to connect it (it's the canonical chart of accounts).
 
 ### 2 · Pull the QuickBooks Account List
-Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **AccountType**, **DetailType (subtype)**, parent, and balance. This is what the draft is built from.
+Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **AccountType**, **DetailType (subtype)**, the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
 
 ### 3 · Draft the P&L map
 For every account whose type is an income-statement type, write a row to `finance/mappings/pnl-mapping.csv`:
@@ -43,7 +43,12 @@ For every account whose type is an income-statement type, write a row to `financ
   | Other Income | Other Income |
   | Other Expense | Other Expense |
 
-- **`department`** — heuristic, parsed from the account name: take the segment after a dash / em-dash, or a recognized department keyword (e.g. "Salaries & Wages — Engineering" → `Engineering`), normalized to the company's department list. Leave blank when the name carries no department.
+- **`department`** — make a judgment call and classify every account you reasonably can, working down this list and stopping at the first that fits:
+  1. **In the account name** — a department after a dash / em-dash or an embedded keyword (e.g. "Salaries & Wages — Engineering" → `Engineering`).
+  2. **Parent account** — if the account is a QBO sub-account, use its parent (header) account's name when that reads like a department or function (e.g. children of a "Marketing" parent → `Marketing`).
+  3. **Judgment from what the account is for** — assign the owning team from the account's purpose. For example: advertising, paid media, events, conferences, marketing agency, content, brand, website, demand gen → **Marketing**; sales commissions, CRM, sales tooling → **Sales**; hosting, cloud / infrastructure, engineering tools, R&D → **Engineering**; support / success tooling → **Customer Success**; rent, insurance, legal, audit, accounting, bank & merchant fees, office supplies, company-wide software → **G&A**.
+
+  **G&A is a legitimate home** for genuinely general-and-administrative accounts — book those there. The only accounts to leave blank (and flag for review) are ones that look **irregular** or whose purpose you genuinely can't determine — don't force a guess there, and don't use G&A as a catch-all for accounts you simply couldn't place.
 
 ### 4 · Draft the balance-sheet map
 For every balance-sheet account, write a row to `finance/mappings/balance-sheet-mapping.csv`:
@@ -82,7 +87,7 @@ For every balance-sheet account, write a row to `finance/mappings/balance-sheet-
 ### 5 · Review the drafts with the human (the gate)
 Present both drafts, separated by confidence:
 - **Deterministic** (class and `bs_group` from AccountType; AR / AP / deferred-revenue → Operating) — show for a quick confirm.
-- **Heuristic — needs review**: every parsed `department` (and any P&L account left with no department), plus the judgment calls — a treasury / investment account that QuickBooks lists as a current asset but that you may want under **Non-current Assets** and **Investing**, contra accounts, and anything whose name fights its type.
+- **Heuristic — needs review**: the `department` calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place), plus the judgment calls — a treasury / investment account that QuickBooks lists as a current asset but that you may want under **Non-current Assets** and **Investing**, contra accounts, and anything whose name fights its type.
 
 Don't finalize until the human signs off. Save their corrections back to the two CSVs.
 
