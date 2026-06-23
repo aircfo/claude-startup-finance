@@ -38,9 +38,9 @@ Before the workflows can reason *across* your systems, they need to know how you
 
 Run the **finance-context-builder** skill once. It:
 1. invites you to share any docs or notes about your business — your monthly reporting package, an SOP, or just a few sentences on what's unique — and reads them into the profile;
-2. pulls your QuickBooks Account List and **drafts an account map** (`account-map.csv`) — every account classified: income-statement accounts get a `class` + `department`, balance-sheet accounts get a `bs_group` + cash-flow section/line;
+2. pulls your QuickBooks Account List and **drafts an account map** (`account-map.csv`) — one row per account with its QuickBooks **type**, **detail type**, and a short **description**, plus a management-reporting **department** for P&L accounts (`Revenue`, `Cost of Goods Sold`, or an OpEx department) and a **cash-flow mapping** (`cf_section` / `cf_line`) for balance-sheet accounts;
 3. walks you through the judgment calls and saves your corrections, then resolves how Mercury, Ramp, and Stripe accounts map onto the GL;
-4. saves everything to an **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/`) — the profile, the account map, your shared docs, and a changelog — and wires the profile into `CLAUDE.md` so every session and every workflow uses it.
+4. saves everything to an **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/`) — the profile, the account map, your shared docs, and a changelog. Every finance workflow reads the profile from there when it runs, so the context loads only when you're actually doing finance work — not on every session.
 
 It's read-only against your systems, confirms anything uncertain before saving, and you can drop new docs into the folder (or say "add this to my finance context") to refresh it anytime.
 

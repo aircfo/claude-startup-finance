@@ -33,10 +33,11 @@ The shipped workflows are starting points — every finance team runs its own. T
 
 `finance-context-builder` drafts a single **account map** (`account-map.csv`) straight from your QuickBooks Account List — one row per account — then has you review it:
 
-- **Income-statement accounts** → a `class` (Revenue / COGS / Expense / Other Income / Other Expense, from the QBO account type) and a `department` (classified with judgment — from the name, the parent account, or what the account is for).
-- **Balance-sheet accounts** → a `bs_group` (current / non-current assets, current / non-current liabilities, equity) and a cash-flow `cf_section` and `cf_line`.
+- Every account carries its QuickBooks **type** and **detail type** (verbatim) plus a short **description**.
+- **P&L accounts** also get a management-reporting **department** — `Revenue`, `Cost of Goods Sold`, or an OpEx department (G&A, Engineering, Sales, Marketing, …) — classified with judgment from the name, the parent account, or what the account is for.
+- **Balance-sheet accounts** instead get a cash-flow mapping — a `cf_section` (Operating / Investing / Financing) and `cf_line` — so each account's period-over-period change feeds the right cash-flow line.
 
-You only correct the judgment calls (departments, treasury-as-investing, and the like). The blank template and full column spec live in [`templates/`](./templates/).
+You only correct the judgment calls (the OpEx departments and the odd treasury-as-investing call). The blank template and full column spec live in [`templates/`](./templates/).
 
 ## Using it
 

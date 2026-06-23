@@ -18,7 +18,7 @@ An **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/
 └── CHANGELOG.md           # dated log of what changed each run
 ```
 
-Also add an `@import` to the profile in `CLAUDE.md` (absolute path) so it loads in every session. The profile binds three layers:
+Each finance workflow reads this profile at its own Step 0 — so it loads when finance work actually runs, not globally on every session. The profile binds three layers:
 - **Business context (from the pro)** — what's true and unique about this company, captured from whatever docs and notes they share.
 - **Reporting framework** — the account map (below).
 - **Money-flow graph (discovered)** — how each Mercury account, Ramp clearing account, and Stripe payout/revenue stream maps onto a QuickBooks GL account.
@@ -47,67 +47,54 @@ Before touching the numbers, invite the pro to tell you — **right here in the 
 Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the profile's **Business context** section, citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they share nothing, proceed; they can add context later just by telling you.
 
 ### 3 · Pull the QuickBooks Account List
-Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **AccountType**, **DetailType (subtype)**, the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
+Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **Type**, **Detail Type**, the account **description** (if any), the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
 
 ### 4 · Draft the account map
-Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. Columns: `account_number, account_name, account_type, class, department, bs_group, cf_section, cf_line`. Each account fills only the columns that apply to it; the rest stay blank.
+Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. Columns: `account_number, account_name, account_type, detail_type, department, cf_section, cf_line, description`.
 
-**Income-statement accounts** (Income / COGS / Expense / Other Income / Other Expense) get `class` + `department`:
+**Most columns come straight from QuickBooks — no judgment:**
 
-- **`class`** — deterministic, from the QuickBooks AccountType:
+- **`account_number`** + **`account_name`** — the QBO account number and name, exactly as QuickBooks has them (this pair is the key).
+- **`account_type`** — the QuickBooks **Type** field, verbatim. P&L accounts: `Income`, `Cost of Goods Sold`, `Expense`, `Other Income`, `Other Expense`. Balance-sheet accounts: `Bank`, `Accounts Receivable`, `Other Current Asset`, `Fixed Asset`, `Other Asset`, `Accounts Payable`, `Credit Card`, `Other Current Liability`, `Long Term Liability`, `Equity`.
+- **`detail_type`** — the QuickBooks **Detail Type** field, verbatim (e.g. `Checking`, `Savings`, `Service/Product Income`, `Cost of Sales`, `Payroll`, `Legal & Professional`).
+- **`description`** — a short, plain-language note on what the account is for. Use the QuickBooks account description if it has one; otherwise write a one-liner.
 
-  | QuickBooks AccountType | class |
-  | --- | --- |
-  | Income | Revenue |
-  | Cost of Goods Sold | COGS |
-  | Expense | Expense |
-  | Other Income | Other Income |
-  | Other Expense | Other Expense |
+The two remaining columns are the **reporting maps** — **`department`** for P&L accounts, **`cf_section` + `cf_line`** for balance-sheet accounts. Each account fills one or the other, never both.
 
-- **`department`** — make a judgment call and classify every account you reasonably can, working down this list and stopping at the first that fits. Lean on the pro's context docs (their reporting package often names the canonical departments):
+**`department` — P&L accounts only** (leave blank for every balance-sheet account). The management-reporting grouping:
+
+- **Income → `Revenue`.** Every income account is grouped as `Revenue` — whether the company runs a single revenue account or several revenue sub-accounts.
+- **Cost of Goods Sold → `Cost of Goods Sold`.** All COGS accounts group together above the gross-margin line — never folded into an operating department.
+- **Expense → an OpEx department.** Classify every operating-expense account to the team that owns it, working down this list and stopping at the first that fits (lean on the pro's context docs — their reporting package usually names the canonical departments):
   1. **In the account name** — a department after a dash / em-dash or an embedded keyword (e.g. "Salaries & Wages — Engineering" → `Engineering`).
   2. **Parent account** — if the account is a QBO sub-account, use its parent (header) account's name when that reads like a department or function (e.g. children of a "Marketing" parent → `Marketing`).
-  3. **Judgment from what the account is for** — assign the owning team from the account's purpose. For example: advertising, paid media, events, conferences, marketing agency, content, brand, website, demand gen → **Marketing**; sales commissions, CRM, sales tooling → **Sales**; hosting, cloud / infrastructure, engineering tools, R&D → **Engineering**; support / success tooling → **Customer Success**; rent, insurance, legal, audit, accounting, bank & merchant fees, office supplies, company-wide software → **G&A**.
+  3. **Judgment from what the account is for** — advertising, paid media, events, conferences, marketing agency, content, brand, website, demand gen → **Marketing**; sales commissions, CRM, sales tooling → **Sales**; cloud / infrastructure or engineering tooling booked as operating expense, R&D → **Engineering**; support / success tooling → **Customer Success**; rent, insurance, legal, audit, accounting, bank & merchant fees, office supplies, company-wide software → **G&A**.
 
-  **G&A is a legitimate home** for genuinely general-and-administrative accounts — book those there. The only accounts to leave blank (and flag for review) are ones that look **irregular** or whose purpose you genuinely can't determine — don't force a guess there, and don't use G&A as a catch-all for accounts you simply couldn't place.
+  **G&A is a legitimate home** for genuinely general-and-administrative accounts — book those there. Leave `department` blank (and flag for review) only for an expense account that looks **irregular** or whose purpose you genuinely can't determine — don't force a guess, and don't use G&A as a catch-all.
+- **Other Income / Other Expense → blank.** These sit below operating income, so they don't take a management department.
 
-**Balance-sheet accounts** get `bs_group` + `cf_section` + `cf_line`:
+**`cf_section` + `cf_line` — balance-sheet accounts only** (leave blank for every P&L account). The cash-flow-statement mapping (indirect method): each account's period-over-period **change** feeds a cash-flow line. Mostly deterministic from the account type — the rows marked "—" stay blank:
 
-- **`bs_group`** — deterministic, from the QuickBooks AccountType:
+| QuickBooks account type (detail type) | cf_section | cf_line |
+| --- | --- | --- |
+| Bank / cash on hand | — *(blank: this is the ending cash)* | — |
+| Accounts Receivable | Operating | Change in accounts receivable |
+| Other Current Asset — prepaids | Operating | Change in other current assets |
+| Other Current / Other Asset — investments, treasury | Investing | Treasury / investments |
+| Fixed Asset | Investing | Capital expenditures |
+| Accounts Payable | Operating | Change in accounts payable |
+| Credit Card | Operating | Change in credit card payable |
+| Other Current Liability — deferred revenue / accrued / payroll / sales tax | Operating | Change in *(that liability)* |
+| Long Term Liability | Financing | Debt proceeds / (repayments) |
+| Equity — common / preferred / APIC | Financing | Equity issuance |
+| Equity — retained earnings / accumulated deficit | — *(blank: rolls from net income)* | — |
 
-  | QuickBooks AccountType | bs_group |
-  | --- | --- |
-  | Bank | Current Assets |
-  | Accounts Receivable | Current Assets |
-  | Other Current Asset | Current Assets |
-  | Fixed Asset | Non-current Assets |
-  | Other Asset | Non-current Assets |
-  | Accounts Payable | Current Liabilities |
-  | Credit Card | Current Liabilities |
-  | Other Current Liability | Current Liabilities |
-  | Long Term Liability | Non-current Liabilities |
-  | Equity | Equity |
-
-- **`cf_section`** + **`cf_line`** — from the indirect-method defaults. Every balance-sheet account still gets a `bs_group`; the rows marked "—" simply get a **blank** `cf_section`/`cf_line`:
-
-  | QuickBooks AccountType (DetailType) | cf_section | cf_line |
-  | --- | --- | --- |
-  | Bank / cash on hand | — *(blank: this is the ending cash)* | — |
-  | Accounts Receivable | Operating | Change in accounts receivable |
-  | Other Current Asset — prepaids | Operating | Change in other current assets |
-  | Other Current / Other Asset — investments, treasury | Investing | Treasury / investments |
-  | Fixed Asset | Investing | Capital expenditures |
-  | Accounts Payable | Operating | Change in accounts payable |
-  | Credit Card | Operating | Change in credit card payable |
-  | Other Current Liability — deferred revenue / accrued / payroll / sales tax | Operating | Change in *(that liability)* |
-  | Long Term Liability | Financing | Debt proceeds / (repayments) |
-  | Equity — common / preferred / APIC | Financing | Equity issuance |
-  | Equity — retained earnings / accumulated deficit | — *(blank: rolls from net income)* | — |
+The one judgment call to surface: a **treasury / investment** account QuickBooks lists as a current asset that you may instead treat as **Investing** (above).
 
 ### 5 · Review the draft with the human (the gate)
 Present the account map, separated by confidence:
-- **Deterministic** (class and `bs_group` from AccountType; AR / AP / deferred-revenue → Operating) — show for a quick confirm.
-- **Heuristic — needs review**: the `department` calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place), plus the judgment calls — a treasury / investment account that QuickBooks lists as a current asset but that you may want under **Non-current Assets** and **Investing**, contra accounts, and anything whose name fights its type.
+- **Straight from QuickBooks** (`account_type`, `detail_type`, the `Revenue` / `Cost of Goods Sold` department groupings, and the deterministic `cf_section` / `cf_line` defaults) — show for a quick confirm.
+- **Needs review** — the **OpEx `department`** calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place); any **`cf_section`** judgment call (e.g. a treasury / investment account QuickBooks lists as a current asset that you may want under **Investing**); plus any `description` you wrote yourself and anything whose name fights its type.
 
 Don't finalize until the human signs off. Save their corrections back to `account-map.csv`.
 
@@ -123,7 +110,6 @@ Pin: fiscal year, accounting basis (cash/accrual), reporting currency, the inter
 ### 8 · Write the airCFO Finance Context
 - Write `finance-profile.md` (schema below) and `account-map.csv` into the folder; make sure the docs the pro shared are saved in `context/`.
 - Append a dated entry to `CHANGELOG.md` describing what changed.
-- Add or update the `@import` to the profile in `CLAUDE.md` (absolute path; create `CLAUDE.md` if absent, never duplicate the line).
 - Record provenance: as-of date, connectors read, and the docs ingested.
 
 ## Updating & adding context over time
@@ -135,12 +121,13 @@ This skill is **build-or-refresh** — run it again anytime to refresh:
 ## The account map (schema)
 `account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on `account_number` + `account_name` (must match QuickBooks exactly). A blank-header template ships in the plugin's `templates/`.
 
-`account_number, account_name, account_type, class, department, bs_group, cf_section, cf_line`
+`account_number, account_name, account_type, detail_type, department, cf_section, cf_line, description`
 
-- `class` ∈ {Revenue, COGS, Expense, Other Income, Other Expense} — income-statement accounts only.
-- `department` — income-statement accounts (cost-center).
-- `bs_group` ∈ {Current Assets, Non-current Assets, Current Liabilities, Non-current Liabilities, Equity} — balance-sheet accounts only.
-- `cf_section` ∈ {Operating, Investing, Financing} and `cf_line` — balance-sheet accounts (blank for cash and retained earnings).
+- `account_type` — the QuickBooks **Type** field, verbatim (P&L: Income / Cost of Goods Sold / Expense / Other Income / Other Expense; balance sheet: Bank / Accounts Receivable / Other Current Asset / Fixed Asset / Other Asset / Accounts Payable / Credit Card / Other Current Liability / Long Term Liability / Equity).
+- `detail_type` — the QuickBooks **Detail Type** field, verbatim.
+- `department` — **P&L accounts only** (blank for balance-sheet accounts): the management-reporting grouping — `Revenue` (income), `Cost of Goods Sold` (COGS), or an OpEx department (G&A, Engineering, Sales, Marketing, …); blank for Other Income / Other Expense.
+- `cf_section` ∈ {Operating, Investing, Financing} and `cf_line` — **balance-sheet accounts only** (blank for P&L accounts, and blank for cash/bank and retained earnings): the indirect-method cash-flow line each account's period-over-period change feeds.
+- `description` — a short, plain-language note on what the account is for.
 
 ## `finance-profile.md` schema
 1. **Header** — company, as-of date, connectors read, docs ingested, accounting basis, fiscal year, currency.
