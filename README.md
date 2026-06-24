@@ -81,7 +81,11 @@ Connector note for beta:
 - QuickBooks uses an airCFO-operated MCP server during beta.
 - If you are not ready to authorize production finance data, use a sandbox or test company file while evaluating the plugin.
 
-Data retention/logging for the beta QuickBooks MCP server: [TBD by airCFO].
+What the beta QuickBooks connection stores and logs:
+- **Your financial data is never stored.** Reports, ledgers, and balances are pulled fresh from QuickBooks each time you ask a question and shown to you — never saved or copied anywhere on the server.
+- **Only the connection itself is kept** — your QuickBooks login (stored encrypted, so it's unreadable even if someone got hold of the file), your company name, and the email you enter when connecting. Nothing else.
+- **You stay in control.** Tell Claude to "disconnect QuickBooks" anytime and the server immediately cuts off access and erases what it kept.
+- **Records are activity-only** — which tool ran, when, and whether it worked — kept only to keep the service healthy. They never include your financial data or report contents.
 
 ## Requirements
 
