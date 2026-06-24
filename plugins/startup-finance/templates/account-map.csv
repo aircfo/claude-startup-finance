@@ -1,1 +1,1 @@
-account_number,account_name,account_type,detail_type,department,cf_section,cf_line,description
+account_number,account_name,account_type,detail_type,reporting_group,cf_section,cf_line,description

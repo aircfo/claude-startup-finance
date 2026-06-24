@@ -18,7 +18,7 @@ references account-map.csv for the per-account detail, never duplicates it.
 - **Current stage:** [PLACEHOLDER: e.g. Seed / Series A]
 - **Primary business model:** [PLACEHOLDER: one line]
 - **As-of date:** [PLACEHOLDER: date this profile reflects]
-- **Connected systems read:** [PLACEHOLDER: e.g. QuickBooks, Stripe, Ramp, Mercury, Rippling]
+- **Connected systems read:** [PLACEHOLDER: e.g. QuickBooks, Stripe, Ramp, Mercury, plus any payroll/headcount source you connect separately]
 
 ## 2 · Business Model
 *Plain-English: how the company makes money, and the main operating drivers.*

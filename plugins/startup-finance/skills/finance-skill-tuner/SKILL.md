@@ -17,7 +17,8 @@ Match the symptom the user describes to its usual cause:
 | --- | --- | --- |
 | Didn't trigger when expected | `description` is too vague, or missing the phrase the user actually says | Rewrite the description: lead with what it does, add concrete trigger phrases in the user's words |
 | Triggers when it shouldn't | `description` overlaps another skill or is too broad | Narrow it; spell out what it's *not* for |
-| Re-derived the account setup / used the wrong accounts | Missing **Step 0 — load `finance-profile.md`** | Add the Step 0 block and name the definitions it depends on |
+| Re-derived the account setup / used the wrong accounts | Missing (or naive) **Step 0 — load `finance-profile.md`** | Add the Step 0 block with the airCFO Finance Context lookup order (pointer → default Desktop folder → workspace), and name the definitions it depends on |
+| Couldn't find the profile and re-ran onboarding | Step 0 only checks the current folder | Add the full lookup order so it finds the saved profile before falling back to `finance-context-builder` |
 | Totals look wrong or inconsistent | Aggregates were eyeballed | Add the computation-step rule to **Always** |
 | Finalized without checking | Missing a **Gate** | Add a confirmation gate before the output |
 | Output is the wrong shape | Output template is vague or absent | Pin a concrete **Output format** |

@@ -13,7 +13,7 @@ In Claude Code:
 /plugin install startup-finance@claude-startup-finance
 ```
 
-On first use, Claude will walk you through logging into **your own** Stripe, Ramp, Mercury, and QuickBooks accounts in your browser. Authentication is per-user and handled by each provider's OAuth — no API keys live in this repo, and nothing is shared with airCFO.
+As workflows invoke each connector, Claude prompts you to sign in to that system in **your own** browser — on the first run, `finance-context-builder` checks all four connectors up front, so you'll authorize the ones you use then (decline any you don't). Authentication is per-user OAuth. API keys and OAuth tokens are not stored in this repository. During beta, QuickBooks requests route through an airCFO-operated MCP server — see [Data handling & security](#data-handling--security).
 
 ## What you get
 
@@ -28,26 +28,70 @@ On first use, Claude will walk you through logging into **your own** Stripe, Ram
 - **Runway & burn** — net monthly burn and months of cash on hand.
 - **Revenue reconciliation** — tie Stripe to QuickBooks recognized revenue and explain the gap.
 - **Board metrics** — ARR/MRR, cash, burn, runway, and AR/AP aging in one board-ready summary.
-- **Build your own** — two meta-skills, **finance-skill-builder** and **finance-skill-tuner**, help you turn *your* workflows into reusable skills (and fix them when they misbehave). They write skills into your own workspace, never the plugin, so they survive updates.
+- **Build your own** — two meta-skills, **finance-skill-builder** and **finance-skill-tuner**, help you turn *your* workflows into reusable skills (and fix them when they misbehave). They generate copy-ready skills for your own workspace, so you choose where to save them and they survive plugin updates.
 
 **How to use:** just ask in plain English ("what's our runway?") and the right skill runs automatically; each skill is also invocable by name (e.g. `/runway-and-burn`). Run **finance-context-builder** first — the other workflows read the profile it produces.
+
+## Recommended first session
+
+1. Install the plugin.
+2. Run `/finance-context-builder`.
+3. Share one finance artifact if you have it: a board deck, monthly reporting package, close checklist, KPI sheet, or a short description of the business.
+4. Review the account map Claude drafts from QuickBooks.
+5. Finalize the finance profile, leaving placeholders where information is still unknown.
+6. Run: "What is our runway?"
+7. Run: "Give me board metrics for last month."
+
+Expected timing:
+- Install/auth: 5–10 minutes
+- First context build: 15–30 minutes
+- First useful workflow: immediately after profile creation
+
+After setup, you should have:
+- `finance-profile.md`
+- `account-map.csv`
+- a list of open questions
+- at least one successful finance workflow output
 
 ## First run — build your finance context
 
 Before the workflows can reason *across* your systems, they need to know how your accounts relate — which Mercury account is your operating cash in QuickBooks, how Ramp spend and Stripe revenue land in the GL, and how your general ledger rolls up into your management financials — plus what's unique about *your* business.
 
 Run the **finance-context-builder** skill once. It:
-1. invites you to share any docs or notes about your business — your monthly reporting package, an SOP, or just a few sentences on what's unique — and reads them into the profile;
-2. pulls your QuickBooks Account List and **drafts an account map** (`account-map.csv`) — one row per account with its QuickBooks **type**, **detail type**, and a short **description**, plus a management-reporting **department** for P&L accounts (`Revenue`, `Cost of Goods Sold`, or an OpEx department) and a **cash-flow mapping** (`cf_section` / `cf_line`) for balance-sheet accounts;
-3. walks you through the judgment calls and saves your corrections, then resolves how Mercury, Ramp, and Stripe accounts map onto the GL;
-4. saves everything to an **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/`) — the profile, the account map, your shared docs, and a changelog. Every finance workflow reads the profile from there when it runs, so the context loads only when you're actually doing finance work — not on every session.
+1. checks which connectors are live (a quick read against each) so you can see what will work now and what stays placeholder;
+2. invites you to share any docs or notes about your business — your monthly reporting package, an SOP, or just a few sentences on what's unique — and reads them into the profile;
+3. pulls your QuickBooks Account List and **drafts an account map** (`account-map.csv`) — one row per account with its QuickBooks **type**, **detail type**, and a short **description**, plus a management-reporting **group** (`reporting_group`) for P&L accounts (`Revenue`, `Cost of Goods Sold`, or an OpEx department) and a **cash-flow mapping** (`cf_section` / `cf_line`) for balance-sheet accounts;
+4. walks you through the judgment calls and saves your corrections, then resolves how Mercury, Ramp, and Stripe accounts map onto the GL;
+5. saves everything to an **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/`) — the profile, the account map, your shared docs, and a changelog — and records a lightweight pointer to that folder so future workflows can find it.
+
+Every workflow reads `finance-profile.md` first, using the saved airCFO Finance Context pointer when available and falling back to the default Desktop folder — so the context loads only when you're actually doing finance work, not on every session.
 
 It's read-only against your systems, confirms anything uncertain before saving, and you can drop new docs into the folder (or say "add this to my finance context") to refresh it anytime.
+
+## Data handling & security
+
+- The plugin connects to your finance systems through MCP servers using per-user OAuth.
+- The plugin is designed for read-only analysis. Workflow skills must not write to QuickBooks, Stripe, Ramp, or Mercury.
+- API keys and OAuth tokens are not stored in this repository.
+- The plugin writes local context files only to the airCFO Finance Context folder you approve (plus, with your OK, a small pointer file/note so workflows can find that folder).
+- Do not place secrets, tokens, or full account numbers in `finance-profile.md`, `account-map.csv`, or shared context docs.
+
+Connector note for beta:
+- Stripe, Ramp, and Mercury use their configured remote MCP endpoints.
+- QuickBooks uses an airCFO-operated MCP server during beta.
+- If you are not ready to authorize production finance data, use a sandbox or test company file while evaluating the plugin.
+
+Data retention/logging for the beta QuickBooks MCP server: [TBD by airCFO].
 
 ## Requirements
 
 - A recent version of [Claude Code](https://claude.com/claude-code).
 - Accounts on whichever of Stripe / Ramp / Mercury / QuickBooks you want to use. You can install the plugin even if you only use some of them — Claude only prompts for auth on the connectors you actually invoke.
+
+What to expect from full vs. partial setup:
+- **Best experience:** QuickBooks + Stripe + Ramp + Mercury.
+- **Minimum useful setup:** QuickBooks plus at least one operating system (Stripe, Ramp, or Mercury).
+- Missing connectors are not blockers, but the related profile sections and workflows stay incomplete until you connect them — Claude leaves them as explicit placeholders, never guesses.
 
 ## Updating
 
