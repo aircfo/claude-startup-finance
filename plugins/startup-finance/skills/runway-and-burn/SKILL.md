@@ -11,7 +11,14 @@ Calculate net monthly burn and months of cash runway across the startup's bank a
 Trigger when the user asks about runway, burn rate, months of cash, cash-out date, or needs a burn update for a board meeting or fundraise.
 
 ## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). It tells you which Mercury accounts are operating vs. treasury, which count as cash for runway, what the company treats as an internal transfer (excluded from burn), and the pinned burn definition — so you don't re-derive the topology or guess. If it doesn't exist, run the `finance-context-builder` skill first (or tell the user to): without it, the operating-vs-treasury split and the internal-transfer exclusions are guesswork.
+Read `finance-profile.md` first (the company's semantic map). It tells you which Mercury accounts are operating vs. treasury, which count as cash for runway, what the company treats as an internal transfer (excluded from burn), and the pinned burn definition — so you don't re-derive the topology or guess.
+
+Find the profile in this order:
+1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include an **airCFO Finance Context** pointer, use the profile path it names.
+2. Else if `.aircfo-finance-context.json` exists in the current workspace, read `financeProfile` from it.
+3. Else check the default location: `~/Desktop/airCFO Finance Context/finance-profile.md`.
+4. Else check the current workspace for `finance-profile.md`.
+5. If you still can't find it, run `finance-context-builder` first (or tell the user to). **Do not guess** the operating-vs-treasury split or the internal-transfer exclusions — without the profile they're guesswork.
 
 ## Data to gather
 1. **Current cash** — from **Mercury**: sum the available balance across all operating and treasury accounts. This is the numerator for runway.
@@ -37,3 +44,7 @@ Read `finance-profile.md` first (the company's semantic map). It tells you which
 2. A short table: month | outflows | inflows | net burn.
 3. One sentence on the trend (burn rising or falling) and the single biggest spend driver if it's obvious from Ramp.
 4. Caveats (one-time items, accounts excluded, cash vs. accrual).
+
+## Never
+- Read-only — never write to Mercury, Ramp, Stripe, or QuickBooks.
+- Never store secrets, tokens, or full account numbers — names, last-4, and internal IDs only.

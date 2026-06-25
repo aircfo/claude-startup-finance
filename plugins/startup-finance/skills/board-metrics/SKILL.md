@@ -11,7 +11,14 @@ Produce a concise, board-ready financial summary by pulling the key metrics from
 Trigger when the user is preparing a board deck, investor update, or monthly metrics summary and wants the core financial KPIs in one place.
 
 ## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). Use its pinned definitions (MRR, revenue recognition, burn, internal transfers), the cash account set, and the AR/AP account mappings so every metric here is consistent with the other workflows. If it doesn't exist, run the `finance-context-builder` skill first.
+Read `finance-profile.md` first (the company's semantic map). Use its pinned definitions (MRR, revenue recognition, burn, internal transfers), the cash account set, and the AR/AP account mappings so every metric here is consistent with the other workflows.
+
+Find the profile in this order:
+1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include an **airCFO Finance Context** pointer, use the profile path it names.
+2. Else if `.aircfo-finance-context.json` exists in the current workspace, read `financeProfile` from it.
+3. Else check the default location: `~/Desktop/airCFO Finance Context/finance-profile.md`.
+4. Else check the current workspace for `finance-profile.md`.
+5. If you still can't find it, run `finance-context-builder` first (or tell the user to). **Do not guess** the metric definitions or account set — without the profile they're guesswork.
 
 ## Metrics to assemble (confirm the reporting month with the user first)
 1. **Revenue (Stripe)**: MRR and ARR, new vs. churned MRR if available, month-over-month growth %.
@@ -39,3 +46,7 @@ A clean summary the user can paste into a deck:
 > - **AP**: $X total ($Y past due)
 
 Follow with a 2–3 sentence narrative on the most important trend or risk.
+
+## Never
+- Read-only — never write to Stripe, Mercury, Ramp, or QuickBooks.
+- Never store secrets, tokens, or full account numbers — names, last-4, and internal IDs only.

@@ -5,7 +5,7 @@ description: Turn a finance workflow into a reusable skill that fits this plugin
 
 # Finance Skill Builder — author a workflow skill that fits the house
 
-Write a new finance workflow skill into the user's own workspace, so a finance professional can capture *their* workflow — not a one-size-fits-all template — and have it follow the same conventions as the built-in skills (`runway-and-burn`, `revenue-reconciliation`, `board-metrics`).
+Generate a new finance workflow skill for the user to save into their own workspace, so a finance professional can capture *their* workflow — not a one-size-fits-all template — and have it follow the same conventions as the built-in skills (`runway-and-burn`, `revenue-reconciliation`, `board-metrics`).
 
 The hard part of authoring a skill isn't the markdown — it's pinning down the tacit steps a finance person runs on autopilot. This skill does that extraction for them, then bakes in the non-negotiables so they never have to know those rules exist.
 
@@ -18,7 +18,7 @@ Either way, the skill inherits the house rubric below whether or not the user me
 
 ## The house rubric (always injected)
 Every finance skill this builder writes must:
-1. **Load `finance-profile.md` as Step 0** — read the company's semantic map before pulling data, so the skill never re-derives the account topology, the operating-vs-treasury split, or the pinned definitions. If the profile is missing, the skill tells the user to run `finance-context-builder` first.
+1. **Load `finance-profile.md` as Step 0** — read the company's semantic map before pulling data, so the skill never re-derives the account topology, the operating-vs-treasury split, or the pinned definitions. The skill should locate it via the saved **airCFO Finance Context** pointer (a workspace `CLAUDE.md` note or `.aircfo-finance-context.json`), then the default `~/Desktop/airCFO Finance Context/` folder, then the current workspace. If it still can't be found, the skill tells the user to run `finance-context-builder` first and does not guess.
 2. **Be read-only** against every connector — never write to QuickBooks, Stripe, Ramp, or Mercury.
 3. **Use a computation step for aggregates** — never eyeball totals across many transactions.
 4. **Cite the source of every figure** — name the connector, report, and pull date behind each number, so it traces back to the system of record.
@@ -46,7 +46,7 @@ Use when the user just ran an analysis in this conversation and wants to keep it
 - **Gates** ← any point where you paused to confirm something with the user.
 - **Output format** ← the shape of the answer you gave, turned into a reusable template.
 
-Show the reconstructed draft and confirm before writing.
+Show the reconstructed draft and confirm before finalizing.
 
 ### B · Build from scratch (the interview)
 Use when there's no prior run to capture. Ask in small clusters — not all at once — because the user is putting tacit work into words for the first time:
@@ -57,7 +57,7 @@ Use when there's no prior run to capture. Ask in small clusters — not all at o
 5. **Output** — "What does the finished thing look like? Paste an example if you have one." → output template.
 6. **Guardrails** — "Anything it should never do?" → Never rules, on top of the defaults.
 
-## Dry-run before you write it (don't skip this)
+## Dry-run before you deliver it (don't skip this)
 A finance pro won't trust a skill whose math they've never seen work — so once the workflow is scoped, **run it**, don't just describe it:
 - Execute the drafted logic against the **live connectors** for a concrete recent period (read-only).
 - Show the user the actual output and **how each figure ties out** to its source.
@@ -65,7 +65,7 @@ A finance pro won't trust a skill whose math they've never seen work — so once
 
 On-ramp A (capture): the analysis already ran, so re-run the **generalized** version (period and figures parameterized) to confirm it reproduces what you just did. On-ramp B (interview): this is the skill's first real execution — treat a wrong or unverifiable result as a sign the logic isn't pinned down yet.
 
-Only once the dry-run is correct and the user has confirmed it do you write up the file.
+Only once the dry-run is correct and the user has confirmed it do you finalize the file.
 
 ## Skill template (what you'll hand over)
 Mirror the built-in skills exactly:
@@ -84,7 +84,7 @@ description: <what it does + concrete trigger phrases in the user's own words: "
 <Trigger conditions.>
 
 ## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). <Name the specific definitions/accounts this skill relies on.> If it doesn't exist, run `finance-context-builder` first.
+Read `finance-profile.md` first (the company's semantic map). <Name the specific definitions/accounts this skill relies on.> Find it in this order: (1) an **airCFO Finance Context** pointer in this session's instructions (e.g. a workspace `CLAUDE.md`); (2) `.aircfo-finance-context.json` in the current workspace (`financeProfile`); (3) the default `~/Desktop/airCFO Finance Context/finance-profile.md`; (4) the current workspace. If you still can't find it, run `finance-context-builder` first — do not guess.
 
 ## Data to gather
 <Connectors, reports, window.>

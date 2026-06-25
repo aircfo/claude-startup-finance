@@ -1,0 +1,21 @@
+title: airCFO Claude for Startup Finance
+description: Beta docs for startup finance teams testing the airCFO Claude plugin.
+theme: jekyll-theme-minimal
+show_downloads: false
+
+# The site is served at https://aircfo.github.io/claude-startup-finance/ (a GitHub
+# Pages project site). These two keys make the theme's CSS and internal links resolve
+# under that subpath. If you later attach a custom domain (a CNAME file), set baseurl to "".
+url: "https://aircfo.github.io"
+baseurl: "/claude-startup-finance"
+
+# Gem themes do not wrap pages automatically — apply the theme layout to every page.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Let [text](other-page.md) links between docs resolve to their published URLs.
+plugins:
+  - jekyll-relative-links
