@@ -1,17 +1,19 @@
 # (Un)official Claude for Startup Finance
 
-A Claude Code plugin marketplace for the startup back-office stack. One install wires up the connectors most early-stage companies already run on — **Stripe, Ramp, Mercury, and QuickBooks** — and adds finance skills that work *across* all of them — runway & burn, revenue reconciliation, and a board-ready metrics pack — built on a one-time onboarding that maps how your accounts relate across systems.
+A Claude Cowork plugin marketplace for the startup back-office stack. One install wires up the connectors most early-stage companies already run on — **Stripe, Ramp, Mercury, and QuickBooks** — and adds finance skills that work *across* all of them — runway & burn, revenue reconciliation, and a board-ready metrics pack — built on a one-time onboarding that maps how your accounts relate across systems.
 
 > **Unofficial.** Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury, Intuit (QuickBooks), or Anthropic. All trademarks belong to their respective owners. Provided as-is under the MIT license.
 
 ## Install
 
-In Claude Code:
+In **Claude Cowork** (in the Claude desktop app, select the **Cowork** tab from the mode selector):
 
-```
-/plugin marketplace add aircfo/claude-startup-finance
-/plugin install startup-finance@claude-startup-finance
-```
+1. Click **Customize** in the left sidebar, then **Browse plugins**.
+2. Select **Personal**, click the **+** button, and choose **Add marketplace from GitHub**.
+3. Enter the repository URL: `https://github.com/aircfo/claude-startup-finance`
+4. Click **Install** on the **startup-finance** plugin. It activates automatically.
+
+Then start setup by running `/finance-context-builder` (type **/** or click **+** to see every skill the plugin adds), or just ask in plain English — "set up the finance plugin."
 
 As workflows invoke each connector, Claude prompts you to sign in to that system in **your own** browser — on the first run, `finance-context-builder` checks all four connectors up front, so you'll authorize the ones you use then (decline any you don't). Authentication is per-user OAuth. API keys and OAuth tokens are not stored in this repository. During beta, QuickBooks requests route through an airCFO-operated MCP server — see [Data handling & security](#data-handling--security).
 
@@ -81,15 +83,19 @@ Connector note for beta:
 - QuickBooks uses an airCFO-operated MCP server during beta.
 - If you are not ready to authorize production finance data, use a sandbox or test company file while evaluating the plugin.
 
-What the beta QuickBooks connection stores and logs:
-- **Your financial data is never stored.** Reports, ledgers, and balances are pulled fresh from QuickBooks each time you ask a question and shown to you — never saved or copied anywhere on the server.
-- **Only the connection itself is kept** — your QuickBooks login (stored encrypted, so it's unreadable even if someone got hold of the file), your company name, and the email you enter when connecting. Nothing else.
-- **You stay in control.** Tell Claude to "disconnect QuickBooks" anytime and the server immediately cuts off access and erases what it kept.
-- **Records are activity-only** — which tool ran, when, and whether it worked — kept only to keep the service healthy. They never include your financial data or report contents.
+The beta QuickBooks connector is a multi-user, remote MCP server (verified against its source and deployment on 2026-06-25):
+- **Read-only.** No write tools exist — Claude can read your books and change nothing.
+- **Your financial data is never stored.** It's fetched live from QuickBooks for each question, used to answer, and not kept in the connector's database. Only your connection tokens and minimal metadata are stored, and each connection reaches only the one company tied to that login.
+- **Encrypted everywhere.** All traffic is TLS/HTTPS in transit on every hop; the Intuit tokens held at rest are encrypted with AES-256-GCM.
+- **Hosting & subprocessors.** Runs on Railway (US East, Virginia). The only third parties that touch your data are Railway (hosting), Intuit/QuickBooks (the source you authorize), and Anthropic (Claude, which receives the data to answer you).
+- **AI training.** Your data is never used to train any AI model — not by us. It's sent to Claude (Anthropic) only to answer your question; how Anthropic handles it is governed by the terms of your own Claude account.
+- **Logs & control.** Operational logs (never financial data or tokens) are kept up to 30 days. You can disconnect anytime, which deletes the stored connection and attempts to revoke the Intuit token. Security questions: alex@aircfo.com (subject "Security").
+
+Full detail: [docs/data-handling-security.md](docs/data-handling-security.md).
 
 ## Requirements
 
-- A recent version of [Claude Code](https://claude.com/claude-code).
+- [Claude Cowork](https://claude.com/product/cowork), in the Claude desktop app ([download](https://claude.com/download)) — available on Pro, Max, Team, and Enterprise plans.
 - Accounts on whichever of Stripe / Ramp / Mercury / QuickBooks you want to use. You can install the plugin even if you only use some of them — Claude only prompts for auth on the connectors you actually invoke.
 
 What to expect from full vs. partial setup:
@@ -99,11 +105,7 @@ What to expect from full vs. partial setup:
 
 ## Updating
 
-This plugin uses explicit versioning. To get the latest version:
-
-```
-/plugin marketplace update claude-startup-finance
-```
+This plugin uses explicit versioning. To get the latest version, open **Customize → Browse plugins**, find the airCFO marketplace, and click **Update** to re-sync it from GitHub.
 
 ## Repository layout
 
