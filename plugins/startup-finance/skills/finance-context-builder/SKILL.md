@@ -30,12 +30,15 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 - **Fill or placeholder — never guess.** Draft the profile from what you actually know (the context docs + the system analysis); mark every gap with an explicit `[PLACEHOLDER: …]` and surface it for the human — never invent a value to fill a section.
 - **QuickBooks is the source of truth for the account list and the amounts.** The map decides how those accounts classify and roll up.
 - **Read-only** against every connector.
+- **Degrade gracefully on partial access.** A connector that's connected but blocks some endpoints (a permission/scope error) — or returns more data than fits in one read — is *partial*, not failed: read what you can, page large pulls, and mark the rest as an explicit placeholder. Never hard-fail the whole run on one bad endpoint.
 - **The folder is the finance pro's.** Keep it human-readable and easy to open; never move or delete files in `context/` without asking.
 
 ## Build sequence
 
 ### 1 · Locate or create the airCFO Finance Context folder
 On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (let the user pick another spot); create it with the structure above. On later runs, use the existing folder.
+
+**In Claude Cowork, you can only write to a folder the user has granted the session access to.** Before relying on the default path, make sure a writable working folder is available; if creating or writing the folder fails with a permission error, stop and ask the user to pick a folder in Cowork (the *"Work in a folder"* control in the Cowork session) and then continue. Never run all the way to the end only to silently fail to save the output.
 
 **Then persist a lightweight pointer**, so future workflows can find the profile without loading it into every session. Write the machine-readable pointer to the current workspace (if writable), and offer to add a short note to the workspace `CLAUDE.md`:
 
@@ -74,6 +77,10 @@ Before pulling any numbers, check which connectors are actually connected by run
 
 If a connector isn't authorized yet, that read surfaces the provider's normal browser sign-in. Set expectations up front: authorize the systems you use; for any you don't, decline and the connector is marked **Not connected** and its profile sections stay as explicit placeholders. **Never block setup on a missing connector.**
 
+**Use the QuickBooks connector bundled with this plugin — the airCFO-operated server.** If the environment also exposes a separate Intuit/QuickBooks connector, the account list and the amounts must come from the airCFO connector, not the other one; if you can't tell which one answered, confirm the company name with the user before drafting anything.
+
+A connector can also be **connected but partial** — it answers some reads and returns a permission/scope error on others (e.g. Ramp returning *"You do not have permission to view checking accounts"*). Mark it **Connected (partial)**, use what you can read, and record the blocked parts as explicit placeholders and open questions.
+
 Show a short status table and the impact of anything missing:
 
 | Connector | Status | Impact |
@@ -97,6 +104,8 @@ Read whatever they share, then **persist it**: save the source material (and a s
 
 ### 4 · Pull the QuickBooks Account List
 Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **Type**, **Detail Type**, the account **description** (if any), the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
+
+**Large charts of accounts need paging.** A real startup chart can run to several hundred accounts, and pulling them all in one call can exceed the connector's output-size limit and error out (a ~250-account chart can return well over 100K characters). Pull the list in pages — step through with the query's `startposition` / `maxresults` (around 100 accounts at a time) and assemble the rows as you go. If a page still errors on size, halve the page size and retry. Don't abandon the chart of accounts because the first full pull was too big.
 
 ### 5 · Draft the account map
 Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. Columns: `account_number, account_name, account_type, detail_type, reporting_group, cf_section, cf_line, description`.
@@ -150,7 +159,7 @@ Don't finalize until the human signs off. Save their corrections back to `accoun
 ### 7 · Map the other systems onto the GL (money-flow graph)
 For each connected system, bind its money containers to GL accounts (match on names, last-4, amounts; confirm anything low-confidence):
 - **Mercury** — accounts (operating vs treasury, name, last-4, balance) → the QBO bank GL account each represents; mark which count as cash for runway.
-- **Ramp** — the funding/clearing account → its QBO liability/clearing account; how spend categories roll up to expense accounts; the top recurring vendors.
+- **Ramp** — the funding/clearing account → its QBO liability/clearing account; how spend categories roll up to expense accounts; the top recurring vendors. If Ramp blocks the business/treasury/checking-account reads with a permission error (a scope the user didn't grant), map what you *can* see — card spend and vendors — and leave the funding/treasury mapping as a placeholder and open question.
 - **Stripe** — the payout destination → which Mercury account → which GL account; how gross revenue, processing fees, and refunds book; the recognition method and treatment of annual prepays, coupons, and trials.
 
 ### 8 · Capture conventions
@@ -185,7 +194,7 @@ This skill is **build-or-refresh** — run it again anytime to refresh:
 - **Always** append a dated `CHANGELOG.md` entry describing what changed, and update the profile's as-of date and the pointer's `lastUpdated`.
 
 ## The account map (schema)
-`account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on `account_number` + `account_name` (must match QuickBooks exactly). A blank-header template ships in the plugin's `templates/`.
+`account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on `account_number` + `account_name` (must match QuickBooks exactly). A blank-header template ships alongside this skill in `templates/`.
 
 `account_number, account_name, account_type, detail_type, reporting_group, cf_section, cf_line, description`
 

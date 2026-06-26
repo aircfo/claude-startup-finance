@@ -37,7 +37,7 @@ The shipped workflows are starting points — every finance team runs its own. T
 - **P&L accounts** also get a management-reporting **group** (`reporting_group`) — `Revenue`, `Cost of Goods Sold`, or an OpEx department (G&A, Engineering, Sales, Marketing, …) — classified with judgment from the name, the parent account, or what the account is for.
 - **Balance-sheet accounts** instead get a cash-flow mapping — a `cf_section` (Operating / Investing / Financing) and `cf_line` — so each account's period-over-period change feeds the right cash-flow line.
 
-You only correct the judgment calls (the OpEx departments and the odd treasury-as-investing call). The blank template and full column spec live in [`templates/`](./templates/).
+You only correct the judgment calls (the OpEx departments and the odd treasury-as-investing call). The blank template and full column spec live in [`skills/finance-context-builder/templates/`](./skills/finance-context-builder/templates/).
 
 ## Using it
 
