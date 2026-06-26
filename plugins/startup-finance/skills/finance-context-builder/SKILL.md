@@ -35,10 +35,17 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 
 ## Build sequence
 
+### 0 · Orient the user first (before doing anything)
+This is a guided, **~15–20 minute** setup with two quick review points. Open with a one-message roadmap so the pop-ups and the wait don't feel random, then begin:
+
+> "I'll set up your finance context — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect your finance systems (you'll see sign-in pop-ups — authorize the ones you use, skip the rest) → ③ tell me about your business → ④ I draft your account map and you review just the judgment calls → ⑤ I build your finance profile. You can stop and resume anytime. Ready?"
+
+Then keep the user oriented as you go — a one-line "here's where we are / here's what's next" at each stage beats long silent stretches, especially while pulling a large chart of accounts or drafting the map.
+
 ### 1 · Locate or create the airCFO Finance Context folder
 On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (let the user pick another spot); create it with the structure above. On later runs, use the existing folder.
 
-**In Claude Cowork, you can only write to a folder the user has granted the session access to.** Before relying on the default path, make sure a writable working folder is available; if creating or writing the folder fails with a permission error, stop and ask the user to pick a folder in Cowork (the *"Work in a folder"* control in the Cowork session) and then continue. Never run all the way to the end only to silently fail to save the output.
+**In Claude Cowork, you can only write to a folder the user has granted the session access to — confirm this *first*, before investing the next 15 minutes.** Create the folder and immediately write a small file to it (the `LOCATION.md` below doubles as the write-test). If that write fails with a permission error, stop right here and ask the user to grant a folder via Cowork's *"Work in a folder"* control, then retry — do not move on to connectors or the account map until a write has actually succeeded. Never run all the way to the end only to silently fail to save the output.
 
 **Then persist a lightweight pointer**, so future workflows can find the profile without loading it into every session. Write the machine-readable pointer to the current workspace (if writable), and offer to add a short note to the workspace `CLAUDE.md`:
 
@@ -73,9 +80,11 @@ On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (le
 Also drop a human-readable `LOCATION.md` inside the Finance Context folder noting its own path — a convenience for the user. Don't rely on it for discovery: workflows find the folder via the pointer or the default path, not this file.
 
 ### 2 · Connector preflight — see which systems are live
-Before pulling any numbers, check which connectors are actually connected by running **one lightweight read against each** (read-only): QuickBooks (company info), Stripe (account/balance), Ramp (current user), Mercury (accounts). Detect connection status from what responds — **don't ask the user to list their systems.**
+**Tell the user what's coming before you trigger anything:** "I'll check your four connectors now — you'll get a sign-in pop-up for each. Authorize the ones you use (QuickBooks is the important one) and just close/decline the rest. If a sign-in window won't load or won't connect, close it — I'll mark that one as not connected and you can add it later."
 
-If a connector isn't authorized yet, that read surfaces the provider's normal browser sign-in. Set expectations up front: authorize the systems you use; for any you don't, decline and the connector is marked **Not connected** and its profile sections stay as explicit placeholders. **Never block setup on a missing connector.**
+Then check connectors by running **one lightweight read against each** (read-only). **Do QuickBooks first** — it's the backbone, so confirm it before the rest: read company info and show the user the company name you got back ("Connected to QuickBooks: *Acme, Inc.*") so a wrong connector or wrong company is caught immediately. Then check Stripe (account/balance), Ramp (current user), and Mercury (accounts). Detect connection status from what responds — **don't ask the user to list their systems.**
+
+If a connector isn't authorized, its read surfaces the provider's browser sign-in. If a sign-in **fails to complete** (window won't load, "can't connect to the server," or the user closes it), don't wait on it — mark the connector **Not connected**, note it, and move on; the user can reconnect and re-run later. **Never block setup on a missing or failed connector.**
 
 **Use the QuickBooks connector bundled with this plugin — the airCFO-operated server.** If the environment also exposes a separate Intuit/QuickBooks connector, the account list and the amounts must come from the airCFO connector, not the other one; if you can't tell which one answered, confirm the company name with the user before drafting anything.
 
@@ -150,11 +159,11 @@ The two remaining columns are the **reporting maps** — **`reporting_group`** f
 The one judgment call to surface: a **treasury / investment** account QuickBooks lists as a current asset that you may instead treat as **Investing** (above).
 
 ### 6 · Review the draft with the human (the gate)
-Present the account map, separated by confidence:
-- **Straight from QuickBooks** (`account_type`, `detail_type`, the `Revenue` / `Cost of Goods Sold` groupings, and the deterministic `cf_section` / `cf_line` defaults) — show for a quick confirm.
-- **Needs review** — the **OpEx `reporting_group`** calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place); any **`cf_section`** judgment call (e.g. a treasury / investment account QuickBooks lists as a current asset that you may want under **Investing**); plus any `description` you wrote yourself and anything whose name fights its type.
+**Don't make the user read all N rows** — a real chart has hundreds of accounts; only the judgment calls need their eyes. Say so up front ("Most of your ~250 accounts mapped straight from QuickBooks — I only need you on the few I had to judge"), then present the map separated by confidence:
+- **Straight from QuickBooks** (`account_type`, `detail_type`, the `Revenue` / `Cost of Goods Sold` groupings, and the deterministic `cf_section` / `cf_line` defaults) — summarize as a count ("228 accounts mapped directly"), don't enumerate.
+- **Needs review** — present **compactly** (grouped, ideally a short table): the **OpEx `reporting_group`** calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place); any **`cf_section`** judgment call (e.g. a treasury / investment account QuickBooks lists as a current asset that you may want under **Investing**); plus any `description` you wrote yourself and anything whose name fights its type.
 
-Don't finalize until the human signs off. Save their corrections back to `account-map.csv`.
+Don't finalize until the human signs off on the judgment calls. Save their corrections back to `account-map.csv` — the full map stays in the folder for spreadsheet editing anytime.
 
 ### 7 · Map the other systems onto the GL (money-flow graph)
 For each connected system, bind its money containers to GL accounts (match on names, last-4, amounts; confirm anything low-confidence):
@@ -186,6 +195,7 @@ Fold in whatever they give you, re-surface anything still open, and repeat until
 - Confirm the pointer is current: update `.aircfo-finance-context.json` (`lastUpdated`) and the `CLAUDE.md` block if one was added.
 - Append a dated entry to `CHANGELOG.md` describing what changed and what's still open.
 - Record provenance (§14): as-of date, connectors read, docs ingested, and which sections remain placeholder.
+- **Hand off to the first workflow.** Close by confirming they're set up and what to try next: "Your finance context is ready in *<folder>*. Try asking *'what's our runway?'* or *'give me board metrics for last month'* — they'll use this profile." If sections are still placeholder, add one line that those fill in as they share more.
 
 ## Updating & adding context over time
 This skill is **build-or-refresh** — run it again anytime to refresh:
