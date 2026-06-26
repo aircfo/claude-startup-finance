@@ -37,6 +37,8 @@ Then begin setup:
 
 You can also just ask — "set up the finance plugin." Type **/** or click **+** in Cowork anytime to see every skill the plugin adds.
 
+> **First, open a working folder in Cowork.** Before you run the skill, use the *"Work in a folder"* control in your Cowork session and pick (or create) a folder Claude can read and write. That folder is where your Finance Context gets saved. If you skip this, Claude may finish the setup but be unable to save the output.
+
 ## Step 1: Confirm The Finance Context Folder
 
 Claude will propose a folder, usually:
@@ -70,6 +72,10 @@ The plugin works best with:
 On the first run, `/finance-context-builder` checks all four connectors up front, so you may see several browser sign-in prompts in a row. Authorize the systems you use and decline the rest — declining is expected and never blocks setup.
 
 You do not need all four. The minimum useful setup is **QuickBooks plus at least one of Stripe, Ramp, or Mercury**. Missing systems become placeholders and open questions rather than guesses.
+
+> **QuickBooks — connect the airCFO connector, not Intuit's.** This plugin ships its own QuickBooks connector. Claude or Cowork may also offer Intuit's official QuickBooks connector — that is a *different* one and produces weaker results here. Make sure the QuickBooks connection used during setup is the airCFO one that came with the plugin. If a first run gave odd QuickBooks numbers, this is the most likely cause — check the connector and re-run.
+
+> **Some connectors grant only partial access.** Depending on the scope you approve, or your role in that system, a connector may connect but block certain data — for example, Ramp may allow card and vendor data but refuse treasury/checking accounts. That is fine: the skill uses what it can read and marks the rest as open questions.
 
 ## Step 3: Share Business Context
 
@@ -147,7 +153,19 @@ After a successful first session, you should have:
 
 ## If Something Goes Wrong
 
-If auth fails:
+If a connector sign-in fails (the connect page will not load, shows "can't connect to the server" or a `localhost` address, or reports an "unavailable scope"):
+
+- make sure you are in the **Claude desktop app with Cowork open** — a browser-only flow cannot always complete the sign-in handshake;
+- close the failed sign-in tab and retry the connection once or twice;
+- an **"unavailable scope" or permission error** means your account or role cannot grant that data (for example Ramp treasury) — that is not a blocker; the skill continues with what it can read;
+- if a connector keeps failing, decline it and connect it later — setup never blocks on one connector.
+
+If QuickBooks output looks wrong:
+
+- confirm the **airCFO** QuickBooks connector was used, not Intuit's built-in one (see Step 2), then re-run;
+- if the chart of accounts is large and a pull errors out, ask Claude to "pull the account list in smaller pages."
+
+If auth otherwise fails:
 
 - confirm the connector account is accessible in your browser;
 - retry the workflow that invoked the connector;

@@ -116,8 +116,7 @@ claude-startup-finance/
     └── startup-finance/              # the bundled plugin
         ├── .claude-plugin/plugin.json
         ├── .mcp.json                 # connector wiring
-        ├── skills/                   # finance-context-builder + the finance workflows
-        ├── templates/                # fillable mapping tables (your reporting framework)
+        ├── skills/                   # finance-context-builder (+ its templates/) + the finance workflows
         └── README.md
 ```
 
