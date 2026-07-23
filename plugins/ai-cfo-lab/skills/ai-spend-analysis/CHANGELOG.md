@@ -14,6 +14,20 @@ its own spend.
   `scaffold.py` also writes a workspace `.gitignore` (covering `.secrets/`,
   `raw/`, `workbooks/`, `artifacts/`, `config/`) so an operator who
   version-controls their workspace can't commit real spend data or keys.
+- **Roster bootstrap** — the first spend export seeds a fill-in `config/roster.xlsx`
+  (Excel, with a `standard`/`premium` dropdown; `roster.csv` fallback when openpyxl
+  is absent). Complete it by editing the sheet or by pasting a roster into the chat
+  for Claude to fill; `apply_roster.py` regenerates `org_chart.csv` + `seats.csv`
+  from it every run, with per-seat dollars derived from `pipeline.json` `seat_rates`.
+- **Secret handling (operator-placed, never chat).** The optional Admin API key is
+  supplied via a scaffolded `PASTE_ADMIN_KEY_HERE.txt` drop file; `secure_key.py`
+  moves it into `.secrets/anthropic_admin_key` (chmod 600, gitignored) and deletes
+  the drop, so the key travels file → file and never enters chat, a command, or a
+  log. Env var `ANTHROPIC_ADMIN_API_KEY` still works. (Cowork has no secrets store
+  yet — Surface C is cleanest from a local/CLI session.)
+- **User guide** — `USER_GUIDE.md` in the skill folder: a non-technical,
+  step-by-step walkthrough (setup → monthly export → roster → optional API key →
+  reading the three-surface dashboard) with a short troubleshooting FAQ.
 - **Monthly pipeline** — pulls the three surfaces, rebuilds two `.xlsx`
   workbooks + `build_summary.json`, regenerates a self-contained interactive HTML
   dashboard (trend + forecast bar, department/person/product/model tabs, model-
@@ -28,8 +42,10 @@ its own spend.
 - Model families (regex → `frontier|sonnet|haiku|other`, colors, labels, and the
   Sonnet-class reference cost/request) live in `config/models.json` — update as
   model lines evolve, no code change.
-- Standard seat rate lives in `thresholds.json` (`standard_seat_rate_usd`); the
-  shipped `pipeline.json` template ships `org_id: null`.
+- Standard seat rate lives in `thresholds.json` (`standard_seat_rate_usd`);
+  per-seat-type prices live in `pipeline.json` `seat_rates` (drive the
+  roster → `seats.csv` dollar fill). The shipped `pipeline.json` template ships
+  `org_id: null`.
 - `ANTHROPIC_ADMIN_API_KEY` supports a `.secrets/anthropic_admin_key` file
   fallback (env still wins); the Enterprise fetcher uses
   `ANTHROPIC_ANALYTICS_API_KEY` / `.secrets/anthropic_analytics_key`.
@@ -42,7 +58,11 @@ its own spend.
   (happy path + missing-export failure path + artifact-embed assertions);
   `scripts/__tests__/data-hygiene.test.js` is the PII/branding gate over
   `fixtures/` + `config.example/`, closing the gap that `.csv` files slip past
-  most content scanners.
+  most content scanners; `scripts/__tests__/roster.test.js` covers the
+  bootstrap → apply roster flow (rate derivation, department mapping, the
+  no-overwrite guard, and the no-op path when no roster is present);
+  `scripts/__tests__/secure_key.test.js` covers the key drop-file ingest (extract →
+  `.secrets/` at 600 → drop deleted, plus the no-op and no-key-found paths).
 
 **Fixtures:** `fixtures/make_fixtures.py` (seeded) generates a synthetic
 3-month, ~20-user `@example.com` dataset engineered to exercise every flag and

@@ -57,13 +57,26 @@ is a convenience, never a dependency.
 - **This tool produces per-employee spend data.** The dashboard and workbooks
   name individuals and their spend. Decide your access model *before* circulating
   the artifact — treat inputs and outputs as admin-only.
+- **The roster comes from your own data.** The people list is seeded from your
+  spend export (`bootstrap_roster.py` → `config/roster.xlsx|csv`) and never leaves
+  the workspace; you only add department + seat type. `apply_roster.py` maps it to
+  `org_chart.csv`/`seats.csv`, deriving each seat's cash from `pipeline.json`
+  `seat_rates`.
 - **Admin-only inputs.** The seat/overage/API data all require org-admin access
   to obtain. The pipeline is **read-only** on every surface — it never modifies
   seats, billing, or org settings.
 - **Key handling.** The Admin API key (`ANTHROPIC_ADMIN_API_KEY`) and the
   Enterprise Analytics key (`ANTHROPIC_ANALYTICS_API_KEY`) live only in env vars
   or `$ROOT/.secrets/` (gitignored). They are never written to config, workbooks,
-  the artifact, logs, or chat.
+  the artifact, logs, or chat. The operator supplies the Admin key via the
+  `PASTE_ADMIN_KEY_HERE.txt` drop file (`secure_key.py` moves it into `.secrets/`
+  and deletes the drop) or an env var — **never by pasting it into chat**; if a key
+  ever lands in chat, treat it as compromised and rotate it.
+- **Cowork secret caveat.** Claude on the web has no secrets store yet (its env-var
+  field warns against secrets), and file-upload transcript privacy isn't documented.
+  So on Cowork, run Surface C from a local/CLI session, or leave it "not configured"
+  until a platform secrets store lands (tracking: `anthropics/claude-code#32733`).
+  Surfaces A and B need no key and work fully on Cowork.
 - **The artifact is self-contained.** Single HTML file, data embedded as JSON at
   build time — no external calls, no CDN, no secrets. Safe to open offline.
 - **Nothing is ever sent.** `draft_slack.py` writes a `.txt` and prints it; the

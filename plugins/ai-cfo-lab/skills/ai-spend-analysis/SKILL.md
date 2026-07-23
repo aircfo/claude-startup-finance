@@ -46,28 +46,51 @@ the org's data and is never committed anywhere.
 Run it as a friendly first-run setup — ask, confirm, write; the operator mostly
 confirms rather than types.
 
-1. **Pick / confirm the workspace root** `$ROOT`. Scaffold it:
+1. **Pick / confirm the workspace root** `$ROOT` — a folder for this org's data
+   (roster, monthly exports, dashboards). Suggest an easy-to-find spot like
+   `~/Desktop/AI-Spend-Analytics`, and **keep it outside any git repo you might
+   publish** — it holds real per-person spend (a scaffolded `.gitignore` protects
+   it, but living outside a repo is belt-and-suspenders). Scaffold it:
    `python3 $SKILL/scripts/scaffold.py "$ROOT"` — creates the folder tree and
    seeds `config/` from `$SKILL/config.example/` templates.
 2. **Ask** for: company name; **plan tier** (`team` or `enterprise`); seat types
    and their monthly list prices; then write them into `$ROOT/config/pipeline.json`
    (`company_name`, `plan_tier`) and `$ROOT/config/thresholds.json`
    (`standard_seat_rate_usd`).
-3. **Org id** — instruct the operator to copy it from their claude.ai admin URL;
-   write it to `pipeline.json` `org_id`. (Team plan only; Enterprise does not
-   need it for the Analytics API.)
-4. **Roster** — accept a pasted/uploaded CSV of `email,name,department` → write
-   `config/org_chart.csv` and `config/seats.csv`. If the operator has no roster
-   handy, bootstrap the email list from the first spend export and ask only for
-   departments.
+3. **Org id (optional).** Only the optional Team browser-automation shortcut uses
+   it; the manual export path does not, so the operator can safely skip it. If they
+   want the automation: copy it from their claude.ai admin URL → write it to
+   `pipeline.json` `org_id`. (Team only; Enterprise's Analytics API doesn't use it.)
+4. **Roster** — no roster needed up front. On the first run I read the people
+   straight out of your spend export (`bootstrap_roster.py`) and write a fill-in
+   roster at `config/roster.xlsx` — Excel, with a `standard`/`premium` dropdown
+   (or `config/roster.csv` if openpyxl isn't installed). Emails and a name guess
+   come pre-filled; the operator adds **department** and **seat_type** two ways:
+   edit the sheet, or paste/attach their own roster and I fill it in for them.
+   Per-seat dollars derive from `seat_rates` in `pipeline.json`, so there's no
+   dollar column to touch. Every run then regenerates `config/org_chart.csv` +
+   `config/seats.csv` from the roster (`apply_roster.py`). Bringing your own?
+   Drop a `config/roster.csv` (`email,name,department,seat_type`), or hand-maintain
+   `org_chart.csv`/`seats.csv` — with no roster file present the pipeline uses
+   those CSVs as-is.
 5. **Model families** — the shipped `config/models.json` classifies models into
    `frontier | sonnet | haiku | other` by regex. Confirm the patterns match the
    org's current model lines; it drives the what-if routing panel's colors and
    labels (no code changes needed to update).
-6. **Optional — Surface C key.** If they want API-platform cash, set
-   `ANTHROPIC_ADMIN_API_KEY` (or drop it in `$ROOT/.secrets/anthropic_admin_key`).
-   Skipping it is fine — the dashboard shows "Surface C not configured".
-7. **Validate** by doing a first monthly run (below) and showing the dashboard.
+6. **Optional — Surface C (API/Console cash).** If they want it, **the operator
+   places the key — never paste it in chat.** Easiest: open the scaffolded
+   `$ROOT/PASTE_ADMIN_KEY_HERE.txt`, paste the whole `sk-ant-…` key, save. On the
+   next run `secure_key.py` moves it into `$ROOT/.secrets/anthropic_admin_key`
+   (chmod 600, gitignored) and deletes the drop file — the key never touches chat,
+   a command, or a log. (Env var `ANTHROPIC_ADMIN_API_KEY` also works.) Skipping it
+   is fine — the dashboard shows "Surface C not configured". **If a key ever appears
+   in chat, refuse it, tell the operator to rotate it, and point them at the drop
+   file.** (Cowork has no secrets store yet — run Surface C from a local/CLI session
+   or leave it off; see the reference guide.)
+7. **Validate** by doing a first monthly run (below): pull the export, let me
+   bootstrap the roster from it for the operator to fill, then run the pipeline and
+   show the dashboard. (The very first build, before the roster is filled, shows
+   everyone under "(unmapped)" — expected; it sharpens once the roster lands.)
 
 ## Monthly run (target period = last full calendar month, `YYYY-MM`)
 
@@ -106,9 +129,12 @@ gap; the dashboard and summary lead with the "Surface B missing" banner.
 python3 $SKILL/scripts/run_pipeline.py "$ROOT" YYYY-MM
 ```
 
-In order: (Enterprise only) `fetch_surface_b_enterprise.py`; then
+In order: `secure_key.py` (ingest a dropped `PASTE_ADMIN_KEY_HERE.txt`, if present);
+(Enterprise only) `fetch_surface_b_enterprise.py`; then
 `fetch_surface_c.py` (Admin API via key; gracefully `not_configured` if unset),
 `validate_surface_b.py` (schema + sanity → `surface_b_status.json`),
+`apply_roster.py` (only when a `config/roster.xlsx|csv` exists — regenerates
+`config/org_chart.csv` + `config/seats.csv` from it),
 `build_workbooks.py` (rebuilds both `.xlsx` from **all** periods in `raw/`; writes
 `build_summary.json`), `build_artifact.py` (writes `artifacts/<period>_ai_spend.html`),
 `draft_slack.py` (writes `artifacts/<period>_slack_draft.txt`).
@@ -136,14 +162,19 @@ In order: (Enterprise only) `fetch_surface_b_enterprise.py`; then
 
 - **Read-only on every financial surface.** Never modify seats, plans, billing,
   or org settings; sessions/keys are used for GET-equivalent reads only.
-- **Secrets never leak.** API keys live only in env vars or `$ROOT/.secrets/`
-  (gitignored). Never write a key to config, workbook, artifact, log, or chat.
+- **Secrets never leak — the operator places them, not the assistant.** API keys
+  live only in env vars or `$ROOT/.secrets/` (gitignored). The friendly path is the
+  `PASTE_ADMIN_KEY_HERE.txt` drop file → `secure_key.py` (file → file, never through
+  chat or a command). Never solicit a key in chat; if one appears there, refuse it
+  and tell the operator to rotate. Never write a key to config, workbook, artifact,
+  log, or chat.
 - **Three surfaces stay visually distinct** everywhere. Overage is usage-credit
   spend beyond allotments; in-allotment usage is tokens-only by design (not a bug).
 - **Fail loud.** A missing surface produces a banner + first-line summary alert,
   never a silent gap. Empty months never pollute flag lookbacks.
-- **Config, not workbooks.** New hires / seat changes / new keys go in
-  `config/*.csv`; the workbooks and artifact fully regenerate every run.
+- **Config, not workbooks.** New hires / seat changes go in the roster
+  (`config/roster.xlsx|csv`) — or edit `config/*.csv` directly; new API keys go in
+  `config/api_key_map.csv`. The workbooks and artifact fully regenerate every run.
 - **No real org data, no other vendors.** This ships with synthetic fixtures only;
   it covers Anthropic/Claude spend, not OpenAI/Gemini (on the roadmap).
 
@@ -159,10 +190,14 @@ In order: (Enterprise only) `fetch_surface_b_enterprise.py`; then
 | `scripts/build_artifact.py` | Self-contained interactive HTML dashboard |
 | `scripts/draft_slack.py` | Draft summary `.txt` (never sends) |
 | `scripts/scaffold.py` | Create a fresh workspace + seed config from templates |
+| `scripts/bootstrap_roster.py` | Seed a fill-in `config/roster.xlsx` (or `.csv`) from the first spend export |
+| `scripts/apply_roster.py` | Turn the roster into `config/org_chart.csv` + `config/seats.csv` (rates from `pipeline.json` `seat_rates`) |
+| `scripts/secure_key.py` | Move an Admin key from the `PASTE_ADMIN_KEY_HERE.txt` drop file into `.secrets/` (600), then delete the drop |
 | `scripts/artifact_template.html` | The dashboard template (config-driven; single file, no external calls) |
 | `config.example/` | Templated config (fake values) — the shape setup fills in |
 | `fixtures/` | Synthetic 3-month dataset + `make_fixtures.py` (seeded) for tests |
 | `references/dashboard-guide.md` | Three-surface framing, plan-tier matrix, security model, data traps, roadmap |
+| `USER_GUIDE.md` | Friendly end-user walkthrough (setup → export → roster → optional key → reading the dashboard) |
 
 ## Maintenance notes
 

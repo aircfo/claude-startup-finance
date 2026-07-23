@@ -9,8 +9,8 @@ Order:
   - plan_tier == "team" (default): Surface B (the seat-overage export) is NOT
     fetched here. On Team, the operator drops the manual/browser export into
     raw/<period>/overage_spend.csv per SKILL.md Step 1 before running this.
-  Then, for both tiers: Surface C pull -> validate Surface B -> workbooks ->
-  artifact -> Slack draft.
+  Then, for both tiers: Surface C pull -> validate Surface B -> (apply roster if
+  a config/roster.xlsx|csv is present) -> workbooks -> artifact -> Slack draft.
 
 Never sends anything; read-only against every financial surface."""
 import json, os, subprocess, sys
@@ -38,10 +38,14 @@ def main():
     root, period = sys.argv[1], sys.argv[2]
     outdir = os.path.join(root, "raw", period)
     os.makedirs(outdir, exist_ok=True)
+    run("secure_key.py", root)  # ingest a dropped PASTE_ADMIN_KEY_HERE.txt into .secrets/ (no-op if none)
     if plan_tier(root) == "enterprise":
         run("fetch_surface_b_enterprise.py", root, period)  # writes overage_spend.csv (scripted path)
     run("fetch_surface_c.py", root, period)
     run("validate_surface_b.py", os.path.join(outdir, "overage_spend.csv"), period)  # fail-loud is via the status file
+    cfg = os.path.join(root, "config")
+    if os.path.exists(os.path.join(cfg, "roster.xlsx")) or os.path.exists(os.path.join(cfg, "roster.csv")):
+        run("apply_roster.py", root)  # roster is the source of truth when present; regenerates org_chart.csv + seats.csv
     if run("build_workbooks.py", root):
         return 1
     if run("build_artifact.py", root):
