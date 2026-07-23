@@ -13,6 +13,14 @@
       "version": "0.5.0",
       "category": "finance",
       "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "quickbooks"]
+    },
+    {
+      "name": "ai-cfo-lab",
+      "source": "./plugins/ai-cfo-lab",
+      "description": "Skills shipped with the AI CFO newsletter. First up: ai-spend-analysis — turn your organization's Anthropic/Claude spend into a person / department / product / model dashboard across committed seats, variable overage, and API-platform cash. Read-only; it drafts a summary and never sends. Ships with synthetic fixtures only.",
+      "version": "0.1.0",
+      "category": "finance",
+      "keywords": ["finance", "ai-spend", "anthropic", "claude", "cost", "fpa", "newsletter"]
     }
   ]
 }
