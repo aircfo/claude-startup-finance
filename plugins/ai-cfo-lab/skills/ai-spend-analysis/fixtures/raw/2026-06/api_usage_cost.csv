@@ -1,0 +1,4 @@
+record_type,date,workspace_id,api_key_id,model,service_tier,uncached_input_tokens,cache_read_tokens,cache_creation_tokens,output_tokens,cost_usd,description
+usage,2026-06-05,wrkspc_main,apikey_MAIN0001,claude-opus-4-1,standard,2000000,500000,0,400000,,
+usage,2026-06-06,wrkspc_rogue,apikey_ROGUE9999,claude-sonnet-4-5,standard,800000,0,0,150000,,
+cost,2026-06-28,wrkspc_main,,,,,,,,60.0,API usage

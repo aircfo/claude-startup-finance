@@ -1,0 +1,11 @@
+{
+  "company_name": "Northwind Analytics",
+  "plan_tier": "team",
+  "org_id": "example-org-id-0000",
+  "timezone": "America/New_York",
+  "run_day": "3rd of month",
+  "surface_b_endpoint": "/api/organizations/{org_id}/analytics/spend-report-export?start_date={start}&end_date={end}",
+  "surface_b_method": "MANUAL EXPORT (fixture data \u2014 synthetic)",
+  "surface_b_requires": "n/a for fixtures",
+  "notes": "synthetic fixture config \u2014 not real"
+}
