@@ -1,0 +1,11 @@
+{
+  "families": [
+    { "name": "frontier", "label": "Frontier (top-tier)", "pattern": "opus|fable", "color": "#1e3a8a" },
+    { "name": "sonnet",   "label": "Mid (Sonnet-class)",  "pattern": "sonnet",     "color": "#60a5fa", "reference_cpr_usd": 0.003 },
+    { "name": "haiku",    "label": "Small (Haiku-class)", "pattern": "haiku",      "color": "#bfdbfe" },
+    { "name": "other",    "label": "Other",               "pattern": "",           "color": "#e5e7eb" }
+  ],
+  "frontier_family": "frontier",
+  "sonnet_family": "sonnet",
+  "notes": "Model-family classification. The FIRST family whose 'pattern' (case-insensitive regex) matches the model name wins; the family with an empty pattern is the catch-all and must come last. The what-if routing panel models shifting traffic from frontier_family to sonnet_family at the sonnet family's observed cost/request (falling back to its reference_cpr_usd when request volume is thin). Update the patterns as model lines evolve — no code changes needed."
+}

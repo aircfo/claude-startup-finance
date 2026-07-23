@@ -1,0 +1,3 @@
+api_key_id,workspace_id,owner_email,purpose
+apikey_EXAMPLE0001,wrkspc_EXAMPLE,ada@example.com,Production backend
+apikey_EXAMPLE0002,wrkspc_EXAMPLE,grace@example.com,Data pipeline

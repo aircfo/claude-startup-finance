@@ -1,0 +1,21 @@
+email,name,department,team,manager,cost_center
+ada@example.com,Ada Lovelace,Engineering,,grace@example.com,CC-ENG
+alan@example.com,Alan Turing,Engineering,,grace@example.com,CC-ENG
+grace@example.com,Grace Hopper,Engineering,,grace@example.com,CC-ENG
+linus@example.com,Linus Torvalds,Engineering,,grace@example.com,CC-ENG
+margaret@example.com,Margaret Hamilton,Engineering,,grace@example.com,CC-ENG
+dennis@example.com,Dennis Ritchie,Engineering,,grace@example.com,CC-ENG
+steve@example.com,Steve Wozniak,Product,,steve@example.com,CC-PRO
+radia@example.com,Radia Perlman,Product,,steve@example.com,CC-PRO
+barbara@example.com,Barbara Liskov,Product,,steve@example.com,CC-PRO
+donald@example.com,Donald Knuth,Product,,steve@example.com,CC-PRO
+katherine@example.com,Katherine Johnson,Sales,,katherine@example.com,CC-SAL
+john@example.com,John von Neumann,Sales,,katherine@example.com,CC-SAL
+hedy@example.com,Hedy Lamarr,Sales,,katherine@example.com,CC-SAL
+claude@example.com,Claude Shannon,Sales,,katherine@example.com,CC-SAL
+leonhard@example.com,Leonhard Euler,Finance,,leonhard@example.com,CC-FIN
+carl@example.com,Carl Gauss,Finance,,leonhard@example.com,CC-FIN
+emmy@example.com,Emmy Noether,Finance,,leonhard@example.com,CC-FIN
+nikola@example.com,Nikola Tesla,Operations,,nikola@example.com,CC-OPE
+marie@example.com,Marie Curie,Operations,,nikola@example.com,CC-OPE
+rosalind@example.com,Rosalind Franklin,Operations,,nikola@example.com,CC-OPE

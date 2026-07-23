@@ -1,0 +1,17 @@
+{
+  "standard_seat_rate_usd": 30.0,
+  "standard_seat_rate_note": "List price of the downgrade-target seat tier; used in the premium-underutilized savings estimate. Set this to your plan's standard (non-premium) seat price.",
+  "premium_utilization_floor_usd": 100.0,
+  "premium_utilization_note": "A premium seat is flagged as a downgrade candidate if its overage in the latest full month is below this floor.",
+  "reclaim_tokens_floor": 1000000,
+  "reclaim_months_lookback": 2,
+  "reclaim_note": "A seat is a reclaim candidate if prompt+completion tokens stayed below reclaim_tokens_floor in each of the last reclaim_months_lookback full months.",
+  "consistent_overage_months": 3,
+  "consistent_overage_floor_usd": 50.0,
+  "consistent_overage_note": "Flag a user at/above consistent_overage_floor_usd of overage for consistent_overage_months periods running — check for runaway automation or a mis-sized seat.",
+  "frontier_share_products": ["Chat", "Cowork"],
+  "frontier_share_note": "Products whose frontier-vs-cheaper model mix feeds the what-if routing panel. Model families themselves are defined in models.json.",
+  "spike_mom_pct": 100,
+  "spike_min_usd": 50.0,
+  "spike_note": "A product's overage is flagged as a spike when month-over-month growth >= spike_mom_pct AND the later month is >= spike_min_usd."
+}
