@@ -28,7 +28,7 @@ The finance profile stores those definitions, mappings, and judgment calls in on
 
 ## What It Contains
 
-The beta profile uses a 14-section structure:
+The profile uses a 14-section structure:
 
 1. Company Snapshot
 2. Business Model
@@ -53,11 +53,14 @@ The profile references `account-map.csv` for per-account detail.
 
 `account-map.csv` is the spreadsheet-editable source for:
 
-- QuickBooks account names;
-- account types and detail types;
-- management reporting groupings;
-- cash-flow mappings;
-- short account descriptions.
+- QuickBooks account identity, verbatim (internal id, number, name, type, detail type, parent);
+- the **expense category** — what kind of money each account is (Subscription revenue, Payroll & benefits, Software & tools, …);
+- the **department** — whose money it is (Engineering, Sales, Marketing, G&A, …);
+- cash-flow mappings for balance-sheet accounts;
+- **tags** that group accounts for cross-cutting analyses (`mrr` for P&L-based recurring revenue, `cac`, clearing accounts that must net to zero);
+- a **review status** per row (`auto`, `needs-review`, `confirmed`) so every workflow knows which mappings a human has verified — refreshes never overwrite confirmed rows.
+
+Reports pivot those columns rather than following a fixed outline: the same map renders a monthly package, a department P&L, a cash-flow walk, or a tag-based MRR total. The full column contract and vocabularies ship with the plugin in `templates/account-map-spec.md`.
 
 The profile should summarize the reporting framework, not duplicate the full account table.
 

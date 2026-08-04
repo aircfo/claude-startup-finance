@@ -4,11 +4,11 @@ title: Known Limitations
 
 # Known Limitations
 
-This beta is intentionally narrow. The goal is to learn whether a persistent finance context makes Claude more useful for startup finance workflows.
+This early-access release is intentionally narrow. The goal is to learn whether a persistent finance context makes Claude more useful for startup finance workflows.
 
 ## Best With A Specific Stack
 
-The full beta experience is best with:
+The full experience is best with:
 
 - QuickBooks
 - Stripe
@@ -23,15 +23,19 @@ The account map is drafted from the QuickBooks chart of accounts.
 
 If QuickBooks is missing, disconnected, or poorly configured, the initial finance profile will be much less complete.
 
+## Connector Sessions Expire
+
+Connector sessions lapse after a few idle days. On a later run, a connector that worked before may ask you to sign in again — that is normal, not a failure. Re-authorize and continue; the skills are written to expect it.
+
 ## Some Workflows Are Early Examples
 
-The beta includes workflows for:
+The plugin includes workflows for:
 
 - runway and burn;
 - revenue reconciliation;
 - board metrics.
 
-These are starting points, not final packaged finance products. Expect them to improve based on tester feedback.
+These are starting points, not final packaged finance products. Expect them to improve based on early-access feedback.
 
 ## Human Review Is Required
 
@@ -76,7 +80,7 @@ If none of that context is available, Claude will rely more heavily on system da
 
 ## No Writeback Workflows
 
-This beta is designed for read-only analysis.
+The plugin is designed for read-only analysis.
 
 The plugin should not create journal entries, update accounts, change customers, modify subscriptions, or write back to connected finance systems.
 
@@ -86,7 +90,7 @@ The profile includes sections for people, payroll, planning, and forecast assump
 
 The bundled connector set does not include every payroll or planning system. Those sections may need to be filled from documents, spreadsheets, or user-provided context.
 
-## Security And Data Policies Are Still Beta-Specific
+## Security And Data Policies Are Still Maturing
 
 Use sandbox or test-company data if you are not ready to authorize production systems.
 

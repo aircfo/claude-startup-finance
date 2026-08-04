@@ -138,9 +138,9 @@ Best with:
 
 Expected output:
 
-- deterministic mappings;
-- judgment calls;
-- blank or irregular rows;
+- a count of rule-mapped (`auto`) and human-verified (`confirmed`) rows;
+- the `needs-review` queue with each row's reason;
+- the current `mrr` tag set (the accounts that define your P&L-based MRR);
 - accounts whose name conflicts with their type;
 - recommended questions for review.
 
@@ -185,7 +185,7 @@ Best with:
 Expected output:
 
 - recurring vendors;
-- likely department or reporting group;
+- likely department and expense category;
 - unusual increases;
 - potential duplicate or stale tools;
 - suggested follow-up questions.
