@@ -26,8 +26,8 @@ As workflows invoke each connector, Claude prompts you to sign in to that system
 - QuickBooks
 
 **Skills** (finance workflows across the connectors):
-- **Finance context builder** (`finance-context-builder`) — build your company's finance semantic map: draft an account map from your QuickBooks Account List (classifying each account and inferring departments for you to review), then resolve how Mercury, Ramp, and Stripe accounts map onto the GL. Run this first; every other workflow reads the map it produces.
-- **Runway & burn** — net monthly burn and months of cash on hand.
+- **Finance context builder** (`finance-context-builder`) — build your company's finance semantic map: draft an account map from your QuickBooks Account List (classifying each account and inferring departments for you to review), resolve how Mercury, Ramp, and Stripe accounts map onto the GL, then **verify the model ties to your live systems** before handing off. Run this first; every other workflow reads the map it produces.
+- **Runway & burn** — net monthly burn and months of cash on hand from complete bank flows, with Ramp explaining the spend drivers.
 - **Revenue reconciliation** — tie Stripe to QuickBooks recognized revenue and explain the gap.
 - **Board metrics** — ARR/MRR, cash, burn, runway, and AR/AP aging in one board-ready summary.
 - **Build your own** — two meta-skills, **finance-skill-builder** and **finance-skill-tuner**, help you turn *your* workflows into reusable skills (and fix them when they misbehave). They generate copy-ready skills for your own workspace, so you choose where to save them and they survive plugin updates.

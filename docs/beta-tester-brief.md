@@ -1,10 +1,10 @@
 ---
-title: Beta Tester Brief
+title: Early Access Brief
 ---
 
-# Beta Tester Brief
+# Early Access Brief
 
-Thank you for testing airCFO Claude for Startup Finance.
+Thank you for trying airCFO Claude for Startup Finance during early access.
 
 This beta is testing a simple but important idea: finance analysis gets dramatically better when Claude has a durable understanding of your company's finance context before it pulls numbers.
 

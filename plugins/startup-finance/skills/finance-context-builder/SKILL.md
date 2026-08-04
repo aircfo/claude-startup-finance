@@ -31,6 +31,8 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 - **QuickBooks is the source of truth for the account list and the amounts.** The map decides how those accounts classify and roll up.
 - **Read-only** against every connector.
 - **Degrade gracefully on partial access.** A connector that's connected but blocks some endpoints (a permission/scope error) — or returns more data than fits in one read — is *partial*, not failed: read what you can, page large pulls, and mark the rest as an explicit placeholder. Never hard-fail the whole run on one bad endpoint.
+- **Expect connections to expire.** Connector sessions lapse after a few idle days — on a refresh run, a connector that worked last time may ask the user to sign in again. That's normal, not a bug: say so ("your QuickBooks session expired — you'll see a quick re-sign-in"), let them re-auth, and continue. Never treat a re-auth prompt as a failed connector.
+- **Always pass explicit date ranges.** On any dated report pull (balance sheet, P&L, trial balance), pass *both* a start date and an end date — some connectors silently ignore a lone end date and return the wrong period. If a number looks implausible, re-pull with the full explicit range before trusting it.
 - **The folder is the finance pro's.** Keep it human-readable and easy to open; never move or delete files in `context/` without asking.
 
 ## Build sequence
@@ -38,7 +40,7 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 ### 0 · Orient the user first (before doing anything)
 This is a guided, **~15–20 minute** setup with two quick review points. Open with a one-message roadmap so the pop-ups and the wait don't feel random, then begin:
 
-> "I'll set up your finance context — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect your finance systems (you'll see sign-in pop-ups — authorize the ones you use, skip the rest) → ③ tell me about your business → ④ I draft your account map and you review just the judgment calls → ⑤ I build your finance profile. You can stop and resume anytime. Ready?"
+> "I'll set up your finance context — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect your finance systems (you'll see sign-in pop-ups — authorize the ones you use, skip the rest) → ③ tell me about your business → ④ I draft your account map and you review just the judgment calls → ⑤ I build your finance profile → ⑥ I verify the model ties to your live systems. You can stop and resume anytime. Ready?"
 
 Then keep the user oriented as you go — a one-line "here's where we are / here's what's next" at each stage beats long silent stretches, especially while pulling a large chart of accounts or drafting the map.
 
@@ -195,7 +197,17 @@ Fold in whatever they give you, re-surface anything still open, and repeat until
 - Confirm the pointer is current: update `.aircfo-finance-context.json` (`lastUpdated`) and the `CLAUDE.md` block if one was added.
 - Append a dated entry to `CHANGELOG.md` describing what changed and what's still open.
 - Record provenance (§14): as-of date, connectors read, docs ingested, and which sections remain placeholder.
-- **Hand off to the first workflow.** Close by confirming they're set up and what to try next: "Your finance context is ready in *<folder>*. Try asking *'what's our runway?'* or *'give me board metrics for last month'* — they'll use this profile." If sections are still placeholder, add one line that those fill in as they share more.
+
+### 12 · Prove it ties (ground-truth check), then hand off
+Don't end on "here are your files" — end on **evidence the model is right**. Run a quick tie-out of the freshly built context against the live systems, picking the 2–3 checks the connected systems support:
+
+- **Cash tie (Mercury ↔ QuickBooks):** for each Mercury account bound in the money-flow graph, compare the live Mercury balance to the mapped QuickBooks bank-account balance as of the last close date. An exact tie is the headline; a difference should be explainable (uncleared items, timing since close) or it becomes an open question.
+- **Revenue coverage (account map ↔ QuickBooks):** pull last full month's P&L from QuickBooks and re-total revenue using the account map's `Revenue` grouping. The two must match to the penny — this proves the map covers every income account, not most of them.
+- **Runway-cash sanity (profile ↔ human):** total the accounts the profile counts as runway cash and play it back: "By your profile's definition, runway cash is ≈ $X across these N accounts — does that match your mental model?"
+
+Present the results as a compact tie-out table — *check · source A · source B · difference · verdict* — using a computation step for the arithmetic, never eyeballed. Every unexplained difference goes into Open Questions (§13) with a suggested next step; never soften or hide a miss. A found discrepancy is the feature working, not the setup failing — say so.
+
+Then **hand off to the first workflow.** Close by confirming they're set up and verified, and what to try next: "Your finance context is built and it ties to your live systems. Try asking *'what's our runway?'* or *'give me board metrics for last month'* — they'll use this profile." If sections are still placeholder, add one line that those fill in as they share more.
 
 ## Updating & adding context over time
 This skill is **build-or-refresh** — run it again anytime to refresh:

@@ -1,0 +1,288 @@
+/* airCFO design system — tokens sourced from aircfo.com (Webflow) */
+:root {
+  --equity-blue: #132c3a;
+  --market-slate: #3c6e82;
+  --trust-blue: #7fcada;
+  --soft-trust: #d4f2fa;
+  --dividend-gold: #ff971e;
+  --light-dividend: #ffe8c7;
+  --clear-ledger: #f5f7fb;
+  --ink: #2b2b2b;
+  --ink-soft: #474747;
+  --font-serif: "Bitter", Georgia, serif;
+  --font-sans: "Inter", -apple-system, sans-serif;
+  --radius: 0.875rem;
+  --measure: 44rem;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  background: #fff;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  border-bottom: 1px solid #e6eaf2;
+  background: #fff;
+}
+.site-header-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+.wordmark {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--equity-blue);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.wordmark .mark b { color: var(--market-slate); font-weight: 600; }
+.wordmark em {
+  font-family: var(--font-serif);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  border-left: 2px solid var(--dividend-gold);
+  padding-left: 0.6rem;
+}
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.site-nav a {
+  color: var(--market-slate);
+  text-decoration: none;
+  padding: 0.25rem 0;
+}
+.site-nav a:hover, .site-nav a:focus-visible { color: var(--equity-blue); }
+.site-nav .nav-github {
+  color: var(--equity-blue);
+  border: 1px solid var(--equity-blue);
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+}
+.site-nav .nav-github:hover { background: var(--clear-ledger); }
+
+/* ---------- Main content ---------- */
+.site-main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+.site-main.is-landing { max-width: 60rem; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--equity-blue);
+  line-height: 1.25;
+  margin: 2.2em 0 0.6em;
+}
+h1 { font-size: 2.4rem; margin-top: 0.4em; }
+h2 { font-size: 1.65rem; }
+h3 { font-size: 1.25rem; }
+p, ul, ol { margin: 0 0 1.1em; }
+li { margin-bottom: 0.35em; }
+
+a { color: var(--market-slate); }
+a:hover, a:focus-visible { color: var(--equity-blue); }
+
+strong { color: var(--ink); }
+
+hr {
+  border: none;
+  border-top: 1px solid #e6eaf2;
+  margin: 2.5rem 0;
+}
+
+/* Prompts & code */
+code {
+  font-size: 0.9em;
+  background: var(--clear-ledger);
+  border-radius: 0.35rem;
+  padding: 0.1em 0.35em;
+  color: var(--equity-blue);
+}
+pre {
+  background: var(--clear-ledger);
+  border-left: 3px solid var(--dividend-gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; color: var(--equity-blue); }
+
+/* Callouts (blockquotes) */
+blockquote {
+  margin: 1.4rem 0;
+  padding: 0.9rem 1.2rem;
+  background: var(--soft-trust);
+  border-radius: var(--radius);
+  color: var(--equity-blue);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.4rem 0;
+  font-size: 0.95rem;
+  display: block;
+  overflow-x: auto;
+}
+th, td {
+  text-align: left;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e6eaf2;
+}
+th {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--market-slate);
+}
+
+/* ---------- Landing page components ---------- */
+.hero {
+  text-align: center;
+  padding: 2.5rem 0 1.5rem;
+}
+.hero .eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--market-slate);
+  margin-bottom: 1rem;
+}
+.hero h1 {
+  font-size: 3rem;
+  margin: 0 auto 0.5em;
+  max-width: 22ch;
+}
+.hero .lede {
+  font-size: 1.2rem;
+  color: var(--ink-soft);
+  max-width: 42rem;
+  margin: 0 auto 1.8rem;
+}
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+}
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-radius: var(--radius);
+  padding: 0.8rem 1.4rem;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.btn-primary { background: var(--dividend-gold); color: var(--equity-blue); }
+.btn-primary:hover { background: #f78a08; color: var(--equity-blue); transform: translateY(-1px); }
+.btn-secondary { background: var(--equity-blue); color: #fff; }
+.btn-secondary:hover { background: var(--market-slate); color: #fff; transform: translateY(-1px); }
+
+.credibility {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  border-top: 1px solid #e6eaf2;
+  border-bottom: 1px solid #e6eaf2;
+  padding: 1rem 0;
+  margin: 2.5rem 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.card {
+  background: var(--clear-ledger);
+  border-radius: var(--radius);
+  padding: 1.3rem 1.4rem;
+}
+.card h3 { margin: 0 0 0.4em; font-size: 1.1rem; }
+.card p { margin: 0; font-size: 0.95rem; }
+.card .step-no {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--equity-blue);
+  background: var(--light-dividend);
+  border-radius: 999px;
+  width: 1.9rem;
+  height: 1.9rem;
+  line-height: 1.9rem;
+  text-align: center;
+  margin-bottom: 0.7rem;
+}
+
+.section-note {
+  background: var(--light-dividend);
+  border-radius: var(--radius);
+  padding: 1rem 1.3rem;
+  font-size: 0.95rem;
+  color: var(--equity-blue);
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  background: var(--equity-blue);
+  color: var(--clear-ledger);
+  margin-top: 2rem;
+}
+.site-footer-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2.2rem 1.25rem;
+  font-size: 0.85rem;
+}
+.site-footer a { color: var(--trust-blue); }
+.site-footer a:hover { color: #fff; }
+.footer-brand { font-size: 0.95rem; }
+.footer-legal { color: #9db4c0; margin-bottom: 0; }
+
+/* ---------- Responsive & a11y ---------- */
+@media (max-width: 640px) {
+  .hero h1 { font-size: 2.1rem; }
+  h1 { font-size: 1.9rem; }
+  .wordmark em { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+:focus-visible {
+  outline: 2px solid var(--dividend-gold);
+  outline-offset: 2px;
+}

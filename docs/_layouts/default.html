@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23132c3a'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23ff971e'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="wordmark" href="{{ '/' | relative_url }}"><span class="mark">air<b>CFO</b></span><em>Claude for Startup Finance</em></a>
+      <nav class="site-nav" aria-label="Documentation">
+        <a href="{{ '/first-session-guide.html' | relative_url }}">First Session</a>
+        <a href="{{ '/use-cases.html' | relative_url }}">Use Cases</a>
+        <a href="{{ '/finance-profile-explainer.html' | relative_url }}">Finance Profile</a>
+        <a href="{{ '/data-handling-security.html' | relative_url }}">Security</a>
+        <a href="{{ '/known-limitations.html' | relative_url }}">Limitations</a>
+        <a href="https://github.com/aircfo/claude-startup-finance" class="nav-github">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main{% if page.url == '/' or page.url == '/index.html' %} is-landing{% endif %}">
+    {{ content }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <p class="footer-brand">Built by <a href="https://aircfo.com">airCFO</a> — the AI-enabled back-office growth partner for startups.</p>
+      <p class="footer-contact">Questions or feedback: <a href="mailto:alex@aircfo.com">alex@aircfo.com</a> · <a href="https://github.com/aircfo/claude-startup-finance">Source on GitHub</a> · MIT License</p>
+      <p class="footer-legal">Unofficial. Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury, Intuit (QuickBooks), or Anthropic. All trademarks belong to their respective owners.</p>
+    </div>
+  </footer>
+</body>
+</html>

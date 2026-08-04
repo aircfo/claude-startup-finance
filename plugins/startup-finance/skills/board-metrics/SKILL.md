@@ -26,7 +26,7 @@ Find the profile in this order:
 3. **Burn & runway (Mercury + Ramp)**: net monthly burn and months of runway — reuse the `runway-and-burn` logic.
 4. **AR aging (QuickBooks)**: total receivables and amount past due (current / 30 / 60 / 90+).
 5. **AP aging (QuickBooks)**: total payables and amount past due.
-6. **Spend highlights (Ramp)**: top spend categories or vendors for the month, if useful context.
+6. **Spend highlights (Ramp)**: top spend categories or vendors for the month, and the biggest movers vs. the prior month.
 
 ## Always
 - Use a computation step for all aggregates; never eyeball totals.
