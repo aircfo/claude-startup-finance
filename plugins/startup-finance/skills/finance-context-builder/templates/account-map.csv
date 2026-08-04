@@ -1,1 +1,1 @@
-account_number,account_name,account_type,detail_type,reporting_group,cf_section,cf_line,description
+gl_account_id,account_number,account_name,account_type,detail_type,parent_account,active,expense_category,department,cf_section,cf_line,tags,mapping_status,review_note,confirmed_by,confirmed_date

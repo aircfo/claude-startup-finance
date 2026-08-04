@@ -31,13 +31,16 @@ The shipped workflows are starting points — every finance team runs its own. T
 
 ## Reporting framework (the account map)
 
-`finance-context-builder` drafts a single **account map** (`account-map.csv`) straight from your QuickBooks Account List — one row per account — then has you review it:
+`finance-context-builder` drafts a single **account map** (`account-map.csv`) straight from your QuickBooks Account List — one row per account, keyed on QuickBooks' internal account Id — then has you review it. The map is a **cube, not a tree**: each account carries independent axes that any report can pivot:
 
-- Every account carries its QuickBooks **type** and **detail type** (verbatim) plus a short **description**.
-- **P&L accounts** also get a management-reporting **group** (`reporting_group`) — `Revenue`, `Cost of Goods Sold`, or an OpEx department (G&A, Engineering, Sales, Marketing, …) — classified with judgment from the name, the parent account, or what the account is for.
-- **Balance-sheet accounts** instead get a cash-flow mapping — a `cf_section` (Operating / Investing / Financing) and `cf_line` — so each account's period-over-period change feeds the right cash-flow line.
+- **Ledger facts** — the QuickBooks type, detail type, parent, and active flag, verbatim.
+- **`expense_category`** — what *kind* of money it is (Subscription revenue, Hosting & infrastructure, Payroll & benefits, Software & tools, …), from a fixed tech-startup vocabulary.
+- **`department`** — *whose* money it is (Engineering, Sales, Marketing, Customer Success, G&A, …).
+- **`cf_section` / `cf_line`** — how each balance-sheet account's change feeds the cash-flow statement.
+- **`tags`** — cross-cutting analysis groups from a small registry: `mrr` (defines your P&L-based MRR/ARR), `cac`, `contra-revenue`, `clearing`, and friends.
+- **Governance columns** — every row is `auto`, `needs-review`, or `confirmed`; refreshes never overwrite what you've confirmed.
 
-You only correct the judgment calls (the OpEx departments and the odd treasury-as-investing call). The blank template and full column spec live in [`skills/finance-context-builder/templates/`](./skills/finance-context-builder/templates/).
+You only review the judgment calls (the `needs-review` queue — typically the department calls, the treasury-as-investing question, and the `mrr` tag set). The blank template and the full spec — vocabularies, tag registry, cash-flow lines, refresh rules — live in [`skills/finance-context-builder/templates/`](./skills/finance-context-builder/templates/).
 
 ## Using it
 
