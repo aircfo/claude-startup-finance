@@ -2,36 +2,53 @@
 
 One table turns the raw QuickBooks general ledger into your management financials: `account-map.csv` classifies every GL account. The `finance-context-builder` skill **drafts it automatically from your QuickBooks Account List**, then walks you through the judgment calls — you don't fill it from scratch. The confirmed map lives in your airCFO Finance Context folder and every finance workflow reads it (via `finance-profile.md`).
 
-QuickBooks owns the account list and the dollar amounts; this table decides how each account classifies and rolls up.
+QuickBooks owns the account list and the dollar amounts; this table decides how each account classifies and rolls up. The full schema — column rules, the Expense Category and department vocabularies, the tag registry, the cash-flow line list, and the refresh workflow — lives in **`account-map-spec.md`** alongside this file. This README is the orientation; the spec is the contract.
+
+## The mental model: a cube, not a tree
+
+Every account carries a few **independent labels** (axes). Reports are built by *pivoting* those axes into whatever nesting a deliverable needs — the map itself never hard-codes an outline:
+
+| Axis | Question it answers | Column |
+| --- | --- | --- |
+| **Class** | Where does it sit on the statements? | derived from `account_type` (never stored) |
+| **Expense Category** | What *kind* of money is it? (Subscription revenue, Payroll & benefits, Software & tools, …) | `expense_category` |
+| **Department** | *Whose* money is it? (Engineering, Sales, Marketing, CS, G&A, …) | `department` |
+| Cash flow | How does its change move cash? | `cf_section` + `cf_line` (balance sheet only) |
+| Analysis groups | What cross-cutting analyses does it feed? (`mrr`, `cac`, `clearing`, …) | `tags` |
+
+The same map renders a monthly package (Class → Category → Department), a department P&L (Class → Department → Category), a cash walk (`cf_section` → `cf_line`), or a P&L-based MRR (sum of `mrr`-tagged accounts) — no restructuring required.
 
 ## `account-map.csv`
-`account_number, account_name, account_type, detail_type, reporting_group, cf_section, cf_line, description`
 
-One row per GL account, keyed on **`account_number` + `account_name`** (matched against QuickBooks exactly). **Most columns come straight from QuickBooks; the two reporting maps — `reporting_group` (P&L) and `cf_section` / `cf_line` (balance sheet) — take a little judgment.**
+`gl_account_id, account_number, account_name, account_type, detail_type, parent_account, active, expense_category, department, cf_section, cf_line, tags, mapping_status, review_note, confirmed_by, confirmed_date`
 
-- **`account_type`** — the QuickBooks **Type** field, verbatim. P&L: `Income`, `Cost of Goods Sold`, `Expense`, `Other Income`, `Other Expense`. Balance sheet: `Bank`, `Accounts Receivable`, `Other Current Asset`, `Fixed Asset`, `Other Asset`, `Accounts Payable`, `Credit Card`, `Other Current Liability`, `Long Term Liability`, `Equity`.
-- **`detail_type`** — the QuickBooks **Detail Type** field, verbatim (e.g. `Checking`, `Service/Product Income`, `Payroll`, `Legal & Professional`).
-- **`reporting_group`** — the management-reporting grouping, **P&L accounts only** (blank for balance-sheet accounts): `Revenue` for income, `Cost of Goods Sold` for COGS, and an OpEx department (G&A, Engineering, Sales, Marketing, …) for operating expense — classified with judgment (account name → parent account → what the account is for; e.g. "Advertising & Paid Media" → `Marketing`, "Legal Fees" → `G&A`). Other Income / Other Expense are left blank. The column most worth a review.
-- **`cf_section`** + **`cf_line`** — the cash-flow-statement mapping (indirect method), **balance-sheet accounts only** (blank for P&L accounts): each account's period-over-period change feeds a cash-flow line. `cf_section` ∈ `Operating` / `Investing` / `Financing`. Mostly deterministic from the account type (e.g. AR → `Operating`, "Change in accounts receivable"); cash/bank and retained earnings stay blank. The judgment call worth a review is a **treasury / investment** account QuickBooks lists as a current asset that you may want under **Investing**.
-- **`description`** — a short plain-language note on what the account is for (the QuickBooks description if it has one).
+One row per GL account, keyed on **`gl_account_id`** — QuickBooks' internal account Id, which survives renames and renumbers, so refreshes can diff safely. Three column groups:
 
-Example (abridged):
+- **Ledger facts** (`gl_account_id` → `active`) — copied verbatim from QuickBooks, overwritten on every refresh, never hand-edited.
+- **Reporting mappings** (`expense_category`, `department`, `cf_section`, `cf_line`, `tags`) — drafted by rule, owned by you after confirmation. Values come from the vocabularies in `account-map-spec.md`.
+- **Governance** (`mapping_status`, `review_note`, `confirmed_by`, `confirmed_date`) — every row is `auto`, `needs-review`, or `confirmed`. **A refresh never overwrites a confirmed row's mappings**, and workflows disclose any non-confirmed rows a deliverable relied on.
 
-| account_number | account_name | account_type | detail_type | reporting_group | cf_section | cf_line | description |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 4000 | Subscription Revenue | Income | Service/Product Income | Revenue | | | Per-seat SaaS subscription revenue |
-| 5000 | Hosting & Infrastructure | Cost of Goods Sold | Cost of Sales | Cost of Goods Sold | | | Cloud hosting & infra serving the product |
-| 6000 | Salaries & Wages — Engineering | Expense | Payroll | Engineering | | | Engineering team salaries |
-| 6100 | Advertising & Paid Media | Expense | Advertising/Promotional | Marketing | | | Paid acquisition spend |
-| 1000 | Mercury Checking ••0736 | Bank | Checking | | | | Primary operating cash account |
-| 1200 | Accounts Receivable | Accounts Receivable | AR | | Operating | Change in accounts receivable | Customer invoices outstanding |
-| 2200 | Deferred Revenue | Other Current Liability | Deferred | | Operating | Change in deferred revenue | Annual prepayments not yet recognized |
+Example (abridged — a typical SaaS chart):
+
+| account_name | account_type | expense_category | department | cf_line | tags | mapping_status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Subscription Revenue | Income | Subscription revenue | | | mrr | confirmed |
+| Implementation Fees | Income | Professional services revenue | | | | confirmed |
+| Promotional Credits | Income | Discounts & credits | | | contra-revenue | confirmed |
+| AWS Hosting | Cost of Goods Sold | Hosting & infrastructure | Infrastructure | | | confirmed |
+| Salaries — Engineering | Expense | Payroll & benefits | Engineering | | | confirmed |
+| Advertising & Paid Media | Expense | Marketing & advertising | Marketing | | cac | confirmed |
+| Mercury Checking ••0736 | Bank | Cash & equivalents | Operating cash | | | confirmed |
+| Mercury Treasury | Bank | Cash & equivalents | Treasury | | | needs-review |
+| Accounts Receivable | Accounts Receivable | Accounts receivable & reserves | | Change in accounts receivable | | confirmed |
+| Deferred Revenue | Other Current Liability | Deferred revenue | | Change in deferred revenue | | confirmed |
+| SAFE Notes | Long Term Liability | SAFEs & convertible notes | | Equity issuance (stock, SAFEs, convertible notes) | | confirmed |
 
 ## Notes
-- `account_type` and `detail_type` are copied **verbatim from QuickBooks** (the QBO **Type** and **Detail Type** fields) — not derived.
-- `reporting_group` is a **management-reporting** grouping (Revenue / Cost of Goods Sold / OpEx department) — it is *not* QuickBooks "class tracking."
-- `cf_section` / `cf_line` are **balance-sheet only** — they map each account's *change* to the indirect-method cash-flow statement. P&L accounts leave them blank.
-- The column names above are the contract the `finance-context-builder` skill reads. Rename a column and you must tell Claude to update the skill.
+- `account_type` / `detail_type` are copied **verbatim from QuickBooks** — not derived. `detail_type` *seeds* the `expense_category` draft; the human's override always wins.
+- `department` is a **management-reporting** grouping — it is *not* QuickBooks "class tracking." What kind of value it holds follows the account's Class (see the spec).
+- `tags` are **registry-controlled** (see the spec) — they encode account-level KPI inputs (`mrr`, `cac`) and behaviors (`clearing`, `contra-revenue`); they are not free-form labels.
+- The column names are the contract every finance workflow reads. Rename a column and you must tell Claude to update the skills.
 - This is a blank-header template that ships with the plugin. Your actual map lives in your airCFO Finance Context folder (default `~/Desktop/airCFO Finance Context/account-map.csv`), written by the skill — not here.
 
 ## `finance-profile-template.md`

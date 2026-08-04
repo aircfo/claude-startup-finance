@@ -114,58 +114,41 @@ Before touching the numbers, invite the pro to tell you — **right here in the 
 Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the relevant profile sections (Business Model, KPI Definitions, the cash / revenue / spend / people rules, Known Exceptions), citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they share nothing, proceed; they can add context later just by telling you.
 
 ### 4 · Pull the QuickBooks Account List
-Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: number, name, **Type**, **Detail Type**, the account **description** (if any), the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
+Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: the QuickBooks internal **Id** (the map's primary key — it survives renames and renumbers), number, name, **Type**, **Detail Type**, **Active** flag, the account **description** (if any), the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
 
 **Large charts of accounts need paging.** A real startup chart can run to several hundred accounts, and pulling them all in one call can exceed the connector's output-size limit and error out (a ~250-account chart can return well over 100K characters). Pull the list in pages — step through with the query's `startposition` / `maxresults` (around 100 accounts at a time) and assemble the rows as you go. If a page still errors on size, halve the page size and retry. Don't abandon the chart of accounts because the first full pull was too big.
 
 ### 5 · Draft the account map
-Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. Columns: `account_number, account_name, account_type, detail_type, reporting_group, cf_section, cf_line, description`.
+Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. The full schema and vocabularies live in **`templates/account-map-spec.md`** — read it before drafting. Columns: `gl_account_id, account_number, account_name, account_type, detail_type, parent_account, active, expense_category, department, cf_section, cf_line, tags, mapping_status, review_note, confirmed_by, confirmed_date`.
 
-**Most columns come straight from QuickBooks — no judgment:**
+**The mental model (from the spec): the map is a cube, not a tree.** Each account carries independent axes — Class (derived from `account_type`), `expense_category` (what kind of money), `department` (whose money), `cf_section`/`cf_line` (how its change moves cash), and `tags` (cross-cutting analysis groups). Deliverables pivot these axes into whatever hierarchy they need; the map never hard-codes an outline.
 
-- **`account_number`** + **`account_name`** — the QBO account number and name, exactly as QuickBooks has them (this pair is the key).
-- **`account_type`** — the QuickBooks **Type** field, verbatim. P&L accounts: `Income`, `Cost of Goods Sold`, `Expense`, `Other Income`, `Other Expense`. Balance-sheet accounts: `Bank`, `Accounts Receivable`, `Other Current Asset`, `Fixed Asset`, `Other Asset`, `Accounts Payable`, `Credit Card`, `Other Current Liability`, `Long Term Liability`, `Equity`.
-- **`detail_type`** — the QuickBooks **Detail Type** field, verbatim (e.g. `Checking`, `Savings`, `Service/Product Income`, `Cost of Sales`, `Payroll`, `Legal & Professional`).
-- **`description`** — a short, plain-language note on what the account is for. Use the QuickBooks account description if it has one; otherwise write a one-liner.
+**Ledger facts — straight from QuickBooks, no judgment:** `gl_account_id` (the internal Id — the primary key), `account_number`, `account_name`, `account_type`, `detail_type`, `parent_account`, `active` — all verbatim. These columns are script-territory: refreshes overwrite them; humans never edit them.
 
-The two remaining columns are the **reporting maps** — **`reporting_group`** for P&L accounts, **`cf_section` + `cf_line`** for balance-sheet accounts. Each account fills one or the other, never both.
+**`expense_category` — every account gets one**, from the spec's fixed vocabulary (Subscription revenue, Hosting & infrastructure, Payroll & benefits, Software & tools, Deferred revenue, …). Seed it by rule and record how confident the rule was:
+1. **`detail_type` lookup** — many detail types map cleanly (Payroll-type → `Payroll & benefits`, Advertising/Promotional → `Marketing & advertising`, Prepaid → `Prepaid expenses`). High confidence → `mapping_status: auto`.
+2. **Account-name keywords** — hosting/AWS/GCP → `Hosting & infrastructure`; legal/audit → `Professional services`; recruiter/ATS → `Recruiting`; etc. Reasonable confidence → `auto`.
+3. **Can't tell** — assign the closest category, set `mapping_status: needs-review`, and say why in `review_note`. Never leave the category blank and never force a confident-looking guess.
 
-**`reporting_group` — P&L accounts only** (leave blank for every balance-sheet account). The management-reporting grouping:
+**`department` — value kind follows the account's Class** (see the spec): revenue accounts → product / revenue stream (often blank for single-product companies); COGS → cost-of-revenue function (Infrastructure / Support / Services); Expense → an OpEx department; Bank accounts → `Operating cash` or `Treasury`. For OpEx, classify to the team that owns the spend, working down this list and stopping at the first that fits (lean on the pro's context docs — their reporting package usually names the canonical departments):
+  1. **In the account name** — a department after a dash or an embedded keyword ("Salaries & Wages — Engineering" → `Engineering`).
+  2. **Parent account** — a sub-account inherits its parent (header) account's department when the parent reads like one (children of a "Marketing" parent → `Marketing`).
+  3. **Judgment from what the account is for** — advertising, paid media, events, agencies, content, brand, demand gen → **Marketing**; commissions, CRM, sales tooling → **Sales**; cloud/engineering tooling in OpEx, R&D → **Engineering**; support/success tooling → **Customer Success**; rent, insurance, legal, audit, bank fees, company-wide software → **G&A**.
 
-- **Income → `Revenue`.** Every income account is grouped as `Revenue` — whether the company runs a single revenue account or several revenue sub-accounts.
-- **Cost of Goods Sold → `Cost of Goods Sold`.** All COGS accounts group together above the gross-margin line — never folded into an operating department.
-- **Expense → an OpEx department.** Classify every operating-expense account to the team that owns it, working down this list and stopping at the first that fits (lean on the pro's context docs — their reporting package usually names the canonical departments):
-  1. **In the account name** — a department after a dash / em-dash or an embedded keyword (e.g. "Salaries & Wages — Engineering" → `Engineering`).
-  2. **Parent account** — if the account is a QBO sub-account, use its parent (header) account's name when that reads like a department or function (e.g. children of a "Marketing" parent → `Marketing`).
-  3. **Judgment from what the account is for** — advertising, paid media, events, conferences, marketing agency, content, brand, website, demand gen → **Marketing**; sales commissions, CRM, sales tooling → **Sales**; cloud / infrastructure or engineering tooling booked as operating expense, R&D → **Engineering**; support / success tooling → **Customer Success**; rent, insurance, legal, audit, accounting, bank & merchant fees, office supplies, company-wide software → **G&A**.
+  **G&A is a legitimate home** for genuinely general-and-administrative accounts. Set `needs-review` (with the reasoning in `review_note`) rather than guessing when an account is irregular — and don't use G&A as a catch-all. Other Income / Other Expense and non-cash balance-sheet accounts take no department.
 
-  **G&A is a legitimate home** for genuinely general-and-administrative accounts — book those there. Leave `reporting_group` blank (and flag for review) only for an expense account that looks **irregular** or whose purpose you genuinely can't determine — don't force a guess, and don't use G&A as a catch-all.
-- **Other Income / Other Expense → blank.** These sit below operating income, so they don't take a reporting group.
+**`cf_section` + `cf_line` — balance-sheet accounts only**, from the spec's line list. Mostly deterministic from account type (AR → Operating / Change in accounts receivable; Fixed Asset → Investing / Purchases of fixed assets; Credit Card → Operating / Change in credit cards; deferred revenue → Operating / Change in deferred revenue; SAFEs & notes → Financing / Equity issuance). Cash accounts and retained earnings stay blank — they're the statement's subject and the net-income roll, not lines. The judgment call to surface: a **treasury / investment** account QuickBooks lists as a current asset that belongs under **Investing** — flag it `needs-review`.
 
-**`cf_section` + `cf_line` — balance-sheet accounts only** (leave blank for every P&L account). The cash-flow-statement mapping (indirect method): each account's period-over-period **change** feeds a cash-flow line. Mostly deterministic from the account type — the rows marked "—" stay blank:
+**`tags` — from the spec's registry only** (`mrr`, `cac`, `contra-revenue`, `pass-through`, `clearing`, `non-operating`). The two that need care on a first draft: tag `mrr` on recurring-revenue accounts *only after* confirming with the pro what they count as recurring (this defines their P&L-based MRR/ARR); tag `clearing` on anything that should net to zero (payroll holding, processor clearing, unapplied-cash system accounts) — the anomaly-sweep workflows key off it.
 
-| QuickBooks account type (detail type) | cf_section | cf_line |
-| --- | --- | --- |
-| Bank / cash on hand | — *(blank: this is the ending cash)* | — |
-| Accounts Receivable | Operating | Change in accounts receivable |
-| Other Current Asset — prepaids | Operating | Change in other current assets |
-| Other Current / Other Asset — investments, treasury | Investing | Treasury / investments |
-| Fixed Asset | Investing | Capital expenditures |
-| Accounts Payable | Operating | Change in accounts payable |
-| Credit Card | Operating | Change in credit card payable |
-| Other Current Liability — deferred revenue / accrued / payroll / sales tax | Operating | Change in *(that liability)* |
-| Long Term Liability | Financing | Debt proceeds / (repayments) |
-| Equity — common / preferred / APIC | Financing | Equity issuance |
-| Equity — retained earnings / accumulated deficit | — *(blank: rolls from net income)* | — |
-
-The one judgment call to surface: a **treasury / investment** account QuickBooks lists as a current asset that you may instead treat as **Investing** (above).
+**`mapping_status` is the honesty column:** rule-drafted rows are `auto`, judgment calls are `needs-review` (with `review_note` saying why), and nothing is `confirmed` until the human signs off in step 6. Downstream workflows disclose any non-confirmed rows they relied on — so the statuses are load-bearing, not decoration.
 
 ### 6 · Review the draft with the human (the gate)
-**Don't make the user read all N rows** — a real chart has hundreds of accounts; only the judgment calls need their eyes. Say so up front ("Most of your ~250 accounts mapped straight from QuickBooks — I only need you on the few I had to judge"), then present the map separated by confidence:
-- **Straight from QuickBooks** (`account_type`, `detail_type`, the `Revenue` / `Cost of Goods Sold` groupings, and the deterministic `cf_section` / `cf_line` defaults) — summarize as a count ("228 accounts mapped directly"), don't enumerate.
-- **Needs review** — present **compactly** (grouped, ideally a short table): the **OpEx `reporting_group`** calls (briefly show how each was derived — name, parent account, or judgment — and surface anything you flagged as irregular or couldn't place); any **`cf_section`** judgment call (e.g. a treasury / investment account QuickBooks lists as a current asset that you may want under **Investing**); plus any `description` you wrote yourself and anything whose name fights its type.
+**Don't make the user read all N rows** — a real chart has hundreds of accounts; only the `needs-review` queue needs their eyes. Say so up front ("Most of your ~250 accounts mapped by rule — I only need you on the few I had to judge"), then present the map by `mapping_status`:
+- **`auto`** (rule-mapped: verbatim ledger facts, clean `detail_type` → category seeds, deterministic `cf_section` / `cf_line` defaults) — summarize as a count ("228 accounts mapped directly"), don't enumerate.
+- **`needs-review`** — present **compactly** (grouped, ideally a short table showing each row's `review_note`): the `expense_category` and `department` judgment calls (how each was derived — name, parent, or judgment), any `cf_section` call (e.g. treasury/investment under Investing), the proposed `mrr` tag set (this defines their MRR — make them say yes), and anything whose name fights its type.
 
-Don't finalize until the human signs off on the judgment calls. Save their corrections back to `account-map.csv` — the full map stays in the folder for spreadsheet editing anytime.
+On sign-off, mark the reviewed rows `confirmed` with `confirmed_by` / `confirmed_date`, and clear their `review_note`. The pro can also confirm the `auto` rows wholesale ("the rest look fine") — record that the same way. Don't finalize until the human has ruled on the judgment calls; their corrections go back into `account-map.csv` — the full map stays in the folder for spreadsheet editing anytime.
 
 ### 7 · Map the other systems onto the GL (money-flow graph)
 For each connected system, bind its money containers to GL accounts (match on names, last-4, amounts; confirm anything low-confidence):
@@ -202,7 +185,7 @@ Fold in whatever they give you, re-surface anything still open, and repeat until
 Don't end on "here are your files" — end on **evidence the model is right**. Run a quick tie-out of the freshly built context against the live systems, picking the 2–3 checks the connected systems support:
 
 - **Cash tie (Mercury ↔ QuickBooks):** for each Mercury account bound in the money-flow graph, compare the live Mercury balance to the mapped QuickBooks bank-account balance as of the last close date. An exact tie is the headline; a difference should be explainable (uncleared items, timing since close) or it becomes an open question.
-- **Revenue coverage (account map ↔ QuickBooks):** pull last full month's P&L from QuickBooks and re-total revenue using the account map's `Revenue` grouping. The two must match to the penny — this proves the map covers every income account, not most of them.
+- **Revenue coverage (account map ↔ QuickBooks):** pull last full month's P&L from QuickBooks and re-total revenue by summing every account the map classes as Income (`account_type: Income`, any `expense_category`). The two must match to the penny — this proves the map covers every income account, not most of them. If any revenue accounts carry the `mrr` tag, also play back the tag-based MRR total as a sanity check on the tag set.
 - **Runway-cash sanity (profile ↔ human):** total the accounts the profile counts as runway cash and play it back: "By your profile's definition, runway cash is ≈ $X across these N accounts — does that match your mental model?"
 
 Present the results as a compact tie-out table — *check · source A · source B · difference · verdict* — using a computation step for the arithmetic, never eyeballed. Every unexplained difference goes into Open Questions (§13) with a suggested next step; never soften or hide a miss. A found discrepancy is the feature working, not the setup failing — say so.
@@ -212,19 +195,18 @@ Then **hand off to the first workflow.** Close by confirming they're set up and 
 ## Updating & adding context over time
 This skill is **build-or-refresh** — run it again anytime to refresh:
 - **New context anytime** — the pro shares more in the session (or says *"add this to my finance context"*); ingest it, persist it to `context/`, fold it into the relevant profile sections (**replacing any matching placeholders**), and note it in the changelog.
-- **Refresh the map** — re-pull the Account List and diff against `account-map.csv`: keep human-confirmed rows, draft only genuinely new accounts, and flag accounts that disappeared or changed type.
+- **Refresh the map** — re-pull the Account List and diff against `account-map.csv` **on `gl_account_id`** (renames and renumbers update in place instead of looking like new accounts): overwrite the ledger-fact columns; draft genuinely new accounts as `auto`/`needs-review`; mark disappeared accounts inactive (never delete); **never overwrite a `confirmed` row's mappings** — flag a conflict for the human instead.
 - **Always** append a dated `CHANGELOG.md` entry describing what changed, and update the profile's as-of date and the pointer's `lastUpdated`.
 
 ## The account map (schema)
-`account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on `account_number` + `account_name` (must match QuickBooks exactly). A blank-header template ships alongside this skill in `templates/`.
+`account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on **`gl_account_id`** (QuickBooks' internal account Id). The full contract — column rules, the Expense Category / department vocabularies, the tag registry, the cash-flow line list, and the refresh workflow — is **`templates/account-map-spec.md`**; a blank-header template CSV ships alongside it.
 
-`account_number, account_name, account_type, detail_type, reporting_group, cf_section, cf_line, description`
+`gl_account_id, account_number, account_name, account_type, detail_type, parent_account, active, expense_category, department, cf_section, cf_line, tags, mapping_status, review_note, confirmed_by, confirmed_date`
 
-- `account_type` — the QuickBooks **Type** field, verbatim (P&L: Income / Cost of Goods Sold / Expense / Other Income / Other Expense; balance sheet: Bank / Accounts Receivable / Other Current Asset / Fixed Asset / Other Asset / Accounts Payable / Credit Card / Other Current Liability / Long Term Liability / Equity).
-- `detail_type` — the QuickBooks **Detail Type** field, verbatim.
-- `reporting_group` — **P&L accounts only** (blank for balance-sheet accounts): the management-reporting grouping — `Revenue` (income), `Cost of Goods Sold` (COGS), or an OpEx department (G&A, Engineering, Sales, Marketing, …); blank for Other Income / Other Expense.
-- `cf_section` ∈ {Operating, Investing, Financing} and `cf_line` — **balance-sheet accounts only** (blank for P&L accounts, and blank for cash/bank and retained earnings): the indirect-method cash-flow line each account's period-over-period change feeds.
-- `description` — a short, plain-language note on what the account is for.
+Three column groups:
+- **Ledger facts** (`gl_account_id` → `active`) — verbatim from QuickBooks; refreshes overwrite them; humans never edit them. Class (Revenue / COGS / OpEx / below-the-line / balance sheet) is derived from `account_type`, never stored.
+- **Reporting mappings** — `expense_category` (what kind of money, from the spec's fixed vocabulary), `department` (whose money; value kind follows Class), `cf_section` + `cf_line` (balance-sheet accounts only), `tags` (registry-controlled cross-cutting groups: `mrr`, `cac`, `contra-revenue`, `pass-through`, `clearing`, `non-operating`).
+- **Governance** — `mapping_status` (`auto` / `needs-review` / `confirmed`), `review_note`, `confirmed_by`, `confirmed_date`. Confirmed rows survive refreshes untouched; workflows disclose reliance on non-confirmed rows.
 
 ## `finance-profile.md` schema
 `finance-profile.md` is a **semantic control file, not a data dump** — it holds definitions, mappings, conventions, and judgment calls so every workflow reasons with the same financial brain. It *references* `account-map.csv` (never duplicates it). A fill-in skeleton ships in `templates/finance-profile-template.md`; draft from it, filling what you know and placeholdering the rest (steps 9–11). The 14 sections:
