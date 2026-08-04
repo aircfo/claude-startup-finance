@@ -17,7 +17,7 @@ You will need:
 - permission to authenticate those systems;
 - one finance artifact or business description, if available.
 
-For a cautious beta test, use sandbox or test-company data first — see [Data Handling and Security](data-handling-security.md).
+For a cautious first test, use sandbox or test-company data — see [Data Handling and Security](data-handling-security.md).
 
 ## Install The Plugin
 
@@ -100,17 +100,15 @@ We are a B2B SaaS company. We report ARR, MRR, gross margin, net burn, and runwa
 
 ## Step 4: Review The Account Map
 
-Claude will draft `account-map.csv` from QuickBooks.
+Claude will draft `account-map.csv` from QuickBooks. Most rows map by rule; you review only the ones Claude marks `needs-review` — typically:
 
-You will review:
-
-- P&L reporting groupings;
-- OpEx department classifications;
+- expense-category calls (what kind of money an account is);
+- department calls (which team owns the spend);
 - COGS vs. operating expense calls;
-- cash-flow mapping for balance-sheet accounts;
-- account descriptions Claude wrote where QuickBooks did not have one.
+- the proposed `mrr` tag set — this defines your P&L-based MRR, so confirm it deliberately;
+- cash-flow mapping questions (e.g. a treasury account you may want treated as Investing).
 
-Do not worry about making it perfect on the first pass. The goal is to confirm obvious mappings and flag anything uncertain.
+Rows you sign off on are marked `confirmed`, and later refreshes never overwrite them. Do not worry about making it perfect on the first pass. The goal is to confirm obvious mappings and flag anything uncertain.
 
 ## Step 5: Finalize The Finance Profile
 
@@ -125,7 +123,17 @@ Some sections may contain placeholders. That is expected.
 
 Placeholders are a product feature: they show where Claude does not know enough yet. Leave them in place rather than accepting a guess.
 
-## Step 6: Run Your First Workflow
+## Step 6: Watch It Verify (Prove It Ties)
+
+Setup does not end on "here are your files." Claude closes by checking the freshly built context against your live systems — for example:
+
+- Mercury balances tied to the mapped QuickBooks bank accounts;
+- last month's revenue re-totaled through the account map, matching the QuickBooks P&L to the penny;
+- your runway-cash definition played back as a number you can sanity-check.
+
+You get a short tie-out table. An unexplained difference becomes an open question — finding one is the feature working, not the setup failing.
+
+## Step 7: Run Your First Workflow
 
 Try one:
 
@@ -148,6 +156,7 @@ After a successful first session, you should have:
 - a Finance Context folder in the location you approved;
 - a first version of `finance-profile.md`;
 - a first version of `account-map.csv`;
+- a tie-out showing the model matches your live systems;
 - a list of open questions;
 - at least one useful finance workflow output.
 
@@ -164,6 +173,10 @@ If QuickBooks output looks wrong:
 
 - confirm the **airCFO** QuickBooks connector was used, not Intuit's built-in one (see Step 2), then re-run;
 - if the chart of accounts is large and a pull errors out, ask Claude to "pull the account list in smaller pages."
+
+If a connector that worked before asks you to sign in again:
+
+- connector sessions expire after a few idle days — a re-sign-in prompt on a later run is **normal, not a bug**; authorize and continue.
 
 If auth otherwise fails:
 

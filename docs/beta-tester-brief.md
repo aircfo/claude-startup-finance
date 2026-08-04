@@ -6,7 +6,7 @@ title: Early Access Brief
 
 Thank you for trying airCFO Claude for Startup Finance during early access.
 
-This beta is testing a simple but important idea: finance analysis gets dramatically better when Claude has a durable understanding of your company's finance context before it pulls numbers.
+Early access tests a simple but important idea: finance analysis gets dramatically better when Claude has a durable understanding of your company's finance context before it pulls numbers.
 
 The plugin builds that context once, stores it locally, and then uses it across repeatable finance workflows.
 
@@ -25,7 +25,7 @@ The goal is not just to answer one question. The goal is to make future finance 
 
 ## Best-Fit Testers
 
-This beta is currently best for teams that:
+Early access is currently best for teams that:
 
 - use QuickBooks as the accounting system;
 - use at least one of Stripe, Ramp, or Mercury;
@@ -41,10 +41,11 @@ In a typical first session, you will:
 2. Authenticate relevant finance systems.
 3. Run `/finance-context-builder`.
 4. Share one helpful finance artifact or business description.
-5. Review the drafted account map.
+5. Review the drafted account map (just the judgment calls Claude flags).
 6. Finalize a first version of `finance-profile.md`.
-7. Run one or two sample workflows, such as runway or board metrics.
-8. Tell us where the product was useful, confusing, or untrustworthy.
+7. Watch Claude verify the model ties to your live systems.
+8. Run one or two sample workflows, such as runway or board metrics.
+9. Tell us where the product was useful, confusing, or untrustworthy.
 
 ## Time Commitment
 
@@ -69,7 +70,7 @@ We are especially interested in:
 
 The most helpful feedback is specific: what you tried, what happened, whether you trusted it, and what you expected instead. Email it to alex@aircfo.com after your test session.
 
-## Beta Expectations
+## What To Expect
 
 This is an early product.
 
