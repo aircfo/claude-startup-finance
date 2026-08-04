@@ -210,8 +210,6 @@ Expected output:
 - a dry run against a recent period;
 - a copy-ready `SKILL.md` if the workflow is validated.
 
-Note: this beta may revamp or remove meta-skills before launch. Treat this use case as experimental.
-
 ## What To Watch For
 
 Good outputs should:

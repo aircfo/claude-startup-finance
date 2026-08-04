@@ -2,19 +2,21 @@
 title: Give Claude Your Finance Context Once
 ---
 
-# Give Claude Your Finance Context Once
+<div class="hero" markdown="0">
+  <p class="eyebrow">A Claude Cowork plugin by airCFO</p>
+  <h1>Give Claude your finance context. Once.</h1>
+  <p class="lede">Claude can already read your finance systems. This plugin teaches it what your numbers <em>mean</em> — your definitions of burn, runway, and MRR; how your accounts map into reporting; the judgment calls your team carries in its head. Built once, reused by every finance workflow after.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="first-session-guide.html">Get started</a>
+    <a class="btn btn-secondary" href="https://github.com/aircfo/claude-startup-finance">View on GitHub</a>
+  </div>
+</div>
 
-airCFO Claude for Startup Finance helps Claude understand how your startup's finance stack actually works: your chart of accounts, cash rules, revenue definitions, system mappings, and the judgment calls your team normally carries in its head.
+<p class="credibility" markdown="0">Built by <a href="https://aircfo.com">airCFO</a>, the AI-enabled back-office growth partner for startups — the same context model our team uses on real books.</p>
 
-Once that context is built, Claude can reuse it across finance workflows like runway, revenue reconciliation, board metrics, and monthly reporting without asking you to re-explain the business every time.
+## The problem
 
-This is a private beta for finance leaders, founders, and operators who want to test a new way of giving Claude durable finance context. It runs in **Claude Cowork**.
-
-## The Problem
-
-Claude can read financial data, but finance work breaks when it does not know your company's definitions.
-
-For example:
+Finance analysis breaks when the model doesn't know your company's definitions:
 
 - Which Mercury accounts count as cash for runway?
 - Does treasury count as available runway cash?
@@ -23,75 +25,55 @@ For example:
 - Which QuickBooks accounts roll into each management reporting line?
 - Which one-time costs should be excluded from run-rate burn?
 
-Those answers rarely live cleanly in one system. They live in board decks, close checklists, reporting packages, spreadsheets, and CFO judgment.
+Those answers rarely live cleanly in one system. They live in board decks, close checklists, reporting packages, spreadsheets, and CFO judgment. Without them, every AI answer is a generic answer.
 
-## The Idea
+## How it works
 
-The plugin first builds a local `finance-profile.md` file. Think of it as Claude's operating manual for your finance function.
+<div class="card-grid" markdown="0">
+  <div class="card">
+    <span class="step-no">1</span>
+    <h3>Connect your stack</h3>
+    <p>One install wires up Stripe, Ramp, Mercury, and QuickBooks — each authorized with your own login, read-only. Use the ones you have; missing systems become open questions, never guesses.</p>
+  </div>
+  <div class="card">
+    <span class="step-no">2</span>
+    <h3>Build the context</h3>
+    <p>A guided ~20-minute setup drafts your account map from QuickBooks, reads whatever you share about the business, and writes a durable <code>finance-profile.md</code>. You review only the judgment calls.</p>
+  </div>
+  <div class="card">
+    <span class="step-no">3</span>
+    <h3>Verify, then work</h3>
+    <p>Setup ends by proving the model ties to your live systems — cash to the bank, revenue to the books. Then every workflow reads the profile first: runway, board metrics, revenue reconciliation, and skills you build yourself.</p>
+  </div>
+</div>
 
-It is not your books. It is the context Claude needs to interpret your books.
+## What you get
 
-The profile captures:
+**Four connectors**, authorized per-user with OAuth: QuickBooks, Stripe, Ramp, and Mercury.
 
-- how your company makes money;
-- which systems own which numbers;
-- how accounts map into management reporting;
-- how you define burn, runway, revenue, ARR, MRR, and other KPIs;
-- known exceptions and judgment calls;
-- open questions that still need human review.
+**A finance context that persists.** The setup produces a folder you own and can open anytime:
 
-## What It Does Today
+- `finance-profile.md` — Claude's operating manual for your finance function: KPI definitions, cash and burn rules, source-of-truth mappings, known exceptions. [How it works →](finance-profile-explainer.md)
+- `account-map.csv` — every QuickBooks account, classified for management reporting and cash-flow mapping, editable in any spreadsheet.
 
-The beta plugin connects Claude to:
+**Workflows that use it:**
 
-- QuickBooks
-- Stripe
-- Ramp
-- Mercury
+- **Runway & burn** — complete bank flows from Mercury, spend drivers explained by Ramp.
+- **Board metrics** — ARR/MRR, cash, burn, runway, and AR/AP aging in one paste-ready summary.
+- **Revenue reconciliation** — an explicit bridge from Stripe gross to QuickBooks recognized revenue.
+- **Build your own** — meta-skills that turn a workflow you just ran into a reusable skill of your own.
 
-It includes workflows to:
+See [Use Cases](use-cases.md) for prompts to try.
 
-- build a company-specific finance profile;
-- draft and review an account map from QuickBooks;
-- calculate runway and burn;
-- reconcile Stripe revenue to QuickBooks;
-- assemble a board-ready financial metrics summary.
+## Read-only by design
 
-## Who This Is For
+The plugin reads your systems; it never writes to them. No journal entries, no subscription changes, no writeback of any kind. Outputs are analysis for human review — placeholders and open questions mark what the model doesn't know, instead of fake certainty.
 
-This beta is best for:
-
-- early-stage startups using QuickBooks plus at least one of Stripe, Ramp, or Mercury;
-- finance leaders who already have recurring reporting workflows;
-- founders or operators who want Claude to understand their finance model before analysis;
-- teams comfortable reviewing AI-generated finance outputs before relying on them.
-
-The full experience is strongest with QuickBooks, Stripe, Ramp, and Mercury connected. Partial setups are supported, but missing systems will create placeholders and open questions in the finance profile.
-
-## What It Is Not
-
-This beta is not:
-
-- an accounting system;
-- a replacement for your source-of-truth systems;
-- an audit tool;
-- a writeback automation;
-- a substitute for CFO review.
-
-The plugin is designed for read-only finance analysis. You should review outputs before using them in board materials, investor updates, audits, or operational decisions.
-
-## Start Here
-
-1. Read the [Beta Tester Brief](beta-tester-brief.md).
-2. Review the [Data Handling and Security FAQ](data-handling-security.md) before you connect anything.
-3. Follow the [First-Session Guide](first-session-guide.md).
-4. Learn how the [Finance Profile](finance-profile-explainer.md) works.
-5. Try the prompts in [Use Cases](use-cases.md).
-6. Know the [Known Limitations](known-limitations.md) of the beta.
+The QuickBooks connector is operated by airCFO and documented in full — what it stores, where it runs, and who can touch your data: [Data Handling and Security](data-handling-security.md).
 
 ## Install
 
-You'll need access to **Claude Cowork**. The plugin installs from inside Cowork — there is no command line. You add the airCFO marketplace once, then install the plugin from it.
+You'll need **Claude Cowork** (the Cowork tab in the Claude desktop app, on Pro, Max, Team, or Enterprise plans). The plugin installs from inside Cowork — no command line.
 
 1. Open Claude Cowork, click **Customize** in the left sidebar, then **Browse plugins**.
 2. Select **Personal**, click the **+** button, and choose **Add marketplace from GitHub**.
@@ -104,10 +86,17 @@ Then, in a Cowork session, start setup:
 /finance-context-builder
 ```
 
-You can also just ask in plain English — "set up the finance plugin."
+You can also just ask in plain English — "set up the finance plugin." The [First-Session Guide](first-session-guide.md) walks through the whole thing.
 
-Questions or feedback during the beta: alex@aircfo.com
+## Early access
 
----
+<p class="section-note" markdown="0">The plugin is in early access. It's best for teams on QuickBooks plus at least one of Stripe, Ramp, or Mercury — and for finance leaders comfortable reviewing AI-drafted mappings before relying on them. Read the <a href="beta-tester-brief.html">Early Access Brief</a> and <a href="known-limitations.html">Known Limitations</a>, and send feedback to <a href="mailto:alex@aircfo.com">alex@aircfo.com</a>.</p>
 
-*Unofficial. Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury, Intuit (QuickBooks), or Anthropic. All trademarks belong to their respective owners.*
+## Documentation
+
+1. [Early Access Brief](beta-tester-brief.md) — what you're testing and what good feedback looks like.
+2. [Data Handling and Security](data-handling-security.md) — read before you connect anything.
+3. [First-Session Guide](first-session-guide.md) — install to first useful output.
+4. [The Finance Profile](finance-profile-explainer.md) — how the context model works.
+5. [Use Cases](use-cases.md) — prompts to try.
+6. [Known Limitations](known-limitations.md) — the honest list.
