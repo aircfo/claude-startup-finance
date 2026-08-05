@@ -6,15 +6,14 @@ title: First-Session Guide
 
 This guide walks you from install to first useful output.
 
-The goal of your first session is to create a usable `finance-profile.md`, review the initial account map, and run at least one finance workflow that uses your company's context.
+The goal of your first session is to build your **ContextOS** — a usable `finance-profile.md` and a reviewed account map — and see it verified against your live books.
 
 ## Before You Start
 
 You will need:
 
 - access to **Claude Cowork**;
-- access to the finance systems you want to connect;
-- permission to authenticate those systems;
+- access to your QuickBooks Online account (and permission to authenticate it);
 - one finance artifact or business description, if available.
 
 For a cautious first test, use sandbox or test-company data — see [Data Handling and Security](data-handling-security.md).
@@ -27,27 +26,29 @@ The plugin installs from inside **Claude Cowork** — there is no command line. 
 2. Click **Customize** in the left sidebar, then **Browse plugins**.
 3. Select **Personal**, click the **+** button, and choose **Add marketplace from GitHub**.
 4. Enter the repository URL: `https://github.com/aircfo/claude-startup-finance`
-5. The **startup-finance** plugin appears in the marketplace — click **Install**. It activates automatically.
+5. Click **Install** on **finance-contextos**. It activates automatically.
+   (Optionally also install **all-systems-go** — it adds Stripe/Ramp/Mercury connectors and
+   the runway, board-metrics, and reconciliation workflows. You can add it after the build too.)
 
-Then begin setup:
+Then begin:
 
 ```text
-/finance-context-builder
+build my ContextOS
 ```
 
-You can also just ask — "set up the finance plugin." Type **/** or click **+** in Cowork anytime to see every skill the plugin adds.
+You can also run `/finance-context-builder` directly. Type **/** or click **+** in Cowork anytime to see every skill the plugins add.
 
-> **First, open a working folder in Cowork.** Before you run the skill, use the *"Work in a folder"* control in your Cowork session and pick (or create) a folder Claude can read and write. That folder is where your Finance Context gets saved. If you skip this, Claude may finish the setup but be unable to save the output.
+> **First, open a working folder in Cowork.** Before you run the skill, use the *"Work in a folder"* control in your Cowork session and pick (or create) a folder Claude can read and write. That folder is where your ContextOS gets saved. If you skip this, Claude may finish the setup but be unable to save the output.
 
-## Step 1: Confirm The Finance Context Folder
+## Step 1: Confirm The ContextOS Folder
 
 Claude will propose a folder, usually:
 
 ```text
-~/Desktop/airCFO Finance Context/
+~/Desktop/ContextOS/
 ```
 
-This folder is where the plugin stores your finance context files.
+This folder is where the plugin stores your ContextOS files. (Built one under the older default, `~/Desktop/airCFO Finance Context/`? It keeps working — refreshes find and reuse it.)
 
 Expected files:
 
@@ -60,18 +61,11 @@ Use a location that is easy for your team to find and safe for your company's da
 
 After you confirm the location, the builder saves a small **pointer** so future finance workflows can find this folder without loading your whole profile into every session. It may also ask permission to add a short note to your workspace configuration — say yes or no; either way the pointer keeps things working, and the full profile is never loaded into every session.
 
-## Step 2: Connect Systems
+## Step 2: Connect QuickBooks
 
-The plugin works best with:
+QuickBooks is the backbone — it's where the account map and most of the profile come from, and it's the only connector `finance-contextos` ships. Expect **one** browser sign-in pop-up: your own QuickBooks login, read-only. Claude confirms the company name it connected to, so a wrong company is caught immediately.
 
-- QuickBooks for accounting and chart of accounts;
-- Stripe for customers, subscriptions, and payment activity;
-- Ramp for card spend and vendor activity;
-- Mercury for cash balances and bank accounts.
-
-On the first run, `/finance-context-builder` checks all four connectors up front, so you may see several browser sign-in prompts in a row. Authorize the systems you use and decline the rest — declining is expected and never blocks setup.
-
-You do not need all four. The minimum useful setup is **QuickBooks plus at least one of Stripe, Ramp, or Mercury**. Missing systems become placeholders and open questions rather than guesses.
+If you've also installed **all-systems-go**, Claude checks its connectors too (Stripe for subscriptions, Ramp for card spend, Mercury for bank balances) — authorize the ones you use and decline the rest; declining is expected and never blocks setup. Missing systems become placeholders and open questions rather than guesses.
 
 > **QuickBooks — connect the airCFO connector, not Intuit's.** This plugin ships its own QuickBooks connector. Claude or Cowork may also offer Intuit's official QuickBooks connector — that is a *different* one and produces weaker results here. Make sure the QuickBooks connection used during setup is the airCFO one that came with the plugin. If a first run gave odd QuickBooks numbers, this is the most likely cause — check the connector and re-run.
 
@@ -135,7 +129,7 @@ You get a short tie-out table. An unexplained difference becomes an open questio
 
 ## Step 7: Run Your First Workflow
 
-Try one:
+The cross-system workflows ship in the **all-systems-go** plugin — install it from the same marketplace if you haven't. Then try one:
 
 ```text
 What is our runway?
@@ -147,13 +141,13 @@ Then try:
 Give me board metrics for last month.
 ```
 
-Claude should use the finance profile before pulling numbers.
+Claude should read your ContextOS before pulling numbers.
 
 ## What Good Looks Like
 
 After a successful first session, you should have:
 
-- a Finance Context folder in the location you approved;
+- a ContextOS folder in the location you approved;
 - a first version of `finance-profile.md`;
 - a first version of `account-map.csv`;
 - a tie-out showing the model matches your live systems;
@@ -186,9 +180,9 @@ If auth otherwise fails:
 
 If the profile cannot be found:
 
-- point Claude to the Finance Context folder;
+- point Claude to the ContextOS folder;
 - rerun `/finance-context-builder` to refresh the pointer;
-- confirm the file exists at `~/Desktop/airCFO Finance Context/finance-profile.md` or your chosen folder.
+- confirm the file exists at `~/Desktop/ContextOS/finance-profile.md` (or `~/Desktop/airCFO Finance Context/finance-profile.md` for older builds), or your chosen folder.
 
 If an output feels wrong:
 

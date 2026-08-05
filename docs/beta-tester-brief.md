@@ -6,13 +6,13 @@ title: Early Access Brief
 
 Thank you for trying airCFO Claude for Startup Finance during early access.
 
-Early access tests a simple but important idea: finance analysis gets dramatically better when Claude has a durable understanding of your company's finance context before it pulls numbers.
+Early access tests a simple but important idea: finance analysis gets dramatically better when Claude has a durable understanding of your company — a ContextOS — before it pulls numbers.
 
 The plugin builds that context once, stores it locally, and then uses it across repeatable finance workflows.
 
 ## What You Are Testing
 
-You are testing a **Claude Cowork** plugin that connects to common startup finance systems and creates an airCFO Finance Context folder you can open anytime.
+You are testing a **Claude Cowork** plugin that connects to common startup finance systems and builds a ContextOS — a context folder you can open anytime.
 
 That folder includes:
 
@@ -52,7 +52,7 @@ In a typical first session, you will:
 Expected first-session timing:
 
 - install/auth: 5-10 minutes;
-- finance context build: 15-30 minutes;
+- ContextOS build: 15-30 minutes;
 - first useful workflow: immediately after profile creation.
 
 The setup may take longer if your chart of accounts is complex or if several connectors need to be authorized.

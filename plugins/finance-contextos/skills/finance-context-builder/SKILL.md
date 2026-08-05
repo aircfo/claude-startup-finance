@@ -1,17 +1,17 @@
 ---
 name: finance-context-builder
-description: Build the company's finance context — an airCFO Finance Context folder (default on the Desktop) holding a finance-profile.md semantic map that resolves how Stripe, Ramp, Mercury, and QuickBooks accounts relate. It first invites the finance pro to share any docs or notes about their business, then drafts an account map from the QuickBooks Account List for review. Use on first-time setup or to refresh, or when someone says "set up the finance plugin," "build my finance context," "build my finance profile," "map my accounts across systems," "add this to my finance context," or when another finance workflow can't find finance-profile.md.
+description: Build the company's ContextOS — a folder (default on the Desktop) holding a finance-profile.md semantic map and an account map drafted from the QuickBooks Account List, verified against the live books before handoff. QuickBooks is the backbone; Stripe, Ramp, and Mercury enrich the context when connected. It first invites the finance pro to share any docs or notes about their business, then drafts the account map for review. Use on first-time setup or to refresh, or when someone says "build my ContextOS," "set up the finance plugin," "build my finance context," "build my finance profile," "map my accounts across systems," "add this to my ContextOS," or when another finance workflow can't find finance-profile.md.
 ---
 
-# Finance Context Builder — build the company's finance context
+# Finance Context Builder — build the company's ContextOS
 
-Produce the **airCFO Finance Context**: a folder the finance pro can open anytime (default `~/Desktop/airCFO Finance Context/`) holding `finance-profile.md` (the semantic map), `account-map.csv` (how every account classifies), the source docs they've shared, and a changelog. Every other finance workflow reads the profile first, so Claude reasons across Stripe, Ramp, Mercury, and QuickBooks with one shared model — grounded in how *this* company actually reports.
+Produce the **ContextOS**: a folder the finance pro can open anytime (default `~/Desktop/ContextOS/`) holding `finance-profile.md` (the semantic map), `account-map.csv` (how every account classifies), the source docs they've shared, and a changelog. Every other finance workflow reads the profile first, so Claude reasons about the company's finances with one shared model — grounded in how *this* company actually reports. **A ContextOS isn't done until it ties** — the build ends by verifying the model against the live books (step 12), never on "here are your files."
 
 ## What this produces
-An **airCFO Finance Context folder** (default `~/Desktop/airCFO Finance Context/`; confirm the location with the user on the first run):
+An **ContextOS folder** (default `~/Desktop/ContextOS/`; confirm the location with the user on the first run):
 
 ```
-~/Desktop/airCFO Finance Context/
+~/Desktop/ContextOS/
 ├── finance-profile.md     # the semantic map (narrative + summary) — the main read
 ├── account-map.csv        # every GL account × its classification — the editable source of truth
 ├── context/               # source docs the pro shares (written here after they're ingested)
@@ -40,12 +40,12 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 ### 0 · Orient the user first (before doing anything)
 This is a guided, **~15–20 minute** setup with two quick review points. Open with a one-message roadmap so the pop-ups and the wait don't feel random, then begin:
 
-> "I'll set up your finance context — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect your finance systems (you'll see sign-in pop-ups — authorize the ones you use, skip the rest) → ③ tell me about your business → ④ I draft your account map and you review just the judgment calls → ⑤ I build your finance profile → ⑥ I verify the model ties to your live systems. You can stop and resume anytime. Ready?"
+> "I'll build your ContextOS — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect QuickBooks (one sign-in pop-up; if you have other finance connectors installed I'll check those too) → ③ tell me about your business → ④ I draft your account map and you review just the judgment calls → ⑤ I build your finance profile → ⑥ I verify the model ties to your live books. You can stop and resume anytime. Ready?"
 
 Then keep the user oriented as you go — a one-line "here's where we are / here's what's next" at each stage beats long silent stretches, especially while pulling a large chart of accounts or drafting the map.
 
-### 1 · Locate or create the airCFO Finance Context folder
-On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (let the user pick another spot); create it with the structure above. On later runs, use the existing folder.
+### 1 · Locate or create the ContextOS folder
+On the first run, propose `~/Desktop/ContextOS/` and confirm it (let the user pick another spot); create it with the structure above. On later runs, use the existing folder — including folders created by earlier versions under the old default name `~/Desktop/airCFO Finance Context/` (check the pointer file first, then both default paths). An old-named folder is fully valid; never rename or move it without asking.
 
 **In Claude Cowork, you can only write to a folder the user has granted the session access to — confirm this *first*, before investing the next 15 minutes.** Create the folder and immediately write a small file to it (the `LOCATION.md` below doubles as the write-test). If that write fails with a permission error, stop right here and ask the user to grant a folder via Cowork's *"Work in a folder"* control, then retry — do not move on to connectors or the account map until a write has actually succeeded. Never run all the way to the end only to silently fail to save the output.
 
@@ -55,9 +55,9 @@ On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (le
 
   ```json
   {
-    "contextFolder": "/absolute/path/to/airCFO Finance Context",
-    "financeProfile": "/absolute/path/to/airCFO Finance Context/finance-profile.md",
-    "accountMap": "/absolute/path/to/airCFO Finance Context/account-map.csv",
+    "contextFolder": "/absolute/path/to/ContextOS",
+    "financeProfile": "/absolute/path/to/ContextOS/finance-profile.md",
+    "accountMap": "/absolute/path/to/ContextOS/account-map.csv",
     "lastUpdated": "YYYY-MM-DD"
   }
   ```
@@ -70,21 +70,26 @@ On the first run, propose `~/Desktop/airCFO Finance Context/` and confirm it (le
 
   ```md
   <!-- airCFO Finance Context:start -->
-  airCFO Finance Context folder: /absolute/path/to/airCFO Finance Context
-  airCFO finance profile: /absolute/path/to/airCFO Finance Context/finance-profile.md
+  ContextOS folder: /absolute/path/to/ContextOS
+  Finance profile: /absolute/path/to/ContextOS/finance-profile.md
   <!-- airCFO Finance Context:end -->
+
+  (Keep the `airCFO Finance Context` marker comments exactly as-is — they're the bounded-block
+  identifier existing installs already carry, so re-runs keep replacing instead of duplicating.)
   ```
 
   If they decline, skip the `CLAUDE.md` write — the JSON pointer and the default folder still let workflows find the profile.
 
 - **Never add an `@import` of the full profile** to `CLAUDE.md`. That would load the entire profile into every session — exactly what the pointer avoids.
 
-Also drop a human-readable `LOCATION.md` inside the Finance Context folder noting its own path — a convenience for the user. Don't rely on it for discovery: workflows find the folder via the pointer or the default path, not this file.
+Also drop a human-readable `LOCATION.md` inside the ContextOS folder noting its own path — a convenience for the user. Don't rely on it for discovery: workflows find the folder via the pointer or the default path, not this file.
 
 ### 2 · Connector preflight — see which systems are live
-**Tell the user what's coming before you trigger anything:** "I'll check your four connectors now — you'll get a sign-in pop-up for each. Authorize the ones you use (QuickBooks is the important one) and just close/decline the rest. If a sign-in window won't load or won't connect, close it — I'll mark that one as not connected and you can add it later."
+**QuickBooks is the build; everything else is enrichment.** This plugin ships only the QuickBooks connector. Stripe, Ramp, and Mercury tools are present only if the **all-systems-go** plugin (or another connector) is also installed — detect which connectors exist from the available tools, and only mention the ones that do. **Don't ask the user to list their systems.**
 
-Then check connectors by running **one lightweight read against each** (read-only). **Do QuickBooks first** — it's the backbone, so confirm it before the rest: read company info and show the user the company name you got back ("Connected to QuickBooks: *Acme, Inc.*") so a wrong connector or wrong company is caught immediately. Then check Stripe (account/balance), Ramp (current user), and Mercury (accounts). Detect connection status from what responds — **don't ask the user to list their systems.**
+**Tell the user what's coming before you trigger anything:** "I'll connect QuickBooks now — you'll get one sign-in pop-up. Sign in with your own QuickBooks login; access is read-only." (If other finance connectors are installed, add: "I'll also check [Stripe/Ramp/Mercury] — authorize the ones you use and just close/decline the rest.")
+
+Then check each present connector by running **one lightweight read** (read-only). **Do QuickBooks first** — it's the backbone, so confirm it before anything else: read company info and show the user the company name you got back ("Connected to QuickBooks: *Acme, Inc.*") so a wrong connector or wrong company is caught immediately. Then, if installed: Stripe (account/balance), Ramp (current user), Mercury (accounts).
 
 If a connector isn't authorized, its read surfaces the provider's browser sign-in. If a sign-in **fails to complete** (window won't load, "can't connect to the server," or the user closes it), don't wait on it — mark the connector **Not connected**, note it, and move on; the user can reconnect and re-run later. **Never block setup on a missing or failed connector.**
 
@@ -119,7 +124,7 @@ Get company info (legal name, fiscal year, accounting basis, reporting currency)
 **Large charts of accounts need paging.** A real startup chart can run to several hundred accounts, and pulling them all in one call can exceed the connector's output-size limit and error out (a ~250-account chart can return well over 100K characters). Pull the list in pages — step through with the query's `startposition` / `maxresults` (around 100 accounts at a time) and assemble the rows as you go. If a page still errors on size, halve the page size and retry. Don't abandon the chart of accounts because the first full pull was too big.
 
 ### 5 · Draft the account map
-Write one row per GL account to `account-map.csv` in the airCFO Finance Context folder. The full schema and vocabularies live in **`templates/account-map-spec.md`** — read it before drafting. Columns: `gl_account_id, account_number, account_name, account_type, detail_type, parent_account, active, expense_category, department, cf_section, cf_line, tags, mapping_status, review_note, confirmed_by, confirmed_date`.
+Write one row per GL account to `account-map.csv` in the ContextOS folder. The full schema and vocabularies live in **`templates/account-map-spec.md`** — read it before drafting. Columns: `gl_account_id, account_number, account_name, account_type, detail_type, parent_account, active, expense_category, department, cf_section, cf_line, tags, mapping_status, review_note, confirmed_by, confirmed_date`.
 
 **The mental model (from the spec): the map is a cube, not a tree.** Each account carries independent axes — Class (derived from `account_type`), `expense_category` (what kind of money), `department` (whose money), `cf_section`/`cf_line` (how its change moves cash), and `tags` (cross-cutting analysis groups). Deliverables pivot these axes into whatever hierarchy they need; the map never hard-codes an outline.
 
@@ -175,14 +180,16 @@ Show the pro **which sections still contain placeholders**, as a short checklist
 
 Fold in whatever they give you, re-surface anything still open, and repeat until they're ready. Anything left unfilled is mirrored into **Open Questions** (§13) with a suggested next step, so the uncertainty stays visible.
 
-### 11 · Finalize & write the airCFO Finance Context
+**Offer the intake question set for the rest.** For gaps only a human can fill (definitions, policies, rulings), offer `templates/intake-questions.md` — a timeboxed ~30-minute question list where every answer lands in a specific profile section. Adapt it before offering: generate Block 1 from *this company's* actual `needs-review` rows and open questions, and drop any question the build already answered. They can run it now in the session, or take it to whoever owns the numbers and bring back answers ("add this to my ContextOS").
+
+### 11 · Finalize & write the ContextOS
 - Write `finance-profile.md` and `account-map.csv` into the folder; make sure the docs the pro shared are saved in `context/`. Remaining placeholders stay in the file and are listed in Open Questions.
 - Confirm the pointer is current: update `.aircfo-finance-context.json` (`lastUpdated`) and the `CLAUDE.md` block if one was added.
 - Append a dated entry to `CHANGELOG.md` describing what changed and what's still open.
 - Record provenance (§14): as-of date, connectors read, docs ingested, and which sections remain placeholder.
 
 ### 12 · Prove it ties (ground-truth check), then hand off
-Don't end on "here are your files" — end on **evidence the model is right**. Run a quick tie-out of the freshly built context against the live systems, picking the 2–3 checks the connected systems support:
+**A ContextOS isn't done until it ties.** Don't end on "here are your files" — end on **evidence the model is right**. Run a quick tie-out of the freshly built context against the live systems, picking the 2–3 checks the connected systems support:
 
 - **Cash tie (Mercury ↔ QuickBooks):** for each Mercury account bound in the money-flow graph, compare the live Mercury balance to the mapped QuickBooks bank-account balance as of the last close date. An exact tie is the headline; a difference should be explainable (uncleared items, timing since close) or it becomes an open question.
 - **Revenue coverage (account map ↔ QuickBooks):** pull last full month's P&L from QuickBooks and re-total revenue by summing every account the map classes as Income (`account_type: Income`, any `expense_category`). The two must match to the penny — this proves the map covers every income account, not most of them. If any revenue accounts carry the `mrr` tag, also play back the tag-based MRR total as a sanity check on the tag set.
@@ -190,16 +197,16 @@ Don't end on "here are your files" — end on **evidence the model is right**. R
 
 Present the results as a compact tie-out table — *check · source A · source B · difference · verdict* — using a computation step for the arithmetic, never eyeballed. Every unexplained difference goes into Open Questions (§13) with a suggested next step; never soften or hide a miss. A found discrepancy is the feature working, not the setup failing — say so.
 
-Then **hand off to the first workflow.** Close by confirming they're set up and verified, and what to try next: "Your finance context is built and it ties to your live systems. Try asking *'what's our runway?'* or *'give me board metrics for last month'* — they'll use this profile." If sections are still placeholder, add one line that those fill in as they share more.
+Then **hand off.** Close by confirming they're set up and verified: "Your ContextOS is built and it ties to your live books." If the All Systems Go plugin's workflows are installed, suggest one next ("try *'what's our runway?'* or *'give me board metrics for last month'* — they'll use this profile"); otherwise mention that installing **all-systems-go** from the same marketplace adds those workflows plus Stripe/Ramp/Mercury enrichment. If sections are still placeholder, add one line that those fill in as they share more.
 
 ## Updating & adding context over time
 This skill is **build-or-refresh** — run it again anytime to refresh:
-- **New context anytime** — the pro shares more in the session (or says *"add this to my finance context"*); ingest it, persist it to `context/`, fold it into the relevant profile sections (**replacing any matching placeholders**), and note it in the changelog.
+- **New context anytime** — the pro shares more in the session (or says *"add this to my ContextOS"*); ingest it, persist it to `context/`, fold it into the relevant profile sections (**replacing any matching placeholders**), and note it in the changelog.
 - **Refresh the map** — re-pull the Account List and diff against `account-map.csv` **on `gl_account_id`** (renames and renumbers update in place instead of looking like new accounts): overwrite the ledger-fact columns; draft genuinely new accounts as `auto`/`needs-review`; mark disappeared accounts inactive (never delete); **never overwrite a `confirmed` row's mappings** — flag a conflict for the human instead.
 - **Always** append a dated `CHANGELOG.md` entry describing what changed, and update the profile's as-of date and the pointer's `lastUpdated`.
 
 ## The account map (schema)
-`account-map.csv` lives in the airCFO Finance Context folder root (default `~/Desktop/airCFO Finance Context/account-map.csv`), one row per GL account, keyed on **`gl_account_id`** (QuickBooks' internal account Id). The full contract — column rules, the Expense Category / department vocabularies, the tag registry, the cash-flow line list, and the refresh workflow — is **`templates/account-map-spec.md`**; a blank-header template CSV ships alongside it.
+`account-map.csv` lives in the ContextOS folder root (default `~/Desktop/ContextOS/account-map.csv`), one row per GL account, keyed on **`gl_account_id`** (QuickBooks' internal account Id). The full contract — column rules, the Expense Category / department vocabularies, the tag registry, the cash-flow line list, and the refresh workflow — is **`templates/account-map-spec.md`**; a blank-header template CSV ships alongside it.
 
 `gl_account_id, account_number, account_name, account_type, detail_type, parent_account, active, expense_category, department, cf_section, cf_line, tags, mapping_status, review_note, confirmed_by, confirmed_date`
 

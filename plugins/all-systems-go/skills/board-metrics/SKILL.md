@@ -14,9 +14,9 @@ Trigger when the user is preparing a board deck, investor update, or monthly met
 Read `finance-profile.md` first (the company's semantic map). Use its pinned definitions (MRR, revenue recognition, burn, internal transfers), the cash account set, and the AR/AP account mappings so every metric here is consistent with the other workflows.
 
 Find the profile in this order:
-1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include an **airCFO Finance Context** pointer, use the profile path it names.
+1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include a **ContextOS** pointer (the bounded block is labeled `airCFO Finance Context` in older installs), use the profile path it names.
 2. Else if `.aircfo-finance-context.json` exists in the current workspace, read `financeProfile` from it.
-3. Else check the default location: `~/Desktop/airCFO Finance Context/finance-profile.md`.
+3. Else check the default location: `~/Desktop/ContextOS/finance-profile.md` — then the legacy default `~/Desktop/airCFO Finance Context/finance-profile.md`.
 4. Else check the current workspace for `finance-profile.md`.
 5. If you still can't find it, run `finance-context-builder` first (or tell the user to). **Do not guess** the metric definitions or account set — without the profile they're guesswork.
 

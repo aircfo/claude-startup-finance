@@ -1,0 +1,22 @@
+{
+  "name": "finance-contextos",
+  "displayName": "ContextOS by airCFO",
+  "description": "Build your company's ContextOS — the finance context Claude loads before touching your numbers. One guided session drafts your account map from QuickBooks, captures your definitions and judgment calls into a durable finance profile, and proves the result ties to your live books. One connector (QuickBooks, read-only, your own login), one review, yours to keep. Start here; add the All Systems Go plugin later for more connectors and workflows. Unofficial — not affiliated with or endorsed by Intuit or Anthropic.",
+  "version": "0.9.0",
+  "author": {
+    "name": "airCFO",
+    "email": "alex@aircfo.com"
+  },
+  "homepage": "https://aircfo.github.io/claude-startup-finance/",
+  "repository": "https://github.com/aircfo/claude-startup-finance",
+  "license": "MIT",
+  "keywords": [
+    "finance",
+    "contextos",
+    "startup",
+    "accounting",
+    "fpa",
+    "quickbooks",
+    "context"
+  ]
+}

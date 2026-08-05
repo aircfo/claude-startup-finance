@@ -1,8 +1,10 @@
 ---
-title: What Is finance-profile.md?
+title: What Is a ContextOS?
 ---
 
-# What Is `finance-profile.md`?
+# What Is a ContextOS?
+
+Your **ContextOS** is the finance context Claude loads before touching your numbers — a folder you own, holding `finance-profile.md` (the semantic map) and `account-map.csv` (how every account classifies). This page explains the profile at its heart.
 
 `finance-profile.md` is Claude's operating manual for your finance function.
 

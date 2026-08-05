@@ -100,7 +100,7 @@ Show me the bridge from Stripe gross revenue to QuickBooks recognized revenue.
 Prompt:
 
 ```text
-Add this board deck to my finance context.
+Add this board deck to my ContextOS.
 ```
 
 Best with:
