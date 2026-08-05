@@ -29,10 +29,10 @@ If Claude ever proposes a writeback action, stop and review before proceeding.
 
 ## What Gets Written To Your Workspace
 
-The plugin creates an airCFO Finance Context folder in a location you approve, usually:
+The plugin creates a ContextOS folder in a location you approve, usually:
 
 ```text
-~/Desktop/airCFO Finance Context/
+~/Desktop/ContextOS/
 ```
 
 That folder may include:

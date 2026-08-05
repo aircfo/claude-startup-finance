@@ -4,7 +4,7 @@ title: Known Limitations
 
 # Known Limitations
 
-This early-access release is intentionally narrow. The goal is to learn whether a persistent finance context makes Claude more useful for startup finance workflows.
+This early-access release is intentionally narrow. The goal is to learn whether a persistent ContextOS makes Claude more useful for startup finance workflows.
 
 ## Best With A Specific Stack
 
