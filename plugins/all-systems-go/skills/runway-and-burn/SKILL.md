@@ -14,9 +14,9 @@ Trigger when the user asks about runway, burn rate, months of cash, cash-out dat
 Read `finance-profile.md` first (the company's semantic map). It tells you which Mercury accounts are operating vs. treasury, which count as cash for runway, what the company treats as an internal transfer (excluded from burn), and the pinned burn definition — so you don't re-derive the topology or guess.
 
 Find the profile in this order:
-1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include an **airCFO Finance Context** pointer, use the profile path it names.
+1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include a **ContextOS** pointer (the bounded block is labeled `airCFO Finance Context` in older installs), use the profile path it names.
 2. Else if `.aircfo-finance-context.json` exists in the current workspace, read `financeProfile` from it.
-3. Else check the default location: `~/Desktop/airCFO Finance Context/finance-profile.md`.
+3. Else check the default location: `~/Desktop/ContextOS/finance-profile.md` — then the legacy default `~/Desktop/airCFO Finance Context/finance-profile.md`.
 4. Else check the current workspace for `finance-profile.md`.
 5. If you still can't find it, run `finance-context-builder` first (or tell the user to). **Do not guess** the operating-vs-treasury split or the internal-transfer exclusions — without the profile they're guesswork.
 

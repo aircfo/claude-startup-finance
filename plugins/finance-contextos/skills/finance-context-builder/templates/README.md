@@ -1,6 +1,6 @@
 # Mapping table — your account map
 
-One table turns the raw QuickBooks general ledger into your management financials: `account-map.csv` classifies every GL account. The `finance-context-builder` skill **drafts it automatically from your QuickBooks Account List**, then walks you through the judgment calls — you don't fill it from scratch. The confirmed map lives in your airCFO Finance Context folder and every finance workflow reads it (via `finance-profile.md`).
+One table turns the raw QuickBooks general ledger into your management financials: `account-map.csv` classifies every GL account. The `finance-context-builder` skill **drafts it automatically from your QuickBooks Account List**, then walks you through the judgment calls — you don't fill it from scratch. The confirmed map lives in your ContextOS folder and every finance workflow reads it (via `finance-profile.md`).
 
 QuickBooks owns the account list and the dollar amounts; this table decides how each account classifies and rolls up. The full schema — column rules, the Expense Category and department vocabularies, the tag registry, the cash-flow line list, and the refresh workflow — lives in **`account-map-spec.md`** alongside this file. This README is the orientation; the spec is the contract.
 
@@ -49,7 +49,14 @@ Example (abridged — a typical SaaS chart):
 - `department` is a **management-reporting** grouping — it is *not* QuickBooks "class tracking." What kind of value it holds follows the account's Class (see the spec).
 - `tags` are **registry-controlled** (see the spec) — they encode account-level KPI inputs (`mrr`, `cac`) and behaviors (`clearing`, `contra-revenue`); they are not free-form labels.
 - The column names are the contract every finance workflow reads. Rename a column and you must tell Claude to update the skills.
-- This is a blank-header template that ships with the plugin. Your actual map lives in your airCFO Finance Context folder (default `~/Desktop/airCFO Finance Context/account-map.csv`), written by the skill — not here.
+- This is a blank-header template that ships with the plugin. Your actual map lives in your ContextOS folder (default `~/Desktop/ContextOS/account-map.csv`), written by the skill — not here.
 
 ## `finance-profile-template.md`
-The folder's other template is the **finance-profile skeleton** — the 14-section structure the `finance-context-builder` skill drafts your `finance-profile.md` from (Company Snapshot, Business Model, KPI Definitions, Source-of-Truth Map, Reporting Framework, the cash / revenue / spend / people rules, Planning, Cadence & Materiality, Known Exceptions, Open Questions, Provenance). The skill fills what it can from your context docs and a read-only pass over your systems, and leaves a `[PLACEHOLDER: …]` wherever it doesn't yet know — so you can see and fill the gaps before finalizing. It's a starting skeleton; your real profile lives in the airCFO Finance Context folder.
+The folder's other template is the **finance-profile skeleton** — the 14-section structure the `finance-context-builder` skill drafts your `finance-profile.md` from (Company Snapshot, Business Model, KPI Definitions, Source-of-Truth Map, Reporting Framework, the cash / revenue / spend / people rules, Planning, Cadence & Materiality, Known Exceptions, Open Questions, Provenance). The skill fills what it can from your context docs and a read-only pass over your systems, and leaves a `[PLACEHOLDER: …]` wherever it doesn't yet know — so you can see and fill the gaps before finalizing. It's a starting skeleton; your real profile lives in the ContextOS folder.
+
+## `intake-questions.md`
+The **30-minute intake** — the questions your connectors can't answer: definitions,
+policies, intents, and rulings that live in someone's head. Claude offers it at the
+gap-review gate (step 10), adapting Block 1 to *your* flagged judgment calls and skipping
+anything the build already answered. Run it in-session or take it to whoever owns the
+numbers; every answer maps to a specific profile section.

@@ -11,10 +11,6 @@
     "mercury": {
       "type": "http",
       "url": "https://mcp.mercury.com/mcp"
-    },
-    "aircfo-quickbooks": {
-      "type": "http",
-      "url": "https://qbo-mcp-production-5667.up.railway.app/mcp"
     }
   }
 }

@@ -4,15 +4,23 @@
     "name": "airCFO",
     "email": "alex@aircfo.com"
   },
-  "description": "Unofficial Claude connectors and finance workflows for the startup back-office stack. Not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
+  "description": "Unofficial Claude connectors and finance workflows for the startup back-office stack. Start with finance-contextos to build your ContextOS, add all-systems-go for the rest of your stack. Not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
   "plugins": [
     {
-      "name": "startup-finance",
-      "source": "./plugins/startup-finance",
-      "description": "Bundles Stripe, Ramp, Mercury, and QuickBooks connectors with a finance-context builder skill that maps them into one finance profile, cross-tool skills (runway & burn, revenue reconciliation, board-metrics pack), and meta-skills to author and refine your own workflow skills.",
-      "version": "0.6.0",
+      "name": "finance-contextos",
+      "source": "./plugins/finance-contextos",
+      "description": "Start here. Build your company's ContextOS — the finance context Claude loads before touching your numbers. One QuickBooks connector (read-only, your own login), a guided account-map + finance-profile build with human review gates, and a tie-out that proves the result against your live books.",
+      "version": "0.9.0",
       "category": "finance",
-      "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "quickbooks"]
+      "keywords": ["finance", "contextos", "startup", "accounting", "fpa", "quickbooks", "context"]
+    },
+    {
+      "name": "all-systems-go",
+      "source": "./plugins/all-systems-go",
+      "description": "The enrichment pack for your ContextOS, named for airCFO's All Systems Go series on the startup back-office stack. Adds Stripe, Ramp, and Mercury connectors plus cross-system workflows (runway & burn, revenue reconciliation, board metrics) and meta-skills to author your own. Install finance-contextos first.",
+      "version": "0.9.0",
+      "category": "finance",
+      "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "contextos"]
     },
     {
       "name": "ai-cfo-lab",
