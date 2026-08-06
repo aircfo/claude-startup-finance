@@ -1,6 +1,6 @@
 ---
 name: finance-context-builder
-description: Build the company's ContextOS — a folder (default on the Desktop) holding a finance-profile.md semantic map and an account map drafted from the QuickBooks Account List, verified against the live books before handoff. QuickBooks is the backbone; Stripe, Ramp, and Mercury enrich the context when connected. It first invites the finance pro to share any docs or notes about their business, then drafts the account map for review. Use on first-time setup or to refresh, or when someone says "build my ContextOS," "set up the finance plugin," "build my finance context," "build my finance profile," "map my accounts across systems," "add this to my ContextOS," or when another finance workflow can't find finance-profile.md.
+description: Build the company's ContextOS — a folder (default on the Desktop) holding a finance-profile.md semantic map and an account map drafted from the QuickBooks Account List, verified against the live books before handoff. QuickBooks is the backbone; Stripe, Ramp, and Mercury enrich the context when connected. It builds from the systems first (after a light invite to share any docs on hand), drafts the account map for review, then asks the finance pro only the targeted questions their connectors can't answer. Use on first-time setup or to refresh, or when someone says "build my ContextOS," "set up the finance plugin," "build my finance context," "build my finance profile," "map my accounts across systems," "add this to my ContextOS," or when another finance workflow can't find finance-profile.md.
 ---
 
 # Finance Context Builder — build the company's ContextOS
@@ -26,6 +26,7 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 `account-map.csv` is the canonical, spreadsheet-editable classification; `finance-profile.md` is the human-readable layer that **references** it — never duplicate the full per-account table in the profile.
 
 ## Principles
+- **Systems first; humans for the "why."** Connectors alone fill most of a ContextOS — the structure, the amounts, the vendors, the rails. What they can't fill is definitions, policies, and intent. So build from the systems first, then ask the human *targeted* questions generated from the build's actual gaps — never open-ended questions up front, and never a question the books can answer.
 - **Draft, then confirm.** Build a *first draft* of the account map from the QuickBooks Account List, then have the human review it — never finalize a mapping without confirmation.
 - **Fill or placeholder — never guess.** Draft the profile from what you actually know (the context docs + the system analysis); mark every gap with an explicit `[PLACEHOLDER: …]` and surface it for the human — never invent a value to fill a section.
 - **QuickBooks is the source of truth for the account list and the amounts.** The map decides how those accounts classify and roll up.
@@ -40,7 +41,7 @@ Each finance workflow reads this profile at its own Step 0 — so it loads when 
 ### 0 · Orient the user first (before doing anything)
 This is a guided, **~15–20 minute** setup with two quick review points. Open with a one-message roadmap so the pop-ups and the wait don't feel random, then begin:
 
-> "I'll build your ContextOS — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect QuickBooks (one sign-in pop-up; if you have other finance connectors installed I'll check those too) → ③ tell me about your business → ④ I draft your account map and you review just the judgment calls → ⑤ I build your finance profile → ⑥ I verify the model ties to your live books. You can stop and resume anytime. Ready?"
+> "I'll build your ContextOS — about 15–20 minutes. The path: ① pick a folder to save everything → ② connect QuickBooks (one sign-in pop-up; if you have other finance connectors installed I'll check those too) → ③ share any docs you have handy (optional) → ④ I read your books and draft your account map; you rule on just the judgment calls and we lock it → ⑤ I draft your finance profile and show you what your systems filled on their own → ⑥ a few targeted questions only you can answer → ⑦ I verify the model ties to your live books. You can stop and resume anytime. Ready?"
 
 Then keep the user oriented as you go — a one-line "here's where we are / here's what's next" at each stage beats long silent stretches, especially while pulling a large chart of accounts or drafting the map.
 
@@ -108,15 +109,12 @@ Show a short status table and the impact of anything missing:
 
 Then continue with the connected systems. Missing systems become explicit placeholders and open questions, not guesses. **QuickBooks is the backbone** — it owns the account list everything else maps onto — so if QuickBooks isn't connected, say so plainly and focus on what the other systems can still provide.
 
-### 3 · Gather the finance pro's context (in the session)
-Before touching the numbers, invite the pro to tell you — **right here in the conversation** — what's important or unique about their business. They can paste it, attach a file, or just talk it through; *they* decide what matters. Offer a few examples to prompt them, but don't run a questionnaire:
+### 3 · Invite docs — lightly (the conversation comes later)
+**Systems fill the "what"; humans fill the "why" — and the "why" questions can't even be written until the books have been read.** So don't interview the pro up front. Offer one quick chance to share *artifacts* — a reporting package teaches you their department names and conventions before you draft the map — and move on:
 
-> "Tell me what would help me understand your business — paste it here, attach a file, or just talk it through. A few ideas (include whatever *you* think matters):
-> - your monthly reporting package, board deck, or KPI dashboard (the most useful single thing);
-> - an SOP or two — your month-end close checklist, your revenue-recognition policy;
-> - or a few sentences (a ramble is fine) on your revenue model, the metrics you live by, how you think about departments, or anything unusual about your books."
+> "One optional thing before I read your books: if you have anything handy — your monthly reporting package, board deck, a close checklist, a policy doc — drop it here now. It teaches me your department names and conventions before I draft your account map. If not, no problem: I'll read your books first and later ask you only the questions they can't answer."
 
-Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the relevant profile sections (Business Model, KPI Definitions, the cash / revenue / spend / people rules, Known Exceptions), citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they share nothing, proceed; they can add context later just by telling you.
+Read whatever they share, then **persist it**: save the source material (and a short distilled summary) into the `context/` subfolder, and fold the salient points into the relevant profile sections as you draft, citing the saved file. `context/` is a *record of what's been ingested* — the pro never has to manage it. If they volunteer business context in conversation, take it — but don't prompt for it here; the real conversation is the targeted intake in step 10, generated from the build's actual gaps. If they share nothing, proceed immediately.
 
 ### 4 · Pull the QuickBooks Account List
 Get company info (legal name, fiscal year, accounting basis, reporting currency) and run the **Account List** report / chart of accounts. For every account, capture: the QuickBooks internal **Id** (the map's primary key — it survives renames and renumbers), number, name, **Type**, **Detail Type**, **Active** flag, the account **description** (if any), the **parent account** (`ParentRef` and the parent's name — needed for department inference), and balance. This is what the draft is built from.
@@ -148,12 +146,14 @@ Write one row per GL account to `account-map.csv` in the ContextOS folder. The f
 
 **`mapping_status` is the honesty column:** rule-drafted rows are `auto`, judgment calls are `needs-review` (with `review_note` saying why), and nothing is `confirmed` until the human signs off in step 6. Downstream workflows disclose any non-confirmed rows they relied on — so the statuses are load-bearing, not decoration.
 
-### 6 · Review the draft with the human (the gate)
+### 6 · Review the draft with the human, then lock the map (the gate)
 **Don't make the user read all N rows** — a real chart has hundreds of accounts; only the `needs-review` queue needs their eyes. Say so up front ("Most of your ~250 accounts mapped by rule — I only need you on the few I had to judge"), then present the map by `mapping_status`:
 - **`auto`** (rule-mapped: verbatim ledger facts, clean `detail_type` → category seeds, deterministic `cf_section` / `cf_line` defaults) — summarize as a count ("228 accounts mapped directly"), don't enumerate.
 - **`needs-review`** — present **compactly** (grouped, ideally a short table showing each row's `review_note`): the `expense_category` and `department` judgment calls (how each was derived — name, parent, or judgment), any `cf_section` call (e.g. treasury/investment under Investing), the proposed `mrr` tag set (this defines their MRR — make them say yes), and anything whose name fights its type.
 
 On sign-off, mark the reviewed rows `confirmed` with `confirmed_by` / `confirmed_date`, and clear their `review_note`. The pro can also confirm the `auto` rows wholesale ("the rest look fine") — record that the same way. Don't finalize until the human has ruled on the judgment calls; their corrections go back into `account-map.csv` — the full map stays in the folder for spreadsheet editing anytime.
+
+**End the gate on a lock milestone, and say it** — with the real counts: "Your account map is locked — all N accounts confirmed" (or, if rows were parked: "locked — N confirmed, k parked as needs-review"). The lock is what makes the map the live extraction layer every downstream deliverable trusts. Residual *books* questions surfaced during review (an odd reserve, legacy accounts worth deactivating, a reclass candidate) go to profile §13 Open Questions — they're bookkeeping follow-ups, not mapping blockers; never hold the lock hostage to them. If the pro genuinely can't rule on a row yet, it stays `needs-review` and the map locks around it — downstream workflows already disclose reliance on non-confirmed rows.
 
 ### 7 · Map the other systems onto the GL (money-flow graph)
 For each connected system, bind its money containers to GL accounts (match on names, last-4, amounts; confirm anything low-confidence):
@@ -161,8 +161,8 @@ For each connected system, bind its money containers to GL accounts (match on na
 - **Ramp** — the funding/clearing account → its QBO liability/clearing account; how spend categories roll up to expense accounts; the top recurring vendors. If Ramp blocks the business/treasury/checking-account reads with a permission error (a scope the user didn't grant), map what you *can* see — card spend and vendors — and leave the funding/treasury mapping as a placeholder and open question.
 - **Stripe** — the payout destination → which Mercury account → which GL account; how gross revenue, processing fees, and refunds book; the recognition method and treatment of annual prepays, coupons, and trials.
 
-### 8 · Capture conventions
-Pin: fiscal year, accounting basis (cash/accrual), reporting currency, the internal-transfer rule (excluded from burn), the treasury-vs-operating split, the materiality threshold, the MRR and revenue-recognition definitions, and the close cadence. Some of these may already be answered by the context docs from step 3 — don't re-ask what they already told you.
+### 8 · Pin the mechanical conventions
+Pin what the systems (and any step-3 docs) can actually state: fiscal year, accounting basis (cash/accrual), reporting currency, and the internal-transfer topology observed in the books (transfers between own accounts — excluded from burn). The *human-held* conventions — the materiality threshold, the MRR and revenue-recognition definitions, the close cadence, the treasury-vs-operating cash policy — are intake questions (step 10), not things to capture here: don't guess them, and don't run a mini-questionnaire now. If a context doc already answered one, record it with the doc cited and skip the question later.
 
 ### 9 · Draft the profile from the template (fill what you know, placeholder the rest)
 Start from the **finance-profile template** (`templates/finance-profile-template.md`; the 14 sections are detailed under the schema below) and write a *first draft* of `finance-profile.md`. Fill every section you can from two sources: the **context docs** the pro shared (step 3) and the **system analysis** (steps 4–8 — the account map, the money-flow graph, and the pinned conventions).
@@ -173,14 +173,18 @@ Wherever you don't yet know something, **don't guess and don't silently drop the
 
 A section may come out fully filled, partly filled, or all placeholder — that's expected on a first run; the profile fills in over time.
 
-### 10 · Surface the gaps and invite input (the gate before finalizing)
-Show the pro **which sections still contain placeholders**, as a short checklist (section → what's missing). Then offer the choice — don't force it:
+### 10 · Report card, then targeted intake (the gate before finalizing)
+Two moves: show what the systems filled on their own, then ask only what they can't answer.
 
-> "Here's your draft profile. These sections are still incomplete: [list]. Want to fill any in now? Paste it, point me at a doc, or just tell me — or we can finalize as-is and complete them later. Placeholders stay in the file, so nothing gets silently assumed."
+**First, the connector report card** — a compact in-session readout (not a file), one row per profile section: *filled from your systems · filled from your docs · needs you*. Frame it as the win it is: "Your connectors filled most of this on their own — here's the short list only you can answer." This readout is what makes the intake feel targeted instead of like a questionnaire; every remaining gap on it is visibly something no connector could know.
 
-Fold in whatever they give you, re-surface anything still open, and repeat until they're ready. Anything left unfilled is mirrored into **Open Questions** (§13) with a suggested next step, so the uncertainty stays visible.
+**Then run the rulings block in the session (~7 minutes).** Generate it from *this company's* build residue — the `needs-review` rows that survived the map lock plus the §13 open questions — following the Block 1 shapes in `templates/intake-questions.md` (the identity check, the cash-perimeter ruling, the odd-account walkthrough, the unlabeled bucket, the unexplained number, the invisible rail). Each is a 30-second answer that unblocks automated reporting; without it, every future report has to hedge. Fold each ruling into the profile and map immediately, and never ask for a number that's already in the books.
 
-**Offer the intake question set for the rest.** For gaps only a human can fill (definitions, policies, rulings), offer `templates/intake-questions.md` — a timeboxed ~30-minute question list where every answer lands in a specific profile section. Adapt it before offering: generate Block 1 from *this company's* actual `needs-review` rows and open questions, and drop any question the build already answered. They can run it now in the session, or take it to whoever owns the numbers and bring back answers ("add this to my ContextOS").
+**"I don't know" is a valid answer.** When the pro doesn't know offhand ("my controller books those"), record *who does* and move on — the item becomes an open question with an owner, and downstream deliverables hedge that section rather than block on it. Never loop on an unanswerable question.
+
+**Offer the rest of the intake (Blocks 2–5) as the take-away.** KPI definitions, plan and forecast, cadence and materiality, tacit knowledge — the full timeboxed ~30-minute set in `templates/intake-questions.md`, where every answer lands in a specific profile section. They can keep going now if they have the time, or take it to whoever owns the numbers and bring back answers ("add this to my ContextOS"). Drop any question the build or their docs already answered — never re-ask.
+
+Anything still unfilled after this is mirrored into **Open Questions** (§13) with a suggested next step, so the uncertainty stays visible. Placeholders stay in the file — nothing gets silently assumed.
 
 ### 11 · Finalize & write the ContextOS
 - Write `finance-profile.md` and `account-map.csv` into the folder; make sure the docs the pro shared are saved in `context/`. Remaining placeholders stay in the file and are listed in Open Questions.
@@ -195,7 +199,7 @@ Fold in whatever they give you, re-surface anything still open, and repeat until
 - **Revenue coverage (account map ↔ QuickBooks):** pull last full month's P&L from QuickBooks and re-total revenue by summing every account the map classes as Income (`account_type: Income`, any `expense_category`). The two must match to the penny — this proves the map covers every income account, not most of them. If any revenue accounts carry the `mrr` tag, also play back the tag-based MRR total as a sanity check on the tag set.
 - **Runway-cash sanity (profile ↔ human):** total the accounts the profile counts as runway cash and play it back: "By your profile's definition, runway cash is ≈ $X across these N accounts — does that match your mental model?"
 
-Present the results as a compact tie-out table — *check · source A · source B · difference · verdict* — using a computation step for the arithmetic, never eyeballed. Every unexplained difference goes into Open Questions (§13) with a suggested next step; never soften or hide a miss. A found discrepancy is the feature working, not the setup failing — say so.
+Present the results as a compact tie-out table — *check · source A · source B · difference · verdict* — using a computation step for the arithmetic, never eyeballed. Grade every check with the three-word vocabulary: **tie** (exact), **explained variance** (a difference whose cause you state unprompted — uncleared items, timing since close), or **wrong**. A confidently-presented wrong number is the failure mode that matters most — if one appears, say so plainly and fix the mapping before handing off; never reframe a wrong as an explained variance after the fact. Every unexplained difference goes into Open Questions (§13) with a suggested next step; never soften or hide a miss. A found discrepancy is the feature working, not the setup failing — say so.
 
 Then **hand off.** Close by confirming they're set up and verified: "Your ContextOS is built and it ties to your live books." If the All Systems Go plugin's workflows are installed, suggest one next ("try *'what's our runway?'* or *'give me board metrics for last month'* — they'll use this profile"); otherwise mention that installing **all-systems-go** from the same marketplace adds those workflows plus Stripe/Ramp/Mercury enrichment. If sections are still placeholder, add one line that those fill in as they share more.
 
