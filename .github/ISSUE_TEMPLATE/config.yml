@@ -1,0 +1,20 @@
+# Blank issues are disabled so every issue passes through a template carrying the
+# "no credentials, no real financial data" confirmation. Questions and security
+# reports have their own routes below.
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://aircfo.github.io/claude-startup-finance/
+    about: Install steps, the first-session guide, what a ContextOS is, security details, self-hosting, and known limitations.
+
+  - name: Report a security vulnerability (private)
+    url: https://github.com/aircfo/claude-startup-finance/blob/main/SECURITY.md
+    about: Email alex@aircfo.com — please don't file security problems as public issues.
+
+  - name: Ask a question
+    url: mailto:alex@aircfo.com
+    about: Not sure whether something is a bug? Email and we'll help sort it out.
+
+  - name: airCFO
+    url: https://aircfo.com
+    about: The team behind these plugins — the AI-enabled back-office growth partner for startups.
