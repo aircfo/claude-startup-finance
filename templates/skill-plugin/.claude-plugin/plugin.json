@@ -1,0 +1,14 @@
+{
+  "name": "REPLACE: plugin-directory-name",
+  "displayName": "REPLACE: airCFO · Human Readable Name",
+  "description": "REPLACE: one or two sentences on what this does and who it's for. Keep the trailing disclaimer if the skill touches a third-party system. Unofficial — not affiliated with or endorsed by Anthropic.",
+  "version": "0.1.0",
+  "author": {
+    "name": "airCFO",
+    "email": "alex@aircfo.com"
+  },
+  "homepage": "https://aircfo.github.io/claude-startup-finance/",
+  "repository": "https://github.com/aircfo/claude-startup-finance",
+  "license": "MIT",
+  "keywords": ["finance", "REPLACE: add-a-few-more"]
+}
