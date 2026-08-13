@@ -110,17 +110,29 @@ plugin root:
 }
 ```
 
-The `skills` array is what the [`skills` CLI](https://github.com/vercel-labs/skills) reads
-for deterministic discovery (its *Plugin Manifest Discovery* mode), so readers who use
-Claude Code rather than Cowork get a reliable `--skill <name>` install instead of relying
-on the CLI's recursive-search fallback.
+`skills` is an [official marketplace field](https://code.claude.com/docs/en/plugin-marketplaces#marketplace-schema).
+Its declared paths **add to** the default scan of the plugin's `skills/` directory rather
+than replacing it, so listing skills that already sit in the default location is redundant
+for Claude Code itself — verified below that it does not double-register them. The reason to
+declare it anyway is the [`skills` CLI](https://github.com/vercel-labs/skills): declared
+paths put it into documented *Plugin Manifest Discovery* mode instead of its
+recursive-search fallback, which is what gives readers on Claude Code (rather than Cowork) a
+reliable `npx skills add … --skill <name>`.
 
 > **A new skill must be added in two places: its plugin directory *and* the `skills` array
-> in `marketplace.json`.** A skill missing from the array still works in Cowork but becomes
-> undiscoverable to the CLI. The pull-request template checks for this.
+> in `marketplace.json`.** A skill missing from the array still loads in Cowork — the
+> default scan finds it — but discovery by the `skills` CLI stops being deterministic. The
+> pull-request template checks for this.
 
-Do not add `metadata.pluginRoot`. Setting it changes how `source` paths are interpreted,
-and the current explicit `./plugins/<name>` paths already work in both Cowork and the CLI.
+Two related fields, for reference: `strict` defaults to `true`, meaning each plugin's
+`plugin.json` stays the authority for its components and the marketplace entry only
+supplements it. Don't set `strict: false` here — it would make the marketplace entry the
+entire definition and conflict with the `plugin.json` files these plugins ship.
+
+Do not add `metadata.pluginRoot`. It's a real field (it prepends a base directory to
+relative `source` paths), but setting it changes how every existing `source` is interpreted,
+and the explicit `./plugins/<name>` paths already resolve correctly in both Cowork and the
+CLI. No upside, real breakage risk.
 
 ## Release process
 
@@ -142,11 +154,37 @@ so in the release title (`v1.2.0 — ai-cfo-lab`).
 
 ## Before opening a pull request
 
-- `jq . .claude-plugin/marketplace.json` and every `plugins/*/.claude-plugin/plugin.json`
-  parse cleanly.
-- `npx skills add . --list` from the repo root lists every skill, including any new one.
-- The marketplace still loads in Cowork and the affected plugin installs. This one is
-  manual and cannot be skipped — a malformed manifest breaks install for everyone.
+Validate the manifests with Claude Code's own validator — it checks more than JSON syntax:
+
+```bash
+claude plugin validate .                     # the marketplace manifest
+claude plugin validate plugins/<name>        # each plugin you touched
+npx skills add . --list                      # every skill appears, including your new one
+```
+
+Then run a real end-to-end install. This used to be a manual Cowork step; it isn't — point
+Claude Code at a throwaway config directory and it won't touch your own setup:
+
+```bash
+export CLAUDE_CONFIG_DIR=$(mktemp -d)        # isolates the test from your real config
+claude plugin marketplace add ./             # note the trailing slash; "." is rejected
+claude plugin install <plugin>@claude-startup-finance
+claude plugin details <plugin>               # the check that matters — see below
+unset CLAUDE_CONFIG_DIR
+```
+
+`claude plugin details` prints the component inventory that the plugin loader actually
+resolved: the skill count and names, the MCP servers, and the projected token cost. Confirm
+the skill count is **exactly** what you expect — this is what catches a skill that failed to
+load, and it's how we confirmed that declaring `skills[]` doesn't double-register skills
+already found by the default scan. Watch the always-on token cost too: every skill's
+description loads into every session, so a bloated description is a real cost.
+
+A pass in Cowork specifically is still worth a spot check before a release, since it's the
+supported install path, but it's no longer the only way to catch a broken manifest.
+
+Also confirm:
+
 - No secrets, tokens, customer data, or real financial data in the diff. Fixtures stay
   synthetic.
 - Anything touching a financial system is still **read-only**, and every touched README

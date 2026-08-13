@@ -84,22 +84,37 @@ aloud, in effect, by a model.
 
 There's no test suite — these are prompt-shaped artifacts, so verification is a real run.
 
+**Validate the manifests** with Claude Code's own validator:
+
 ```bash
-jq . .claude-plugin/marketplace.json                   # manifest still valid
-jq . plugins/*/.claude-plugin/plugin.json
+claude plugin validate .                               # the marketplace
+claude plugin validate plugins/<name>                  # each plugin you touched
 npx skills add . --list                                # your skill appears by name
 ```
 
-Then the part that actually matters:
+**Install it for real,** in a throwaway config directory so your own setup is untouched:
 
-1. Load the marketplace in Claude Cowork from your fork or branch and install the affected
-   plugin.
-2. Run the skill end to end against a **sandbox or your own** systems — never someone else's
-   data.
-3. Confirm it asks before anything irreversible, cites its numbers, and degrades gracefully
+```bash
+export CLAUDE_CONFIG_DIR=$(mktemp -d)
+claude plugin marketplace add ./                       # trailing slash required
+claude plugin install <plugin>@claude-startup-finance
+claude plugin details <plugin>                         # component inventory + token cost
+unset CLAUDE_CONFIG_DIR
+```
+
+`claude plugin details` is the high-value check: it prints the skills the loader actually
+resolved, so a skill count that's off by one tells you something failed to load. It also
+shows the always-on token cost, which every session pays for your skill's description.
+
+**Then run the skill itself:**
+
+1. Run it end to end against a **sandbox or your own** systems — never someone else's data.
+2. Confirm it asks before anything irreversible, cites its numbers, and degrades gracefully
    when a connector isn't authorized.
 
-Note in the pull request what you ran it against and what the output looked like.
+Note in the pull request what you ran it against and what the output looked like. A spot
+check in Claude Cowork is still worth doing before a release, since that's the supported
+install path for most users.
 
 ## Pull requests
 

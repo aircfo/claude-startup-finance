@@ -32,9 +32,11 @@ figure" is worth more than a green checkmark.
 
 **Install path — breaking these breaks existing users**
 
-- [ ] `jq . .claude-plugin/marketplace.json` and every touched `plugin.json` parse cleanly.
-- [ ] The marketplace loads in Claude Cowork and the affected plugin installs. *(Manual —
-      not skippable.)*
+- [ ] `claude plugin validate .` passes, and `claude plugin validate plugins/<name>` passes
+      for every plugin touched.
+- [ ] Installed end to end in a throwaway config (`CLAUDE_CONFIG_DIR=$(mktemp -d)`), and
+      `claude plugin details <plugin>` shows the **expected skill count** and MCP servers —
+      see CONTRIBUTING.md for the exact commands.
 - [ ] No published plugin or skill was renamed, moved, or split.
 - [ ] New skills are registered in **both** their plugin directory **and** the `skills` array
       in `marketplace.json` — `npx skills add . --list` shows them by name.
