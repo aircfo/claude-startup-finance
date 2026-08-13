@@ -15,6 +15,10 @@ contact_links:
     url: mailto:alex@aircfo.com
     about: Not sure whether something is a bug? Email and we'll help sort it out.
 
+  - name: The AI CFO Newsletter
+    url: https://www.aircfo.com/the-ai-cfo
+    about: Practical, tested playbooks for startup finance in the age of AI. New skills here ship alongside it.
+
   - name: airCFO
     url: https://aircfo.com
     about: The team behind these plugins — the AI-enabled back-office growth partner for startups.

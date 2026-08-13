@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Docs](https://img.shields.io/badge/docs-aircfo.github.io-132c3a.svg)](https://aircfo.github.io/claude-startup-finance/)
 [![Built for Claude Cowork](https://img.shields.io/badge/built%20for-Claude%20Cowork-ff971e.svg)](https://claude.com/product/cowork)
-[![By airCFO](https://img.shields.io/badge/by-airCFO-132c3a.svg)](https://aircfo.com)
+[![The AI CFO Newsletter](https://img.shields.io/badge/newsletter-The%20AI%20CFO-132c3a.svg)](https://www.aircfo.com/the-ai-cfo)
 
 **Point Claude at your startup's finance stack — and have it actually understand your
 numbers.**
@@ -213,17 +213,14 @@ Ideas, bug reports, and skill requests are welcome — see
 
 ## Follow along
 
-New skills and workflows ship alongside airCFO's **AI CFO** writing. The docs site is the
-best place to start, and [airCFO](https://aircfo.com) is the team behind it — the
-AI-enabled back-office growth partner for startups, running this same context model on our
-own books.
+New skills and workflows ship alongside **[The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo)**
+— practical, tested playbooks for startup finance in the age of AI, written by airCFO's CEO
+every two weeks. Skills that accompany an issue land in this repo, versioned so a piece you
+read still matches what you install.
 
-**→ [Read the docs](https://aircfo.github.io/claude-startup-finance/)** ·
+**→ [Subscribe to The AI CFO](https://www.aircfo.com/the-ai-cfo)** ·
+**[Read the docs](https://aircfo.github.io/claude-startup-finance/)** ·
 **[airCFO](https://aircfo.com)** · Questions or feedback: [alex@aircfo.com](mailto:alex@aircfo.com)
-
-<!-- HUMAN follow-up: once the AI CFO newsletter signup URL exists (email capture is
-     planned for the docs quickstart), swap it into the CTA above, the one under the title,
-     and the footers of each plugin README. Deliberately not linked yet — no live URL. -->
 
 ## License
 

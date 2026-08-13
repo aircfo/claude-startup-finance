@@ -1,6 +1,7 @@
 # ai-cfo-lab (plugin)
 
-The home for skills shipped with the **AI CFO newsletter**. Each one is a
+The home for skills shipped with
+**[The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo)**. Each one is a
 self-contained workflow you can install and run against your own systems — no
 airCFO data, no shared secrets, read-only wherever it touches money.
 
@@ -45,4 +46,5 @@ existing installs.
 ---
 
 Part of [(Un)official Claude for Startup Finance](https://github.com/aircfo/claude-startup-finance)
-by [airCFO](https://aircfo.com) · [Docs](https://aircfo.github.io/claude-startup-finance/)
+by [airCFO](https://aircfo.com) · [Docs](https://aircfo.github.io/claude-startup-finance/) ·
+[The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo)

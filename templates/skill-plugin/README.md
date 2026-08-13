@@ -23,4 +23,5 @@ invoke a skill by name (e.g. `/REPLACE-skill-name`).
 ---
 
 Part of [(Un)official Claude for Startup Finance](https://github.com/aircfo/claude-startup-finance)
-by [airCFO](https://aircfo.com) · [Docs](https://aircfo.github.io/claude-startup-finance/)
+by [airCFO](https://aircfo.com) · [Docs](https://aircfo.github.io/claude-startup-finance/) ·
+[The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo)

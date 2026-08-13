@@ -36,7 +36,14 @@ forward.
   preservation, secrets, disclaimers, and manifest validity.
 - `skills` arrays on every plugin entry in `marketplace.json`, so the `skills` CLI resolves
   each skill through documented Plugin Manifest Discovery rather than its recursive-search
-  fallback.
+  fallback. Verified against Claude Code's own loader that this does not double-register
+  skills already found by the default `skills/` scan.
+- `assets/social-preview.png` — the GitHub social preview card (the thumbnail on every share),
+  built from the docs site's brand tokens, with its HTML source and re-render instructions
+  committed alongside it.
+- Links to [The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo) from the README badge
+  row and follow-along section, every plugin README footer, and the issue-template contact
+  links.
 
 ### Changed
 
