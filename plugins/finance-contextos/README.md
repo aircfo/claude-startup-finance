@@ -106,3 +106,10 @@ first.
 
 Unofficial. Not affiliated with, endorsed by, or sponsored by Intuit (QuickBooks) or
 Anthropic. All trademarks belong to their respective owners.
+
+---
+
+Part of [(Un)official Claude for Startup Finance](https://github.com/aircfo/claude-startup-finance)
+by [airCFO](https://aircfo.com) · [Docs](https://aircfo.github.io/claude-startup-finance/) ·
+[The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo) ·
+[Report an issue](https://github.com/aircfo/claude-startup-finance/issues)

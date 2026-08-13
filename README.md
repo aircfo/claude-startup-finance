@@ -1,5 +1,24 @@
 # (Un)official Claude for Startup Finance
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Docs](https://img.shields.io/badge/docs-aircfo.github.io-132c3a.svg)](https://aircfo.github.io/claude-startup-finance/)
+[![Built for Claude Cowork](https://img.shields.io/badge/built%20for-Claude%20Cowork-ff971e.svg)](https://claude.com/product/cowork)
+[![The AI CFO Newsletter](https://img.shields.io/badge/newsletter-The%20AI%20CFO-132c3a.svg)](https://www.aircfo.com/the-ai-cfo)
+
+**Point Claude at your startup's finance stack — and have it actually understand your
+numbers.**
+
+- **A ContextOS you own.** Your definitions of burn, runway, and MRR, plus every account's
+  classification, captured once into plain files on your machine.
+- **Read-only everywhere.** Every connector reads with your own login. Nothing in this repo
+  can write to, move, or send your money.
+- **It isn't done until it ties.** The build ends by verifying itself against your live
+  books — cash to the bank, revenue to the penny.
+
+<!-- HUMAN follow-up: record a ~20s ContextOS build demo, save as assets/demo-contextos.gif,
+     and embed it here with descriptive alt text. Intentionally left as a comment rather
+     than a broken image reference. -->
+
 A Claude Cowork plugin marketplace for the startup back office, built around one idea:
 before AI touches your numbers, it should load **your ContextOS** — your company's finance
 context: what your metrics mean, how your accounts map into reporting, and the judgment
@@ -21,6 +40,47 @@ Two plugins, in order:
 > **Unofficial.** Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury,
 > Intuit (QuickBooks), or Anthropic. All trademarks belong to their respective owners.
 > Provided as-is under the MIT license.
+
+## Contents
+
+- [What's in this repo](#whats-in-this-repo)
+- [Install](#install)
+- [What a ContextOS is](#what-a-contextos-is)
+- [Recommended first session](#recommended-first-session)
+- [Data handling & security](#data-handling--security)
+- [Requirements](#requirements)
+- [Updating](#updating)
+- [Repository layout](#repository-layout)
+- [Contributing](#contributing)
+- [License](#license)
+
+## What's in this repo
+
+| Type | Name | What it does | Install method | Docs |
+| --- | --- | --- | --- | --- |
+| Plugin | **`finance-contextos`** | Builds your ContextOS from QuickBooks — account map, finance profile, tie-out. Start here. | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/finance-contextos/README.md) · [ContextOS explainer](https://aircfo.github.io/claude-startup-finance/finance-profile-explainer.html) |
+| Plugin | **`all-systems-go`** | Adds Stripe, Ramp, and Mercury connectors plus cross-system workflows: runway & burn, revenue reconciliation, board metrics. | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/all-systems-go/README.md) · [Use cases](https://aircfo.github.io/claude-startup-finance/use-cases.html) |
+| Plugin | **`ai-cfo-lab`** | Skills shipped alongside the AI CFO newsletter. Today: `ai-spend-analysis` (org-wide Claude spend dashboard). | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/ai-cfo-lab/README.md) |
+| MCP server | **`qbo-mcp`** | The read-only QuickBooks MCP server behind `finance-contextos`. Runs on airCFO infrastructure by default; self-host it if you'd rather your books never touch ours. | Separate repo — [`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp) | [Self-hosting guide](https://aircfo.github.io/claude-startup-finance/self-hosting.html) |
+
+Anything airCFO publishes publicly for Claude — plugins, MCP servers, standalone skills —
+is indexed in this table, even when the code lives in its own repository. Start there
+rather than browsing directories.
+
+### Not using Claude Cowork?
+
+The skills in this repo are plain [Agent Skills](https://code.claude.com/docs/en/skills),
+so they also install into Claude Code and other skill-aware agents via the
+[`skills` CLI](https://github.com/vercel-labs/skills) — no marketplace required:
+
+```bash
+npx skills add aircfo/claude-startup-finance --list          # see what's available
+npx skills add aircfo/claude-startup-finance --skill runway-and-burn
+```
+
+Note that skills installed this way arrive **without** the plugin's bundled connectors —
+you supply your own MCP configuration for QuickBooks, Stripe, Ramp, or Mercury. The Cowork
+install path is the supported one for a working end-to-end setup.
 
 ## Install
 
@@ -102,7 +162,9 @@ immediately after.
   instance? **Self-host it** — the deploy guide ships with the source.
 - Not ready to authorize production data? Use a QuickBooks sandbox company while evaluating.
 
-Full detail: [docs/data-handling-security.md](docs/data-handling-security.md).
+Full detail: [docs/data-handling-security.md](docs/data-handling-security.md). To report a
+vulnerability, see [SECURITY.md](./SECURITY.md) — please email rather than opening a public
+issue.
 
 ## Requirements
 
@@ -118,25 +180,47 @@ Full detail: [docs/data-handling-security.md](docs/data-handling-security.md).
 Explicit versioning. Open **Customize → Browse plugins**, find the airCFO marketplace,
 and click **Update** to re-sync from GitHub.
 
+Released versions are tagged and listed in [CHANGELOG.md](./CHANGELOG.md).
+
 ## Repository layout
 
 ```
 claude-startup-finance/
 ├── .claude-plugin/marketplace.json   # the marketplace (storefront)
-└── plugins/
-    ├── finance-contextos/            # the flagship: build your ContextOS
-    │   ├── .claude-plugin/plugin.json
-    │   ├── .mcp.json                 # QuickBooks connector only
-    │   ├── skills/finance-context-builder/   # + its templates/
-    │   └── README.md
-    ├── all-systems-go/               # enrichment: Stripe/Ramp/Mercury + workflows
-    │   ├── .claude-plugin/plugin.json
-    │   ├── .mcp.json                 # Stripe, Ramp, Mercury
-    │   ├── skills/                   # runway-and-burn, revenue-reconciliation,
-    │   │                             # board-metrics, finance-skill-builder/tuner
-    │   └── README.md
-    └── ai-cfo-lab/                   # AI CFO newsletter skills
+├── plugins/
+│   ├── finance-contextos/            # the flagship: build your ContextOS
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── .mcp.json                 # QuickBooks connector only
+│   │   ├── skills/finance-context-builder/   # + its templates/
+│   │   └── README.md
+│   ├── all-systems-go/               # enrichment: Stripe/Ramp/Mercury + workflows
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── .mcp.json                 # Stripe, Ramp, Mercury
+│   │   ├── skills/                   # runway-and-burn, revenue-reconciliation,
+│   │   │                             # board-metrics, finance-skill-builder/tuner
+│   │   └── README.md
+│   └── ai-cfo-lab/                   # AI CFO newsletter skills
+├── templates/skill-plugin/           # copy-ready scaffold for a new skill plugin
+└── docs/                             # the published docs site (GitHub Pages)
 ```
+
+## Contributing
+
+Ideas, bug reports, and skill requests are welcome — see
+[CONTRIBUTING.md](./CONTRIBUTING.md). If you're adding a skill or plugin, the house rules
+(naming, required files, versioning, and when a skill gets its own plugin) are in
+[docs/authoring-conventions.md](./docs/authoring-conventions.md).
+
+## Follow along
+
+New skills and workflows ship alongside **[The AI CFO Newsletter](https://www.aircfo.com/the-ai-cfo)**
+— practical, tested playbooks for startup finance in the age of AI, written by airCFO's CEO
+every two weeks. Skills that accompany an issue land in this repo, versioned so a piece you
+read still matches what you install.
+
+**→ [Subscribe to The AI CFO](https://www.aircfo.com/the-ai-cfo)** ·
+**[Read the docs](https://aircfo.github.io/claude-startup-finance/)** ·
+**[airCFO](https://aircfo.com)** · Questions or feedback: [alex@aircfo.com](mailto:alex@aircfo.com)
 
 ## License
 

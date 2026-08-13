@@ -1,0 +1,107 @@
+name: Bug report
+description: A skill produced a wrong result, didn't fire, skipped a review gate, or a connector failed.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Wrong numbers and skills that don't fire are the most useful
+        reports we get.
+
+        **Before you write:** do not paste API keys, tokens, account numbers, or real
+        financial data into this issue — it's public and permanently indexed. Redact figures
+        or replace them with synthetic equivalents. If a credential has already been exposed,
+        rotate it at the source first, then email alex@aircfo.com. Security vulnerabilities
+        go to that address rather than here — see SECURITY.md.
+
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which plugin?
+      options:
+        - finance-contextos
+        - all-systems-go
+        - ai-cfo-lab
+        - Not sure / repo-wide (docs, install, marketplace)
+    validations:
+      required: true
+
+  - type: input
+    id: skill
+    attributes:
+      label: Which skill or command?
+      placeholder: "/finance-context-builder, /runway-and-burn, or the phrase you typed"
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did the skill do, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: What you said to Claude, in order, and where it went wrong.
+      placeholder: |
+        1. Installed finance-contextos, said "build my ContextOS"
+        2. Connected QuickBooks
+        3. At the account-map review step, …
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What Claude said (redacted)
+      description: >
+        The relevant part of the response, with figures redacted or replaced by synthetic
+        values. A wrong number is much easier to diagnose with the surrounding reasoning
+        included.
+      render: text
+
+  - type: dropdown
+    id: connectors
+    attributes:
+      label: Which connectors were authorized at the time?
+      multiple: true
+      options:
+        - QuickBooks (airCFO-hosted)
+        - QuickBooks (self-hosted)
+        - Stripe
+        - Ramp
+        - Mercury
+        - None
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: How you're running it, and the plugin version if you know it.
+      placeholder: "Claude Cowork, desktop app on macOS · finance-contextos 0.9.0"
+
+  - type: dropdown
+    id: data
+    attributes:
+      label: Were you running against production or sandbox data?
+      description: Helps us tell a data-shape problem from a logic problem. Don't share the data itself.
+      options:
+        - Sandbox / test company
+        - Production books
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Before submitting
+      options:
+        - label: This issue contains no API keys, tokens, credentials, or account numbers.
+          required: true
+        - label: This issue contains no real customer or financial data — figures are redacted or synthetic.
+          required: true
+        - label: This isn't a security vulnerability (those go to alex@aircfo.com instead).
+          required: true

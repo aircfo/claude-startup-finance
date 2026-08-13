@@ -1,0 +1,80 @@
+name: Skill request
+description: Suggest a finance workflow that should become a skill.
+title: "[skill] "
+labels: ["skill request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The best requests describe a job you already do by hand, including what the finished
+        output looks like. That's most of the design work.
+
+        **Please don't paste real financial data, customer names, or credentials** — this
+        issue is public. Describe the shape of the data instead, or use synthetic figures.
+
+  - type: textarea
+    id: job
+    attributes:
+      label: What's the job?
+      description: What are you doing by hand today, and how often?
+      placeholder: "Every month before the board meeting I rebuild a headcount-vs-plan table by …"
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: What does the finished output look like?
+      description: >
+        A table, a spreadsheet, a memo, a chart, a drafted email? Sketch the columns or
+        sections if you can — this is the most useful part of the request.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: systems
+    attributes:
+      label: Which systems would it need to read?
+      multiple: true
+      options:
+        - QuickBooks
+        - Stripe
+        - Ramp
+        - Mercury
+        - Payroll (Rippling, Gusto, etc.)
+        - A spreadsheet or file I already have
+        - Something else (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: judgment
+    attributes:
+      label: What judgment calls does it involve?
+      description: >
+        The company-specific decisions a person makes while doing this — which accounts count
+        as cash, which costs are one-time, how you define the metric. These are what a
+        ContextOS captures, and they're usually the difference between a useful skill and a
+        wrong one.
+
+  - type: dropdown
+    id: writes
+    attributes:
+      label: Does the finished workflow need to write or send anything?
+      description: >
+        Skills here are read-only against financial systems and always draft rather than send.
+        Knowing this up front tells us whether the request fits.
+      options:
+        - "No — read and report only"
+        - "It should draft something for me to send myself"
+        - "It would need to write to a system (may not be possible here)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Before submitting
+      options:
+        - label: This request contains no real financial data, customer names, or credentials.
+          required: true

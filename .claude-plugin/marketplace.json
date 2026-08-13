@@ -12,7 +12,8 @@
       "description": "Start here. Build your company's ContextOS — the finance context Claude loads before touching your numbers. One QuickBooks connector (read-only, your own login), a guided account-map + finance-profile build with human review gates, and a tie-out that proves the result against your live books.",
       "version": "0.9.0",
       "category": "finance",
-      "keywords": ["finance", "contextos", "startup", "accounting", "fpa", "quickbooks", "context"]
+      "keywords": ["finance", "contextos", "startup", "accounting", "fpa", "quickbooks", "context"],
+      "skills": ["./skills/finance-context-builder"]
     },
     {
       "name": "all-systems-go",
@@ -20,7 +21,14 @@
       "description": "The enrichment pack for your ContextOS, named for airCFO's All Systems Go series on the startup back-office stack. Adds Stripe, Ramp, and Mercury connectors plus cross-system workflows (runway & burn, revenue reconciliation, board metrics) and meta-skills to author your own. Install finance-contextos first.",
       "version": "0.9.0",
       "category": "finance",
-      "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "contextos"]
+      "keywords": ["finance", "startup", "accounting", "fpa", "stripe", "ramp", "mercury", "contextos"],
+      "skills": [
+        "./skills/runway-and-burn",
+        "./skills/revenue-reconciliation",
+        "./skills/board-metrics",
+        "./skills/finance-skill-builder",
+        "./skills/finance-skill-tuner"
+      ]
     },
     {
       "name": "ai-cfo-lab",
@@ -28,7 +36,8 @@
       "description": "Skills shipped with the AI CFO newsletter. First up: ai-spend-analysis — turn your organization's Anthropic/Claude spend into a person / department / product / model dashboard across committed seats, variable overage, and API-platform cash. Read-only; it drafts a summary and never sends. Ships with synthetic fixtures only.",
       "version": "0.1.0",
       "category": "finance",
-      "keywords": ["finance", "ai-spend", "anthropic", "claude", "cost", "fpa", "newsletter"]
+      "keywords": ["finance", "ai-spend", "anthropic", "claude", "cost", "fpa", "newsletter"],
+      "skills": ["./skills/ai-spend-analysis"]
     }
   ]
 }

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --equity-blue:#132c3a;
+    --market-slate:#3c6e82;
+    --trust-blue:#7fcada;
+    --soft-trust:#d4f2fa;
+    --dividend-gold:#ff971e;
+    --clear-ledger:#f5f7fb;
+    --font-serif:"Bitter",Georgia,serif;
+    --font-sans:"Inter",-apple-system,"Helvetica Neue",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1280px;height:640px;overflow:hidden}
+  body{
+    background:var(--equity-blue);
+    font-family:var(--font-sans);
+    color:#fff;
+    position:relative;
+  }
+  /* faint ledger-rule texture so the field isn't dead flat */
+  .rules{
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(127,202,218,.055) 0 1px,
+      transparent 1px 40px
+    );
+  }
+  .glow{
+    position:absolute;
+    width:780px;height:780px;
+    right:-240px;top:-300px;
+    background:radial-gradient(circle,rgba(60,110,130,.55) 0%,rgba(19,44,58,0) 66%);
+  }
+  .frame{
+    position:absolute;inset:0;
+    padding:64px 72px;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  /* ---------- top ---------- */
+  .top{display:flex;align-items:center;gap:16px}
+  .dot{
+    width:30px;height:30px;border-radius:7px;
+    background:var(--dividend-gold);
+    flex:none;
+  }
+  .wordmark{
+    font-size:27px;font-weight:400;letter-spacing:-.2px;color:#fff;
+  }
+  .wordmark b{font-weight:600;color:var(--trust-blue)}
+  .eyebrow{
+    margin-left:auto;
+    font-size:17px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--trust-blue);opacity:.9;
+  }
+  /* ---------- middle ---------- */
+  .mid{max-width:830px}
+  h1{
+    font-family:var(--font-serif);
+    font-size:96px;line-height:1.02;font-weight:600;
+    letter-spacing:-1.8px;
+    color:#fff;
+  }
+  h1 .accent{color:var(--dividend-gold)}
+  .lede{
+    margin-top:26px;
+    font-size:29px;line-height:1.42;font-weight:400;
+    color:var(--soft-trust);
+    max-width:790px;
+  }
+  /* ---------- bottom ---------- */
+  .bottom{display:flex;align-items:center;gap:14px}
+  .chip{
+    font-size:19px;font-weight:500;
+    padding:10px 20px;border-radius:999px;
+    background:rgba(212,242,250,.09);
+    border:1px solid rgba(127,202,218,.34);
+    color:var(--soft-trust);
+    white-space:nowrap;
+  }
+  .chip.readonly{
+    background:rgba(255,151,30,.14);
+    border-color:rgba(255,151,30,.55);
+    color:#ffd9a1;
+    font-weight:600;
+  }
+  .repo{
+    margin-left:auto;
+    font-size:20px;font-weight:500;
+    color:var(--trust-blue);opacity:.85;
+    white-space:nowrap;
+  }
+  /* gold rule anchoring the bottom edge */
+  .edge{
+    position:absolute;left:0;right:0;bottom:0;height:9px;
+    background:linear-gradient(to right,var(--dividend-gold) 0%,var(--dividend-gold) 34%,var(--market-slate) 34%,var(--market-slate) 100%);
+  }
+</style>
+</head>
+<body>
+  <div class="rules"></div>
+  <div class="glow"></div>
+
+  <div class="frame">
+    <div class="top">
+      <div class="dot"></div>
+      <div class="wordmark">air<b>CFO</b></div>
+      <div class="eyebrow">Unofficial &middot; Claude for Startup Finance</div>
+    </div>
+
+    <div class="mid">
+      <h1>Build your <span class="accent">ContextOS</span>.</h1>
+      <p class="lede">
+        Claude plugins that teach it what your numbers <em>mean</em> — built from
+        QuickBooks, proven against your live books.
+      </p>
+    </div>
+
+    <div class="bottom">
+      <div class="chip">QuickBooks</div>
+      <div class="chip">Stripe</div>
+      <div class="chip">Ramp</div>
+      <div class="chip">Mercury</div>
+      <div class="chip readonly">Read-only</div>
+      <div class="repo">github.com/aircfo/claude-startup-finance</div>
+    </div>
+  </div>
+
+  <div class="edge"></div>
+</body>
+</html>
