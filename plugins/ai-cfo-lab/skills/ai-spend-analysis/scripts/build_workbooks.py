@@ -110,10 +110,18 @@ def load(root):
         if not (re.match(r"\d{4}-\d{2}$", p) and (has_b or has_meta)):
             continue
         periods.append(p)
-        m = json.load(open(os.path.join(pdir, "meta.json"))) if has_meta else {}
+        m, meta_status = {}, "missing"
+        if has_meta:
+            try:
+                m = json.load(open(os.path.join(pdir, "meta.json")))
+                meta_status = "ok"
+            except (json.JSONDecodeError, OSError) as e:
+                print(f"[workbooks] meta.json invalid for {p}: {e} — treating as missing")
+                meta_status = f"invalid: {e}"
         y, mo = map(int, p.split("-"))
         meta[p] = {"days": m.get("days_covered", monthrange(y, mo)[1]),
-                   "dim": monthrange(y, mo)[1], "partial": m.get("partial", False)}
+                   "dim": monthrange(y, mo)[1], "partial": m.get("partial", False),
+                   "meta_status": meta_status}
         for r in (read_csv(bfile) if has_b else []):
             em = r["user_email"].lower().strip()
             o = org.get(em, {})
@@ -339,6 +347,9 @@ def main():
     flags = compute_flags(thr, seats, periods, b_rows, c_rows, keymap)
     summary = {"company": company, "periods": periods, "b_rows": len(b_rows), "c_rows": len(c_rows),
                "flags": len(flags), "flag_list": [{k: fl[k] for k in ("flag", "subject")} for fl in flags]}
+    meta_alerts = {p: meta[p]["meta_status"] for p in periods if meta[p]["meta_status"].startswith("invalid")}
+    if meta_alerts:
+        summary["meta_alerts"] = meta_alerts
     if HAVE_OPENPYXL:
         build_sources(root, seats, periods, b_rows, c_rows)
         build_output(root, org, seats, thr, keymap, periods, b_rows, c_rows, meta, company, flags)

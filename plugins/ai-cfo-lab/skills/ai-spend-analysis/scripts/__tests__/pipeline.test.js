@@ -112,3 +112,25 @@ test('a period with meta but no export registers as missing and the artifact sti
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('a period with a truncated meta.json degrades instead of crashing the whole build', { skip }, () => {
+  const root = freshWorkspace();
+  try {
+    const p = '2026-08';
+    fs.mkdirSync(path.join(root, 'raw', p));
+    fs.writeFileSync(path.join(root, 'raw', p, 'overage_spend.csv'),
+      'user_email,product,model,total_requests,total_prompt_tokens,total_completion_tokens,total_net_spend_usd,total_gross_spend_usd\n' +
+      'ada@example.com,Chat,claude-opus-4-1,10,1000,500,5.00,5.25\n');
+    fs.writeFileSync(path.join(root, 'raw', p, 'meta.json'), '{');
+
+    const r = run('build_workbooks.py', root);
+    assert.strictEqual(r.status, 0, `build_workbooks should still exit 0 with an invalid meta.json: ${r.stderr}`);
+    const summary = JSON.parse(fs.readFileSync(path.join(root, 'workbooks', 'build_summary.json')));
+    assert.ok(summary.periods.includes(p), 'the period with bad meta.json still registers');
+    assert.ok(summary.meta_alerts && summary.meta_alerts[p] && summary.meta_alerts[p].startsWith('invalid'),
+      'build_summary.json flags the bad meta.json instead of crashing silently');
+    assert.deepStrictEqual(summary.periods.filter((x) => x !== p), PERIODS, 'the other periods still build normally');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
