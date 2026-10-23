@@ -1,0 +1,15 @@
+{
+  "cost": {
+    "data": [
+      {
+        "model": "claude-opus-4-1",
+        "total_cost": 144.33252
+      },
+      {
+        "model": "claude-sonnet-4-5",
+        "total_cost": 49.539202
+      }
+    ]
+  },
+  "usage": null
+}

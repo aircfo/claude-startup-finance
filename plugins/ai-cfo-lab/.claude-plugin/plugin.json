@@ -1,8 +1,8 @@
 {
   "name": "ai-cfo-lab",
   "displayName": "airCFO · AI CFO Lab",
-  "description": "Skills shipped with the AI CFO newsletter. First up: ai-spend-analysis — turn your organization's Anthropic/Claude spend into a person / department / product / model dashboard across committed seats, variable overage, and API-platform cash. Read-only; it drafts a summary and never sends. Unofficial — not affiliated with or endorsed by Anthropic.",
-  "version": "0.1.0",
+  "description": "Skills shipped with the AI CFO newsletter. First up: ai-spend-analysis — turn your organization's Anthropic/Claude spend into a person / department / product / model dashboard across committed seats, variable overage, and API-platform cash, optionally kept current daily in a shared Claude Dashboard. Read-only; it drafts a summary and never sends. Unofficial — not affiliated with or endorsed by Anthropic.",
+  "version": "0.2.0",
   "author": {
     "name": "airCFO",
     "email": "alex@aircfo.com"

@@ -17,7 +17,10 @@ def main():
         print(f"[surface_b] {state}: {detail}")
 
     if not os.path.exists(path) or os.path.getsize(path) == 0:
-        write("missing", "overage_spend.csv absent or empty — export failed or not yet fetched"); return 1
+        # A scheduled fetch records why it failed; say that rather than a generic gap.
+        meta_path = os.path.join(os.path.dirname(path), "meta.json")
+        fetch_error = json.load(open(meta_path)).get("fetch_error") if os.path.exists(meta_path) else None
+        write("missing", fetch_error or "overage_spend.csv absent or empty — export failed or not yet fetched"); return 1
     with open(path) as fh:
         rows = list(csv.DictReader(fh))
     if not rows:

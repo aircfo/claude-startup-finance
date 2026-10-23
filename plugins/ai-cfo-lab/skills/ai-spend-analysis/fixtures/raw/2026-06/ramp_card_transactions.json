@@ -1,0 +1,81 @@
+[
+  {
+    "transactions": [
+      {
+        "transaction_uuid": "txn_0000",
+        "spent_by_user": "Ada Lovelace",
+        "original_amount": "40.26",
+        "original_currency": "USD",
+        "state": "CLEARED",
+        "transaction_time": "2026-06-03T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      },
+      {
+        "transaction_uuid": "txn_0001",
+        "spent_by_user": "Steve Wozniak",
+        "original_amount": "21.34",
+        "original_currency": "USD",
+        "state": "CLEARED",
+        "transaction_time": "2026-06-06T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      },
+      {
+        "transaction_uuid": "txn_0002",
+        "spent_by_user": "Pat Example",
+        "original_amount": "20.82",
+        "original_currency": "USD",
+        "state": "CLEARED",
+        "transaction_time": "2026-06-09T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      },
+      {
+        "transaction_uuid": "txn_0003",
+        "spent_by_user": "Ada Lovelace",
+        "original_amount": "43.19",
+        "original_currency": "USD",
+        "state": "CLEARED",
+        "transaction_time": "2026-06-12T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      }
+    ],
+    "total_count": 7
+  },
+  {
+    "transactions": [
+      {
+        "transaction_uuid": "txn_0004",
+        "spent_by_user": "Steve Wozniak",
+        "original_amount": "21.53",
+        "original_currency": "USD",
+        "state": "CLEARED",
+        "transaction_time": "2026-06-15T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      },
+      {
+        "transaction_uuid": "txn_0005",
+        "spent_by_user": "Pat Example",
+        "original_amount": "19.96",
+        "original_currency": "USD",
+        "state": "CLEARED",
+        "transaction_time": "2026-06-18T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      },
+      {
+        "transaction_uuid": "txn_declined",
+        "spent_by_user": "Ada Lovelace",
+        "original_amount": "40.26",
+        "original_currency": "USD",
+        "state": "DECLINED",
+        "transaction_time": "2026-06-03T12:00:00+00:00",
+        "merchant_name": "Anthropic",
+        "spend_allocation_name": "AI Tooling"
+      }
+    ]
+  }
+]
