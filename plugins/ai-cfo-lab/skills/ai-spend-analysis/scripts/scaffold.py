@@ -21,7 +21,12 @@ GITIGNORE = """# AI-Spend workspace — never commit real spend data or secrets.
 # workbooks/ + artifacts/ = regenerated every run (the dashboard names individuals)
 # config/    = your roster (org_chart.csv / seats.csv are real people)
 # PASTE_ADMIN_KEY_HERE.txt / admin_key.txt = transient key drop (moved into .secrets/, then deleted)
+# .browser-profile/ = the claude.ai login the daily export fetch uses
+# dashboard/ + logs/ = per-run uploads and scheduled-job logs
 .secrets/
+.browser-profile/
+dashboard/
+logs/
 PASTE_ADMIN_KEY_HERE.txt
 admin_key.txt
 raw/

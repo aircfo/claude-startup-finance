@@ -165,13 +165,41 @@ file — no internet needed).
 
 ---
 
+## Optional: a daily dashboard your team can open
+
+Instead of a file you open once a month, you can keep a **Claude Dashboard**
+current every morning and share its link with your team. Ask Claude to "set up
+a daily AI spend dashboard for my team" and it walks you through it.
+
+How it stays current:
+
+- **A cloud job** refreshes your API (Console) cost from Ramp each morning. It
+  holds no passwords or keys and touches no individual's data.
+- **A job on your Mac** pulls the claude.ai spend export each morning with a
+  small fixed script (no AI involved) that uses its own Chrome profile, which
+  you sign into claude.ai once. It also picks up your Ramp card charges at
+  Anthropic. It needs your Mac to be awake at some point in the morning; if it
+  isn't, those sections show their age and catch up next time.
+
+Before you share it, decide what your team should see. The default shows
+departments only, with no names. You can choose per-person detail instead, but
+anyone you share the link with can download every row, so make that a
+deliberate decision.
+
+Claude proposes both scheduled jobs and creates them only after you say yes.
+The full runbook is in [`references/daily-refresh.md`](references/daily-refresh.md).
+
+---
+
 ## Privacy & security
 
 - **Admin-only.** The dashboard and workbooks name individuals and their spend.
   Decide who can see them before you share, and treat inputs and outputs as
   admin-only.
 - **Your data stays yours.** Everything lives in your local workspace folder, which
-  is gitignored. Nothing is uploaded or sent anywhere by the skill.
+  is gitignored. Nothing leaves it unless you set up the daily dashboard, and
+  then only the datasets that your visibility setting allows (departments only,
+  by default).
 - **Keys are protected.** API keys live only in environment variables or the hidden
   `.secrets/` folder — never in config, workbooks, the dashboard, logs, or chat.
 - **Nothing is auto-sent.** The Slack summary is a `.txt` draft. You send it.
@@ -187,6 +215,9 @@ file — no internet needed).
 | Everyone shows as **"(unmapped)"** | Fill in departments in `config/roster.xlsx` and re-run. |
 | API spend all lands in an **"unassigned"** bucket | Map keys to owners in `config/api_key_map.csv`. |
 | **Surface C says "not configured"** | Add an Admin key via `PASTE_ADMIN_KEY_HERE.txt` (optional). |
+| Dashboard says **"claude.ai session signed out"** | The export script's login expired. Ask Claude to "sign the AI spend export back in to claude.ai" (it reopens the sign-in window); the next run recovers the whole month. |
+| Dashboard sections say they're **stale** | The Mac job hasn't run (Mac off or asleep all morning). It catches up on the next run. |
+| **Claude Code tab shows only API keys**, no people | Your Admin key belongs to a different organization than your claude.ai Team workspace. Per-person detail comes from the spend export instead. |
 | Your key **wasn't picked up** | Make sure you pasted it into `PASTE_ADMIN_KEY_HERE.txt` and saved, then re-run. |
 
 ---

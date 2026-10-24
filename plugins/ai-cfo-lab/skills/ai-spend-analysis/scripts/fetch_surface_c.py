@@ -11,7 +11,6 @@ pipeline proceeds; the dashboard shows 'Surface C not configured').
 Never prints or persists the key. Read-only endpoints only.
 """
 import csv, json, os, sys, urllib.request, urllib.parse, urllib.error
-from calendar import monthrange
 
 API = "https://api.anthropic.com"
 VER = "2023-06-01"
@@ -51,6 +50,8 @@ def paged(path, params, key):
         if not data.get("has_more"):
             return items
         page = data.get("next_page")
+        if not page:
+            raise RuntimeError(f"{path} said more pages follow but gave no next_page")
 
 
 def main():
@@ -63,7 +64,10 @@ def main():
         return 0
     y, m = map(int, period.split("-"))
     start = f"{period}-01T00:00:00Z"
-    end = f"{period}-{monthrange(y, m)[1]:02d}T23:59:59Z"
+    # ending_at is exclusive, so end at the next month's first midnight; ending a
+    # second early drops whatever lands in the month's final second.
+    next_y, next_m = (y + 1, 1) if m == 12 else (y, m + 1)
+    end = f"{next_y}-{next_m:02d}-01T00:00:00Z"
     rows = []
     try:
         usage = paged("/v1/organizations/usage_report/messages",

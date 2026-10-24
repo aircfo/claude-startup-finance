@@ -9,3 +9,6 @@
 # Python (skills under plugins/ ship Python scripts)
 __pycache__/
 *.pyc
+
+# claude plugin eval run output (reports, transcripts)
+plugins/*/evals/results/

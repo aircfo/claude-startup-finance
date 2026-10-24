@@ -1,0 +1,583 @@
+<style>
+  .as-page { display: grid; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+  .as-head { display: grid; gap: var(--cds-gap-xs); }
+  .as-title { margin: 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); text-wrap: balance; }
+  .as-takeaway { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 70ch; }
+  .as-takeaway b { font-weight: 500; color: var(--color-fg); }
+  .as-banner { display: grid; gap: var(--cds-gap-xs); padding: var(--cds-pad-sm) var(--cds-pad-md); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-panel); font-size: var(--cds-font-size-caption); }
+  .as-banner-line { display: flex; gap: var(--cds-gap-sm); align-items: baseline; }
+  .as-banner-line::before { content: ""; flex: none; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--color-warn); transform: translateY(-0.1em); }
+  .as-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); }
+  .as-tab { appearance: none; border: 0; background: none; color: var(--color-fg-muted); font: inherit; font-size: var(--cds-font-size-body); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 2px solid transparent; cursor: pointer; }
+  .as-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
+  .as-tab:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+  .as-section { display: grid; gap: var(--cds-gap-md); }
+  .as-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
+  .as-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-xs); align-content: start; min-width: 0; }
+  .as-card-title { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+  .as-note { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .as-label { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .as-figure { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; min-height: 1.2em; }
+  .as-aside { border-style: dashed; }
+  .as-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+  .as-chart { position: relative; min-height: 240px; }
+  .as-chart svg { display: block; }
+  .as-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .as-swatch { display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 2px; margin-right: var(--cds-gap-xs); vertical-align: -1px; }
+  .as-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; }
+  .as-tip-date { color: var(--cds-text-secondary); }
+  .as-table-wrap { max-height: 28rem; overflow: auto; }
+  .as-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .as-table th { position: sticky; top: 0; background: var(--color-panel); text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); }
+  .as-table td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); }
+  .as-table .as-num { text-align: right; }
+  .as-empty { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+  [data-dash-source-state=empty] { color: transparent; }
+  .as-failed { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .as-failed::before { content: ""; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--color-bad); }
+</style>
+
+<div class="as-page">
+  <header class="as-head" id="overview-head">
+    <h1 class="as-title">AI spend</h1>
+    <p class="as-takeaway" id="takeaway">
+      <span id="takeaway-month" data-source="current" data-field="period" data-row="0" class="dash-skeleton">—</span>
+      so far: <b id="takeaway-total" data-source="current" data-field="total_usd" data-row="0">—</b>,
+      on pace for <b id="takeaway-projected" data-source="current" data-field="projected_usd" data-row="0">—</b>
+      by month end. Seats are fixed; overage and API cost are what moves.
+    </p>
+  </header>
+
+  <div class="as-banner" id="source-issues" data-source="status api_status" hidden></div>
+
+  <nav class="as-tabs" role="tablist" aria-label="Dashboard sections">
+    <button class="as-tab" role="tab" id="tab-overview" aria-controls="overview" aria-selected="true">Overview</button>
+    <button class="as-tab" role="tab" id="tab-people" aria-controls="people" aria-selected="false">People</button>
+    <button class="as-tab" role="tab" id="tab-models" aria-controls="models" aria-selected="false">Models</button>
+    <button class="as-tab" role="tab" id="tab-code" aria-controls="code" aria-selected="false">Claude Code</button>
+    <button class="as-tab" role="tab" id="tab-cards" aria-controls="cards" aria-selected="false">Card charges</button>
+    <button class="as-tab" role="tab" id="tab-flags" aria-controls="flags" aria-selected="false">Flags</button>
+  </nav>
+
+  <section class="as-section" id="overview" role="tabpanel" aria-labelledby="tab-overview">
+    <div class="as-tiles">
+      <div class="as-card" id="tile-total">
+        <span class="as-label">Month to date, all surfaces</span>
+        <span class="as-figure dash-skeleton" data-source="current" data-field="total_usd" data-row="0">—</span>
+      </div>
+      <div class="as-card" id="tile-seats">
+        <span class="as-label">Committed seats</span>
+        <span class="as-figure dash-skeleton" data-source="current" data-field="seats_usd" data-row="0">—</span>
+      </div>
+      <div class="as-card" id="tile-overage">
+        <span class="as-label">Seat overage (claude.ai)</span>
+        <span class="as-figure dash-skeleton" data-source="current" data-field="overage_usd" data-row="0">—</span>
+      </div>
+      <div class="as-card" id="tile-api">
+        <span class="as-label">API cost (Console)</span>
+        <span class="as-figure dash-skeleton" data-source="current" data-field="api_usd" data-row="0">—</span>
+      </div>
+      <div class="as-card" id="tile-projected">
+        <span class="as-label">Projected for the month</span>
+        <span class="as-figure dash-skeleton" data-source="current" data-field="projected_usd" data-row="0">—</span>
+      </div>
+      <div class="as-card as-aside" id="tile-cards">
+        <span class="as-label">Card charges at Anthropic (not in total)</span>
+        <span class="as-figure dash-skeleton" data-source="card_total" data-field="amount_usd" data-row="0">—</span>
+      </div>
+    </div>
+
+    <div class="as-grid">
+      <div class="as-card" id="monthly-card">
+        <h2 class="as-card-title">Spend by month</h2>
+        <p class="as-note">Seats, overage and API cost kept separate. The current month is partial.</p>
+        <div class="as-legend" id="monthly-legend" data-source="monthly"></div>
+        <div class="as-chart" id="monthly-chart" data-source="monthly"></div>
+      </div>
+      <div class="as-card" id="api-daily-card">
+        <h2 class="as-card-title">API cost by day</h2>
+        <p class="as-note">Latest month, all models.</p>
+        <div class="as-chart" id="api-daily-chart" data-source="api_daily"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="as-section" id="people" role="tabpanel" aria-labelledby="tab-people" hidden>
+    <div class="as-card">
+      <h2 class="as-card-title" id="people-title">Seat overage by person</h2>
+      <p class="as-note">Latest month. $0 overage with tokens means usage stayed inside the seat's allowance.</p>
+      <div class="as-table-wrap">
+        <table class="as-table" id="people-table" data-source="people" data-row-key="who">
+          <thead><tr>
+            <th data-field="who" id="people-who-head">Person</th>
+            <th data-field="department">Department</th>
+            <th data-field="seat_type">Seat</th>
+            <th data-field="overage_usd" class="as-num">Overage</th>
+            <th data-field="tokens" class="as-num">Tokens</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="as-section" id="models" role="tabpanel" aria-labelledby="tab-models" hidden>
+    <div class="as-card">
+      <h2 class="as-card-title">Spend by model family</h2>
+      <p class="as-note">Latest month. Overage and API cost, by the families in config/models.json.</p>
+      <div class="as-table-wrap">
+        <table class="as-table" id="models-table" data-source="models" data-row-key="family">
+          <thead><tr>
+            <th data-field="family">Family</th>
+            <th data-field="overage_usd" class="as-num">Seat overage</th>
+            <th data-field="api_usd" class="as-num">API cost</th>
+            <th data-field="total_usd" class="as-num">Total</th>
+            <th data-field="share" class="as-num">Share</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="as-section" id="code" role="tabpanel" aria-labelledby="tab-code" hidden>
+    <div class="as-grid">
+      <div class="as-card" id="code-daily-card">
+        <h2 class="as-card-title">Claude Code estimated cost by day</h2>
+        <p class="as-note">Anthropic's estimate at list price, latest month. Not billed overage: much of it sits inside seat allowances.</p>
+        <div class="as-chart" id="code-daily-chart" data-source="code_daily"></div>
+      </div>
+      <div class="as-card">
+        <h2 class="as-card-title" id="code-people-title">Claude Code by person</h2>
+        <p class="as-note">Latest month.</p>
+        <div class="as-table-wrap">
+          <table class="as-table" id="code-table" data-source="code_people" data-row-key="who">
+            <thead><tr>
+              <th data-field="who">Who</th>
+              <th data-field="department">Department</th>
+              <th data-field="est_cost_usd" class="as-num">Est. cost</th>
+              <th data-field="tokens" class="as-num">Tokens</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="as-section" id="cards" role="tabpanel" aria-labelledby="tab-cards" hidden>
+    <div class="as-card">
+      <h2 class="as-card-title" id="cards-title">Anthropic charges on company cards</h2>
+      <p class="as-note">Latest month, from Ramp. Actual cash, shown beside the totals rather than in them: a seat invoice paid by card is already counted in committed seats.</p>
+      <div class="as-table-wrap">
+        <table class="as-table" id="cards-table" data-source="cards" data-row-key="who">
+          <thead><tr>
+            <th data-field="who">Cardholder</th>
+            <th data-field="department">Department</th>
+            <th data-field="charges" class="as-num">Charges</th>
+            <th data-field="amount_usd" class="as-num">Amount</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="as-section" id="flags" role="tabpanel" aria-labelledby="tab-flags" hidden>
+    <div class="as-card">
+      <h2 class="as-card-title">Savings and risk flags</h2>
+      <p class="as-note">From the thresholds in config/thresholds.json. Savings are monthly estimates.</p>
+      <div class="as-table-wrap">
+        <table class="as-table" id="flags-table" data-source="flag_rows" data-row-key="id">
+          <thead><tr>
+            <th data-field="flag_label">Flag</th>
+            <th data-field="subject">Who or what</th>
+            <th data-field="detail">Detail</th>
+            <th data-field="est_monthly_saving_usd" class="as-num">Est. saving / mo</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Every figure is computed from the uploaded datasets here, in calcs readers can
+  // open in Sources. "Latest month" is the last month in the periods dataset; the
+  // Claude Code and card views use the last month in their own rows, since those
+  // sources can refresh on a different day than the rest.
+  const lastPeriod = (rows) => rows.map((r) => r.period).sort().pop();
+  const sumBy = (rows, field) => rows.reduce((total, r) => total + Number(r[field] || 0), 0);
+  const whoOf = (r) => r.name || r.email || r.cardholder || r.department;
+
+  dash.calc('monthly', {
+    title: 'Spend by month and surface',
+    description: 'Seats (fixed per month), seat overage and API cost per month, with a run-rate projection for a partial month.',
+    inputs: ['periods', 'seats', 'overage', 'api_cost'],
+    fn: (periods, seats, overage, api_cost) => {
+      const seatsUsd = seats.reduce((t, s) => t + Number(s.monthly_rate || 0), 0);
+      return periods.map((p) => {
+        const overageUsd = overage.filter((r) => r.period === p.period).reduce((t, r) => t + Number(r.net_usd || 0), 0);
+        const apiUsd = api_cost.filter((r) => r.period === p.period).reduce((t, r) => t + Number(r.cost_usd || 0), 0);
+        const days = Number(p.days_covered) || 0;
+        const scale = p.partial && days > 0 ? Number(p.days_in_month) / days : 1;
+        return {
+          period: p.period, partial: p.partial, seats_usd: seatsUsd, overage_usd: overageUsd, api_usd: apiUsd,
+          total_usd: seatsUsd + overageUsd + apiUsd, projected_usd: seatsUsd + (overageUsd + apiUsd) * scale,
+        };
+      });
+    },
+  });
+
+  dash.calc('current', {
+    title: 'Latest month',
+    description: 'The latest month from Spend by month.',
+    inputs: ['monthly'],
+    fn: (monthly) => monthly.slice(-1),
+  });
+
+  dash.calc('api_daily', {
+    title: 'API cost by day, latest month',
+    description: 'API cost summed per day for the latest month in the API cost source.',
+    inputs: ['api_cost'],
+    fn: (api_cost) => {
+      const month = api_cost.map((r) => r.period).sort().pop();
+      const byDay = new Map();
+      api_cost.filter((r) => r.period === month)
+        .forEach((r) => byDay.set(r.date, (byDay.get(r.date) || 0) + Number(r.cost_usd || 0)));
+      return [...byDay].sort().map(([date, cost_usd]) => ({ date, cost_usd }));
+    },
+  });
+
+  dash.calc('people', {
+    title: 'Seat overage by person, latest month',
+    description: 'Overage dollars and tokens per person (or department, when the dashboard is department-level), with their seat type.',
+    inputs: ['overage', 'seats', 'periods'],
+    fn: (overage, seats, periods) => {
+      const month = periods.map((p) => p.period).sort().pop();
+      const seatOf = new Map(seats.filter((s) => s.email).map((s) => [s.email, s.seat_type]));
+      const rows = new Map();
+      overage.filter((r) => r.period === month).forEach((r) => {
+        const who = r.name || r.email || r.department;
+        const row = rows.get(who) || { who, department: r.department, seat_type: seatOf.get(r.email) || '', overage_usd: 0, tokens: 0 };
+        row.overage_usd += Number(r.net_usd || 0);
+        row.tokens += Number(r.tokens || 0);
+        rows.set(who, row);
+      });
+      return [...rows.values()].sort((a, b) => b.overage_usd - a.overage_usd || b.tokens - a.tokens);
+    },
+  });
+
+  dash.calc('models', {
+    title: 'Spend by model family, latest month',
+    description: 'Seat overage plus API cost per model family, and each family’s share of the two combined.',
+    inputs: ['overage', 'api_cost', 'periods'],
+    fn: (overage, api_cost, periods) => {
+      const month = periods.map((p) => p.period).sort().pop();
+      const rows = new Map();
+      const add = (family, field, value) => {
+        const row = rows.get(family) || { family, overage_usd: 0, api_usd: 0 };
+        row[field] += Number(value || 0);
+        rows.set(family, row);
+      };
+      overage.filter((r) => r.period === month).forEach((r) => add(r.family, 'overage_usd', r.net_usd));
+      api_cost.filter((r) => r.period === month).forEach((r) => add(r.family, 'api_usd', r.cost_usd));
+      const all = [...rows.values()].map((r) => ({ ...r, total_usd: r.overage_usd + r.api_usd }));
+      const grand = all.reduce((t, r) => t + r.total_usd, 0);
+      return all.map((r) => ({ ...r, share: grand ? r.total_usd / grand : 0 })).sort((a, b) => b.total_usd - a.total_usd);
+    },
+  });
+
+  dash.calc('code_daily', {
+    title: 'Claude Code estimated cost by day',
+    description: 'Estimated cost summed per day for the latest month in the Claude Code source.',
+    inputs: ['claude_code'],
+    fn: (claude_code) => {
+      const month = claude_code.map((r) => r.period).sort().pop();
+      const byDay = new Map();
+      claude_code.filter((r) => r.period === month)
+        .forEach((r) => byDay.set(r.date, (byDay.get(r.date) || 0) + Number(r.est_cost_usd || 0)));
+      return [...byDay].sort().map(([date, est_cost_usd]) => ({ date, est_cost_usd }));
+    },
+  });
+
+  dash.calc('code_people', {
+    title: 'Claude Code by person, latest month',
+    description: 'Estimated cost and tokens per person (or department, or API key) for the latest month.',
+    inputs: ['claude_code'],
+    fn: (claude_code) => {
+      const month = claude_code.map((r) => r.period).sort().pop();
+      const rows = new Map();
+      claude_code.filter((r) => r.period === month).forEach((r) => {
+        const who = r.name || r.email || r.department;
+        const row = rows.get(who) || { who, department: r.department, est_cost_usd: 0, tokens: 0 };
+        row.est_cost_usd += Number(r.est_cost_usd || 0);
+        row.tokens += Number(r.tokens || 0);
+        rows.set(who, row);
+      });
+      return [...rows.values()].sort((a, b) => b.est_cost_usd - a.est_cost_usd);
+    },
+  });
+
+  dash.calc('cards', {
+    title: 'Card charges by cardholder, latest month',
+    description: 'Anthropic card charges per cardholder (or department) for the latest month in the Ramp data.',
+    inputs: ['card_charges'],
+    fn: (card_charges) => {
+      const month = card_charges.map((r) => r.period).sort().pop();
+      const rows = new Map();
+      card_charges.filter((r) => r.period === month).forEach((r) => {
+        const who = r.cardholder || r.department;
+        const row = rows.get(who) || { who, department: r.department, charges: 0, amount_usd: 0 };
+        row.charges += Number(r.charges || 0);
+        row.amount_usd += Number(r.amount_usd || 0);
+        rows.set(who, row);
+      });
+      return [...rows.values()].sort((a, b) => b.amount_usd - a.amount_usd);
+    },
+  });
+
+  dash.calc('card_total', {
+    title: 'Card charges, latest month',
+    description: 'Total Anthropic card charges for the latest month in the Ramp data.',
+    inputs: ['card_charges'],
+    fn: (card_charges) => {
+      const month = card_charges.map((r) => r.period).sort().pop();
+      const rows = card_charges.filter((r) => r.period === month);
+      return [{ period: month || '', amount_usd: rows.reduce((t, r) => t + Number(r.amount_usd || 0), 0) }];
+    },
+  });
+
+  dash.calc('flag_rows', {
+    title: 'Flags with row ids',
+    description: 'The flags dataset, largest estimated saving first, each with a row id and a readable name.',
+    inputs: ['flags'],
+    fn: (flags) => flags.slice()
+      .sort((a, b) => Number(b.est_monthly_saving_usd || 0) - Number(a.est_monthly_saving_usd || 0))
+      .map((f, index) => ({ id: String(index + 1), flag_label: String(f.flag).replace(/_/g, ' '), ...f })),
+  });
+
+  const money = (v) => (Math.abs(v) >= 10000
+    ? '$' + new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(v)
+    : d3.format('$,.0f')(v));
+  const moneyExact = d3.format('$,.2f');
+  const count = d3.format(',.0f');
+  const share = d3.format('.1%');
+  const tokens = (v) => new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+  const monthName = (period) => d3.utcFormat('%B %Y')(new Date(period + '-01T00:00:00Z'));
+
+  // ---- tabs ----
+  const tabs = [...document.querySelectorAll('.as-tab')];
+  const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
+  let activeTab = 'overview';
+  function showTab(id, updateLink) {
+    activeTab = id;
+    tabs.forEach((tab, i) => {
+      const selected = panels[i].id === id;
+      tab.setAttribute('aria-selected', String(selected));
+      panels[i].hidden = !selected;
+    });
+    if (updateLink) dash.setLink(id);
+    draw();
+  }
+  tabs.forEach((tab) => tab.addEventListener('click', () => showTab(tab.getAttribute('aria-controls'), true)));
+  const linked = panels.find((panel) => panel.id === location.hash.slice(1));
+  if (linked) showTab(linked.id, false);
+
+  // ---- shared drawing ----
+  function failed(el) {
+    el.replaceChildren();
+    const line = document.createElement('div');
+    line.className = 'as-failed';
+    line.textContent = 'Failed to load';
+    el.append(line);
+  }
+
+  function setText(el, source, render) {
+    const d = dash.data(source);
+    el.classList.toggle('dash-skeleton', d.status === 'loading');
+    if (d.status !== 'ok' || !d.data.length) { el.textContent = '—'; return; }
+    el.textContent = render(d.data[0][el.dataset.field]);
+  }
+
+  // Bars by x category; several series stack in order. Tooltip stays inside the box.
+  function drawBars(box, rows, xKey, series, xLabel) {
+    box.replaceChildren();
+    const width = box.clientWidth;
+    if (!width || !rows.length) return;
+    const height = 240;
+    const margin = { top: 8, right: 8, bottom: 24, left: 8 };
+    const totals = rows.map((r) => series.reduce((t, s) => t + Number(r[s.key] || 0), 0));
+    const y = d3.scaleLinear([0, d3.max(totals) || 1], [height - margin.bottom, margin.top]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${width} ${height}`);
+    const ticks = y.ticks(4);
+    const labels = svg.append('g').attr('fill', 'var(--color-fg-muted)').attr('font-size', 'var(--cds-font-size-caption)');
+    labels.selectAll('text').data(ticks).join('text').attr('y', (t) => y(t)).attr('dy', '0.32em').text((t) => money(t));
+    margin.left = d3.max(labels.selectAll('text').nodes(), (n) => n.getComputedTextLength()) + 8;
+    labels.selectAll('text').attr('x', margin.left - 6).attr('text-anchor', 'end');
+    const x = d3.scaleBand(rows.map((r) => r[xKey]), [margin.left, width - margin.right]).padding(0.25);
+    svg.append('g').selectAll('line').data(ticks).join('line')
+      .attr('x1', margin.left).attr('x2', width - margin.right).attr('y1', (t) => y(t)).attr('y2', (t) => y(t))
+      .attr('stroke', 'var(--cds-chart-grid)');
+    const every = Math.max(1, Math.ceil(rows.length / Math.max(1, Math.floor((width - margin.left) / 56))));
+    svg.append('g').attr('fill', 'var(--color-fg-muted)').attr('font-size', 'var(--cds-font-size-caption)')
+      .selectAll('text').data(rows.filter((_, i) => i % every === 0)).join('text')
+      .attr('x', (r) => x(r[xKey]) + x.bandwidth() / 2).attr('y', height - 6).attr('text-anchor', 'middle')
+      .text((r) => xLabel(r[xKey]));
+    const tip = document.createElement('div');
+    tip.className = 'as-tip';
+    tip.hidden = true;
+    box.append(tip);
+    rows.forEach((row, i) => {
+      let base = 0;
+      const g = svg.append('g');
+      series.forEach((s) => {
+        const value = Number(row[s.key] || 0);
+        g.append('rect').attr('x', x(row[xKey])).attr('width', x.bandwidth())
+          .attr('y', y(base + value)).attr('height', Math.max(0, y(base) - y(base + value)))
+          .attr('rx', series.length === 1 ? 4 : 0).attr('fill', s.color)
+          .attr('fill-opacity', row.partial ? 0.55 : 1);
+        base += value;
+      });
+      g.append('rect').attr('x', x(row[xKey])).attr('width', x.bandwidth()).attr('y', margin.top)
+        .attr('height', height - margin.bottom - margin.top).attr('fill', 'transparent')
+        .on('mouseenter', () => {
+          tip.replaceChildren();
+          const head = document.createElement('div');
+          head.className = 'as-tip-date';
+          head.textContent = xLabel(row[xKey]) + (row.partial ? ' (partial)' : '');
+          tip.append(head);
+          series.forEach((s) => {
+            const line = document.createElement('div');
+            if (series.length > 1) {
+              const swatch = document.createElement('span');
+              swatch.className = 'as-swatch';
+              swatch.style.background = s.color;
+              line.append(swatch);
+            }
+            line.append(`${series.length > 1 ? s.label + ' ' : ''}${moneyExact(Number(row[s.key] || 0))}`);
+            tip.append(line);
+          });
+          tip.hidden = false;
+          const left = Math.min(x(row[xKey]) + x.bandwidth() + 8, width - tip.offsetWidth - 4);
+          tip.style.left = Math.max(4, left) + 'px';
+          tip.style.top = margin.top + 'px';
+        })
+        .on('mouseleave', () => { tip.hidden = true; });
+      if (i === rows.length - 1 && totals[i] > 0) {
+        g.append('circle').attr('cx', x(row[xKey]) + x.bandwidth() / 2).attr('cy', y(totals[i]) - 6).attr('r', 2.5)
+          .attr('fill', series[series.length - 1].color);
+      }
+    });
+  }
+
+  function drawChart(id, source, xKey, series, xLabel) {
+    const box = document.getElementById(id);
+    const d = dash.data(source);
+    if (d.status === 'error') return failed(box);
+    if (d.status !== 'ok') { box.replaceChildren(); box.classList.add('dash-skeleton'); return; }
+    box.classList.remove('dash-skeleton');
+    drawBars(box, d.data, xKey, series, xLabel);
+  }
+
+  function drawTable(id, source, columns) {
+    const table = document.getElementById(id);
+    const body = table.querySelector('tbody');
+    const d = dash.data(source);
+    body.replaceChildren();
+    if (d.status === 'error') { failed(body.appendChild(document.createElement('tr')).appendChild(document.createElement('td'))); return; }
+    if (d.status !== 'ok') return;
+    if (!d.data.length) {
+      const cell = body.appendChild(document.createElement('tr')).appendChild(document.createElement('td'));
+      cell.colSpan = columns.length;
+      cell.className = 'as-empty';
+      cell.textContent = 'Nothing for the latest month yet.';
+      return;
+    }
+    d.data.forEach((row) => {
+      const tr = body.appendChild(document.createElement('tr'));
+      tr.dataset.key = String(row[table.dataset.rowKey]);
+      columns.forEach(([field, render]) => {
+        const td = tr.appendChild(document.createElement('td'));
+        if (render !== String) td.className = 'as-num';
+        td.textContent = render(row[field] ?? '');
+      });
+    });
+  }
+
+  function drawIssues() {
+    const banner = document.getElementById('source-issues');
+    // A cloud routine that owns API cost publishes its own api_status; either may be absent.
+    const rows = ['status', 'api_status'].flatMap((id) => {
+      const d = dash.data(id);
+      return d.status === 'ok' ? d.data : [];
+    });
+    const issues = rows.filter((s) => s.state !== 'ok' && s.state !== 'not_configured');
+    banner.hidden = !issues.length;
+    banner.replaceChildren(...issues.map((s) => {
+      const line = document.createElement('div');
+      line.className = 'as-banner-line';
+      line.textContent = `${s.source}: ${s.state.replace('_', ' ')} for ${s.period}. ${s.detail}`;
+      return line;
+    }));
+  }
+
+  function draw() {
+    document.querySelectorAll('[data-source="current"]').forEach((el) =>
+      setText(el, 'current', el.dataset.field === 'period' ? monthName : money));
+    document.querySelectorAll('[data-source="card_total"]').forEach((el) => setText(el, 'card_total', money));
+    drawIssues();
+
+    const perPerson = (dash.data('overage').data || []).some((r) => r.email);
+    document.getElementById('tab-people').textContent = perPerson ? 'People' : 'Departments';
+    document.getElementById('people-title').textContent = perPerson ? 'Seat overage by person' : 'Seat overage by department';
+    document.getElementById('people-who-head').textContent = perPerson ? 'Person' : 'Department';
+
+    if (activeTab === 'overview') {
+      const series = [
+        { key: 'seats_usd', label: 'Committed seats', color: dash.colors[0] },
+        { key: 'overage_usd', label: 'Seat overage', color: dash.colors[1] },
+        { key: 'api_usd', label: 'API cost', color: dash.colors[2] },
+      ];
+      const legend = document.getElementById('monthly-legend');
+      legend.replaceChildren(...series.map((s) => {
+        const item = document.createElement('span');
+        const swatch = document.createElement('span');
+        swatch.className = 'as-swatch';
+        swatch.style.background = s.color;
+        item.append(swatch, s.label);
+        return item;
+      }));
+      drawChart('monthly-chart', 'monthly', 'period', series, (p) => d3.utcFormat('%b')(new Date(p + '-01T00:00:00Z')));
+      drawChart('api-daily-chart', 'api_daily', 'date',
+        [{ key: 'cost_usd', label: 'API cost', color: dash.colors[2] }],
+        (day) => d3.utcFormat('%b %-d')(new Date(day + 'T00:00:00Z')));
+    }
+    if (activeTab === 'people') {
+      drawTable('people-table', 'people', [['who', String], ['department', String], ['seat_type', String],
+        ['overage_usd', moneyExact], ['tokens', tokens]]);
+    }
+    if (activeTab === 'models') {
+      drawTable('models-table', 'models', [['family', String], ['overage_usd', moneyExact], ['api_usd', moneyExact],
+        ['total_usd', moneyExact], ['share', share]]);
+    }
+    if (activeTab === 'code') {
+      drawChart('code-daily-chart', 'code_daily', 'date',
+        [{ key: 'est_cost_usd', label: 'Estimated cost', color: dash.colors[3] }],
+        (day) => d3.utcFormat('%b %-d')(new Date(day + 'T00:00:00Z')));
+      drawTable('code-table', 'code_people', [['who', String], ['department', String],
+        ['est_cost_usd', moneyExact], ['tokens', tokens]]);
+    }
+    if (activeTab === 'cards') {
+      drawTable('cards-table', 'cards', [['who', String], ['department', String], ['charges', count], ['amount_usd', moneyExact]]);
+    }
+    if (activeTab === 'flags') {
+      drawTable('flags-table', 'flag_rows', [['flag_label', String], ['subject', String],
+        ['detail', String], ['est_monthly_saving_usd', (v) => (Number(v) ? money(Number(v)) : '')]]);
+    }
+  }
+
+  dash.onData(draw);
+</script>

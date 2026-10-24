@@ -5,10 +5,14 @@ description: >
   product, and model breakdowns across three cost surfaces (committed seats /
   variable seat-overage / API-platform cash). Fires when the operator says
   "run the AI spend analysis", "refresh the AI spend dashboard", "how much are
-  we spending on Claude / AI", or "set up AI spend tracking". First run walks a
-  conversational SETUP (company, plan tier, seat prices, roster, org id) and
-  scaffolds a local workspace; monthly runs pull the surfaces, rebuild the
-  workbooks + interactive HTML dashboard, and draft (never send) a summary. It
+  we spending on Claude / AI", "set up AI spend tracking", or "set up a daily
+  AI spend dashboard for my team". First run walks a conversational SETUP
+  (company, plan tier, seat prices, roster, org id) and scaffolds a local
+  workspace; monthly runs pull the surfaces, rebuild the workbooks + interactive
+  HTML dashboard, and draft (never send) a summary. Optionally it keeps a shared
+  Claude Dashboard current every day through two scheduled jobs (a cloud
+  routine reading API cost from Ramp, and a Mac job pulling the claude.ai spend
+  export with a fixed script). It
   is a generalized, org-agnostic tool — any Claude for Work organization can run
   it against its own spend. It NEVER modifies seats, billing, or org settings,
   NEVER auto-sends anything, and does NOT cover non-Anthropic vendors
@@ -30,10 +34,14 @@ separate pools of money that must stay visually distinct everywhere:
 Deeper framing, the plan-tier matrix, the security/privacy model, the data
 traps, and the roadmap live in [`references/dashboard-guide.md`](references/dashboard-guide.md) — read it once before the first run.
 
-## Two paths: is this a first run or a monthly run?
+## Three paths: first run, monthly run, or the daily dashboard?
 
 - **`config/pipeline.json` does not exist in the workspace → run SETUP** (below).
 - **It exists → run the MONTHLY pipeline** (below).
+- **The operator wants a shared, daily-refreshed Claude Dashboard, or a
+  scheduled job is running this skill** → follow
+  [`references/daily-refresh.md`](references/daily-refresh.md). It builds on
+  the same workspace and pipeline; read it in full first.
 
 Throughout: `$SKILL` = this skill's directory (the folder holding this file; its
 `scripts/` subdir holds the pipeline). `$ROOT` = the operator's **workspace**
@@ -107,12 +115,16 @@ and writes `raw/<YYYY-MM>/meta.json`:
 > ~90 days; a missed month is unrecoverable. If a month is missing at run time,
 > lead the summary with the gap — never backfill silently later.
 
-*Optional automation (Team, Claude-in-Chrome only):* an authenticated in-page
+*Optional automation (Team):* for unattended daily pulls use the fixed script
+`fetch_surface_b_browser.py` (see `references/daily-refresh.md`) — an unattended
+Claude session is refused this by Claude Code's safety checks. Interactively, with
+Claude-in-Chrome: an authenticated in-page
 fetch of the same export over an **unofficial** endpoint (`org_id` + pattern in
 `pipeline.json`). It is the operator's own Owner session pulling their own export
 — same data as the button — but undocumented, so it can drift. Use only if a
 browser is available; fail loud (the validator + banner catch drift); never
-treat it as required. Details in `references/dashboard-guide.md`.
+treat it as required. Details in `references/dashboard-guide.md`; the daily
+version (scheduled on the operator's Mac) is in `references/daily-refresh.md`.
 
 **Enterprise plan:** no browser step — `run_pipeline.py` (Step 2) fetches Surface
 B via the documented Analytics API (`fetch_surface_b_enterprise.py`). See the
@@ -129,15 +141,23 @@ gap; the dashboard and summary lead with the "Surface B missing" banner.
 python3 $SKILL/scripts/run_pipeline.py "$ROOT" YYYY-MM
 ```
 
-In order: `secure_key.py` (ingest a dropped `PASTE_ADMIN_KEY_HERE.txt`, if present);
-(Enterprise only) `fetch_surface_b_enterprise.py`; then
-`fetch_surface_c.py` (Admin API via key; gracefully `not_configured` if unset),
+In order: register the period (writes `raw/<period>/meta.json` if nothing has,
+so a month with no export still shows — flagged); `secure_key.py` (ingest a
+dropped `PASTE_ADMIN_KEY_HERE.txt`, if present); `ingest_ramp.py` (only when
+`api_cost_source` or `card_charges_source` is `"ramp"` — parses the Ramp answers
+saved into `raw/<period>/`); (Enterprise only) `fetch_surface_b_enterprise.py`;
+then `fetch_surface_c.py` (Admin API via key, when `api_cost_source` is
+`"admin_api"`, the default; gracefully `not_configured` if unset),
+`fetch_claude_code.py` (the Admin API's Claude Code usage report → per-person
+or per-key Claude Code usage; `not_configured` without a key),
 `validate_surface_b.py` (schema + sanity → `surface_b_status.json`),
 `apply_roster.py` (only when a `config/roster.xlsx|csv` exists — regenerates
 `config/org_chart.csv` + `config/seats.csv` from it),
 `build_workbooks.py` (rebuilds both `.xlsx` from **all** periods in `raw/`; writes
 `build_summary.json`), `build_artifact.py` (writes `artifacts/<period>_ai_spend.html`),
-`draft_slack.py` (writes `artifacts/<period>_slack_draft.txt`).
+`draft_slack.py` (writes `artifacts/<period>_slack_draft.txt`),
+`build_dashboard_datasets.py` (writes `dashboard/<id>.json` + `manifest.json`
+for the Claude Dashboard; `--datasets` on `run_pipeline.py` limits which).
 
 > **openpyxl is optional.** Without it, the summary, dashboard, and Slack draft
 > still build; only the two `.xlsx` workbooks are skipped. Install it for the
@@ -175,6 +195,16 @@ In order: `secure_key.py` (ingest a dropped `PASTE_ADMIN_KEY_HERE.txt`, if prese
 - **Config, not workbooks.** New hires / seat changes go in the roster
   (`config/roster.xlsx|csv`) — or edit `config/*.csv` directly; new API keys go in
   `config/api_key_map.csv`. The workbooks and artifact fully regenerate every run.
+- **The shared dashboard follows `dashboard_visibility`.** `"department"` (the
+  default) means no name or email is uploaded; `"person"` only when the operator
+  says their organization has decided to share per-person spend. The filter
+  runs before upload, because anyone who can open the dashboard can download
+  its rows. Never change the setting on your own.
+- **Scheduled jobs are proposals until approved.** Show the full routine or
+  launchd configuration and get a yes before creating either. Keys never go to
+  a cloud job: the cloud routine reads API cost through Ramp's connector and
+  holds no secret; anything needing the Admin key or a claude.ai login runs on
+  the operator's Mac.
 - **No real org data, no other vendors.** This ships with synthetic fixtures only;
   it covers Anthropic/Claude spend, not OpenAI/Gemini (on the roadmap).
 
@@ -192,6 +222,11 @@ In order: `secure_key.py` (ingest a dropped `PASTE_ADMIN_KEY_HERE.txt`, if prese
 | `scripts/scaffold.py` | Create a fresh workspace + seed config from templates |
 | `scripts/bootstrap_roster.py` | Seed a fill-in `config/roster.xlsx` (or `.csv`) from the first spend export |
 | `scripts/apply_roster.py` | Turn the roster into `config/org_chart.csv` + `config/seats.csv` (rates from `pipeline.json` `seat_rates`) |
+| `scripts/fetch_claude_code.py` | Admin API Claude Code usage report → `raw/<period>/claude_code_usage.csv` (per person or API key, per day, per model) |
+| `scripts/ingest_ramp.py` | Parse saved Ramp answers into `api_usage_cost.csv` (Surface C) and `card_charges.csv` |
+| `scripts/build_dashboard_datasets.py` | The Claude Dashboard's datasets (`dashboard/*.json` + manifest), filtered by `dashboard_visibility` |
+| `scripts/dashboard_page.html` | The Claude Dashboard's page (written once to the dashboard's `files/index.html`) |
+| `references/daily-refresh.md` | Daily refresh runbook: dashboard setup, publishing datasets, the cloud routine, the Mac job, the Chrome export step, failure handling |
 | `scripts/secure_key.py` | Move an Admin key from the `PASTE_ADMIN_KEY_HERE.txt` drop file into `.secrets/` (600), then delete the drop |
 | `scripts/artifact_template.html` | The dashboard template (config-driven; single file, no external calls) |
 | `config.example/` | Templated config (fake values) — the shape setup fills in |

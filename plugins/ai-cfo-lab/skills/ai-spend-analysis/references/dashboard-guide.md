@@ -32,7 +32,7 @@ the one thing not to do.
 |---|---|---|
 | Surface B source | claude.ai spend-report export | documented Analytics API |
 | Primary method | **Manual export** (Settings → Analytics → "How much is Claude costing?") | `fetch_surface_b_enterprise.py` (scripted, no browser) |
-| Optional automation | authenticated in-page fetch (Claude-in-Chrome, unofficial endpoint) | n/a — the API is the path |
+| Optional automation | authenticated fetch of the same export (unofficial endpoint): daily via the fixed script `fetch_surface_b_browser.py` in `daily-refresh.md` | n/a — the API is the path |
 | Window | trailing ~90 days (export monthly or lose it) | programmatic, no 90-day trap |
 | User dimension | per-user in the export | per-user via the API |
 | Status | validated in production | **built from docs, untested live (see roadmap)** |
@@ -77,6 +77,16 @@ is a convenience, never a dependency.
   So on Cowork, run Surface C from a local/CLI session, or leave it "not configured"
   until a platform secrets store lands (tracking: `anthropics/claude-code#32733`).
   Surfaces A and B need no key and work fully on Cowork.
+- **The shared Claude Dashboard is a different exposure.** Unlike the local
+  HTML file, a dashboard lives at a link, and everyone it is shared with can
+  download every dataset's rows from its Sources panel. So
+  `dashboard_visibility` filters people out *before* upload: `"department"`
+  (the default) uploads no names or emails at all; `"person"` uploads
+  per-person rows and is for organizations that have decided to share them.
+- **No keys in the cloud.** The daily cloud routine reads API cost through
+  Ramp's AI-spend connector, where Ramp holds the Anthropic admin key; the
+  routine itself holds no secret. Anything that needs the Admin key or a
+  claude.ai login runs on the operator's Mac (`references/daily-refresh.md`).
 - **The artifact is self-contained.** Single HTML file, data embedded as JSON at
   build time — no external calls, no CDN, no secrets. Safe to open offline.
 - **Nothing is ever sent.** `draft_slack.py` writes a `.txt` and prints it; the
@@ -97,7 +107,20 @@ is a convenience, never a dependency.
    department when the workspace's keys have an `owner_email` in
    `api_key_map.csv`. Unowned keys surface as an "(API — unassigned keys)" bucket
    and an `unowned_api_key` flag, not a silent miss.
-5. **Routing what-if is a model, not advice.** The what-if panel estimates
+5. **Three kinds of Claude Code and API dollars.** Seat overage (Surface B)
+   is billed. The Claude Code usage report's cost is Anthropic's *estimate at
+   list price*, including usage still inside a seat's allowance. Ramp's API
+   cost is Ramp's estimate from token counts. The dashboard labels each and
+   never adds the estimates to billed totals.
+6. **The Claude Code report sees one organization.** It reports on the Admin
+   key's Console organization. When the claude.ai Team workspace is a separate
+   organization, it shows only Claude Code run on API keys (`customer_type`
+   `api`) — no Team-seat users. Probe once before counting on it.
+7. **Card charges sit beside the totals.** Anthropic charges on company cards
+   (from Ramp) are actual cash, but a seat invoice paid by card is already in
+   committed seats, so the card figure is a cross-check, not a fourth surface
+   to add.
+8. **Routing what-if is a model, not advice.** The what-if panel estimates
    savings from shifting frontier-model traffic to a cheaper family at the
    observed cost/request. It assumes comparable request counts and does not judge
    quality — that call is the operator's.
@@ -113,5 +136,41 @@ is a convenience, never a dependency.
   `pipeline.json` (`surface_b_enterprise_path` / `surface_b_enterprise_fields`)
   so a tester can correct them without editing code; it fails loud on any shape
   mismatch. Validation from an Enterprise org is welcome.
-- **Not planned:** card-feed ingestion (Ramp), scheduled-task auto-setup, and any
-  form of auto-send (never).
+- **Team-plan export without a browser.** The daily per-person export runs
+  through a fixed script and a signed-in browser profile against an
+  undocumented endpoint, because Team plans have no spend API. If Anthropic
+  opens the Analytics API (or an equivalent) to Team plans, the Mac job's
+  browser step becomes a plain API call and the whole
+  refresh can move to the cloud.
+- **Not planned:** any form of auto-send (never).
+
+## Design decisions
+
+- **2026-10 — daily refresh into a Claude Dashboard (v0.2.0).** Reversed two
+  earlier "not planned" items: Ramp is now an optional source (API cost from
+  its AI-spend connection; Anthropic card charges), and the skill documents
+  scheduled jobs. Why: teams asked for a current, shared view, and a monthly
+  file couldn't give one. How it is bounded:
+  - *Two jobs, split by sensitivity.* A cloud routine refreshes only org-wide
+    API cost (no people, no keys). A Mac job handles everything per-person or
+    key-bearing (spend export, Claude Code report, card charges). Each owns its
+    own datasets, so they never overwrite each other.
+  - *Pushed files, not live queries.* The dashboard's live queries run with each
+    reader's own connector access, so teammates without Ramp would see errors.
+    The jobs upload pre-computed files instead, each keeping its Ramp query on
+    record so an editor can see what produced it.
+  - *Visibility filtered before upload,* defaulting to department level.
+  - *Browser automation accepted for the export, with no AI in it.* Claude
+    Code's safety checks refuse to let an unattended Claude session export
+    per-person data from an Owner's claude.ai session (tested with
+    `dontAsk` and a four-tool allowlist). Rather than loosen that, the export
+    is a fixed script: one read-only GET through a dedicated browser profile,
+    bytes saved as received, schema-checked, failures shown on the dashboard,
+    and the manual export as the fallback.
+  - *Copied data is verified.* Ramp answers reach the scripts through a model
+    writing them to disk, so each is checked against Ramp's own transaction
+    count or per-model total before anything is published.
+- **2026-10 — the Claude Code report as a supporting source.** It is the only
+  documented per-person feed on a Team plan, but it covers Claude Code only,
+  reports estimated (not billed) cost, and only sees the Admin key's own Console
+  organization. It sits beside the export rather than replacing it.
