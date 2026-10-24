@@ -145,6 +145,17 @@ forward.
 
 ## `ai-cfo-lab`
 
+### [0.3.0] — Unreleased
+
+#### Added
+
+- `ai-spend-analysis` setup an operator can finish alone: a `doctor` checkup that names
+  each next step and who can do it (and resumes anywhere), roster matching from an HR
+  export, a previewed installer and an uninstaller for the daily job, invoice
+  reconciliation, a one-page security overview, and a first-install test guide.
+- Plugin evals for seven setup decision points (`plugins/ai-cfo-lab/evals/`).
+- CI runs the skill's offline tests on every pull request.
+
 ### [0.2.0] — Unreleased
 
 #### Added

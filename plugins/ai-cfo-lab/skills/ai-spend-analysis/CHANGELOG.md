@@ -1,5 +1,47 @@
 # Changelog — ai-spend-analysis
 
+## v0.3.0 — Unreleased
+
+Setup a non-technical operator can finish alone, and an outside company can
+approve. Built from the friction of the first real install
+(`references/setup-pitfalls.md`), not from guesses.
+
+- `doctor.py` — every setup check in order, each with its fix and **who** can
+  fix it (operator, claude.ai Owner, Console admin, Ramp admin). The next step
+  is the first unfinished check, read from the workspace itself, so setup
+  resumes anywhere. Catches the silent failures from the first install: Ramp
+  connected to the wrong Console org (prints the Admin key's own org via
+  `/v1/organizations/me`), a Claude Code report that can't see seat users,
+  template seat prices and sample roster left in place, settings missing after
+  an upgrade (`--fix-config`). Logs statuses per run so setup time is measured.
+- `match_roster.py` — fills the roster from an HR/payroll export by email or
+  name, prefers active rows, handles contractor rows, and reports every
+  ambiguity instead of guessing. Reproduced the first install's hand-matched
+  roster exactly.
+- `install_mac_job.py` — previews, then installs, the daily launchd job; the
+  commands are generated, so nobody types them.
+- `uninstall.py` — removes the job, saved sign-in, key or data; lists first.
+- `reconcile.py` — compares a closed month with the invoices: each surface
+  within $1.00 or 0.5%, whichever is larger.
+- `fetch_surface_b_browser.py --check` tests the saved sign-in without saving.
+- Docs: role-based "Before you start" and doctor-driven setup in the user
+  guide and `SKILL.md`; `references/security-overview.md` (one page for an IT
+  reviewer); `references/first-install-test.md` (how to run and score a first
+  install).
+- Evals (`plugins/ai-cfo-lab/evals/`): seven setup decision points. The first
+  run caught the skill nudging an operator toward one of two same-named people;
+  `SKILL.md` now presents both neutrally.
+- CI: the offline tests run on every pull request (`.github/workflows/tests.yml`).
+- Hardened after code review: the doctor reads the roster being edited (not the
+  generated CSVs), moves a pasted Admin key into `.secrets/`, reports "All set"
+  whenever nothing fails (warnings are listed, not blocking), refuses
+  `--fix-config` on an unreadable config instead of replacing it, and quotes every
+  path it suggests. The roster matcher never separates two different people by
+  who is active (same first and last name only), keeps existing seat types unless
+  `--premium` is given, reads T/F and Y/N active columns, and finds roster
+  columns by header. The job installer handles Enterprise (no org id, no browser
+  stage) and quotes paths. New modules pass `mypy --disallow-untyped-defs`.
+
 ## v0.2.0 — Unreleased
 
 A daily, shared view. The monthly workflow is unchanged; everything below is

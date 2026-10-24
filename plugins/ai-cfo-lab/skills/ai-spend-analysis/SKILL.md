@@ -36,7 +36,7 @@ traps, and the roadmap live in [`references/dashboard-guide.md`](references/dash
 
 ## Three paths: first run, monthly run, or the daily dashboard?
 
-- **`config/pipeline.json` does not exist in the workspace → run SETUP** (below).
+- **`config/pipeline.json` does not exist, or the doctor reports failures → run SETUP** (below).
 - **It exists → run the MONTHLY pipeline** (below).
 - **The operator wants a shared, daily-refreshed Claude Dashboard, or a
   scheduled job is running this skill** → follow
@@ -49,56 +49,48 @@ folder (e.g. `AI-Spend-Analytics/`), which holds `config/`, `raw/`, `workbooks/`
 `artifacts/`, `.secrets/`. The workspace is separate from the skill — it holds
 the org's data and is never committed anywhere.
 
-## Setup (first run — conversational)
+## Setup (first run, or resuming one) — doctor-driven
 
-Run it as a friendly first-run setup — ask, confirm, write; the operator mostly
-confirms rather than types.
+**Always start with the doctor**, whether setup is new, half-done, or something
+broke: `python3 $SKILL/scripts/doctor.py "$ROOT" --json`. It runs every check in
+setup order, reads the state from the workspace itself, and returns the next
+step with its fix and **who can do it**. Work through `next`, run the doctor
+again, repeat until it reports no failures. Never keep your own list of what's
+done; the doctor is the record, and its log (`logs/setup.jsonl`) measures how
+long setup took.
 
-1. **Pick / confirm the workspace root** `$ROOT` — a folder for this org's data
-   (roster, monthly exports, dashboards). Suggest an easy-to-find spot like
-   `~/Desktop/AI-Spend-Analytics`, and **keep it outside any git repo you might
-   publish** — it holds real per-person spend (a scaffolded `.gitignore` protects
-   it, but living outside a repo is belt-and-suspenders). Scaffold it:
-   `python3 $SKILL/scripts/scaffold.py "$ROOT"` — creates the folder tree and
-   seeds `config/` from `$SKILL/config.example/` templates.
-2. **Ask** for: company name; **plan tier** (`team` or `enterprise`); seat types
-   and their monthly list prices; then write them into `$ROOT/config/pipeline.json`
-   (`company_name`, `plan_tier`) and `$ROOT/config/thresholds.json`
-   (`standard_seat_rate_usd`).
-3. **Org id (optional).** Only the optional Team browser-automation shortcut uses
-   it; the manual export path does not, so the operator can safely skip it. If they
-   want the automation: copy it from their claude.ai admin URL → write it to
-   `pipeline.json` `org_id`. (Team only; Enterprise's Analytics API doesn't use it.)
-4. **Roster** — no roster needed up front. On the first run I read the people
-   straight out of your spend export (`bootstrap_roster.py`) and write a fill-in
-   roster at `config/roster.xlsx` — Excel, with a `standard`/`premium` dropdown
-   (or `config/roster.csv` if openpyxl isn't installed). Emails and a name guess
-   come pre-filled; the operator adds **department** and **seat_type** two ways:
-   edit the sheet, or paste/attach their own roster and I fill it in for them.
-   Per-seat dollars derive from `seat_rates` in `pipeline.json`, so there's no
-   dollar column to touch. Every run then regenerates `config/org_chart.csv` +
-   `config/seats.csv` from the roster (`apply_roster.py`). Bringing your own?
-   Drop a `config/roster.csv` (`email,name,department,seat_type`), or hand-maintain
-   `org_chart.csv`/`seats.csv` — with no roster file present the pipeline uses
-   those CSVs as-is.
-5. **Model families** — the shipped `config/models.json` classifies models into
-   `frontier | sonnet | haiku | other` by regex. Confirm the patterns match the
-   org's current model lines; it drives the what-if routing panel's colors and
-   labels (no code changes needed to update).
-6. **Optional — Surface C (API/Console cash).** If they want it, **the operator
-   places the key — never paste it in chat.** Easiest: open the scaffolded
-   `$ROOT/PASTE_ADMIN_KEY_HERE.txt`, paste the whole `sk-ant-…` key, save. On the
-   next run `secure_key.py` moves it into `$ROOT/.secrets/anthropic_admin_key`
-   (chmod 600, gitignored) and deletes the drop file — the key never touches chat,
-   a command, or a log. (Env var `ANTHROPIC_ADMIN_API_KEY` also works.) Skipping it
-   is fine — the dashboard shows "Surface C not configured". **If a key ever appears
-   in chat, refuse it, tell the operator to rotate it, and point them at the drop
-   file.** (Cowork has no secrets store yet — run Surface C from a local/CLI session
-   or leave it off; see the reference guide.)
-7. **Validate** by doing a first monthly run (below): pull the export, let me
-   bootstrap the roster from it for the operator to fill, then run the pipeline and
-   show the dashboard. (The very first build, before the roster is filled, shows
-   everyone under "(unmapped)" — expected; it sharpens once the roster lands.)
+Talk to the operator in plain language, one step at a time; they mostly
+confirm. The checks and how to clear each one:
+
+| Check | How to clear it |
+|---|---|
+| `workspace` | Agree a folder **outside any git repo** (suggest `~/Desktop/AI-Spend-Analytics`), then `python3 $SKILL/scripts/scaffold.py "$ROOT"`. |
+| `config_complete` | `doctor.py "$ROOT" --fix-config` (adds settings from newer versions; changes nothing existing). |
+| `company`, `seat_prices_confirmed` | Ask for the company name and each seat type's monthly price (claude.ai → Settings → Billing); write `company_name`, `seat_rates`, and `standard_seat_rate_usd` in `thresholds.json`. Ask for the plan tier (`team` / `enterprise`) at the same time. |
+| `org_id` | Team only. A claude.ai Owner copies it from Settings → Organization (or the `…/organizations/<id>/…` address). |
+| `admin_key` | Optional. The **Console admin** creates an Admin key and pastes it into `$ROOT/PASTE_ADMIN_KEY_HERE.txt`; the next pipeline run (or `secure_key.py`) moves it to `.secrets/`. **Never accept a key in chat** — if one appears, refuse it, tell them to revoke it, and point at the file. |
+| `admin_key_org` | When `api_cost_source` is `"ramp"`: call `ramp_get_ai_token_spend_connections` and compare its Anthropic `organization_id` with the id the doctor printed. **A mismatch is the single most damaging silent failure** (API cost reads near $0 with no error): the **Ramp admin** re-adds the right org's key in Ramp's AI-spend settings. |
+| `claude_code_visibility` | A warning that the report sees API keys only is normal when the Team workspace and Console org are separate — explain it; nothing to fix. |
+| `export_login` | Team only. A **claude.ai Owner** runs the `--login` command the doctor prints and signs in once in the window that opens. Claude must not drive claude.ai itself: unattended export sessions are refused by Claude Code's safety checks, so this is a fixed script. |
+| `first_export` | `uv run --with playwright python $SKILL/scripts/fetch_surface_b_browser.py "$ROOT"` (or the manual export, saved to `raw/<YYYY-MM>/overage_spend.csv`). |
+| `roster_real`, `roster_complete` | `bootstrap_roster.py "$ROOT" <YYYY-MM>` creates `config/roster.xlsx` from the export. Then ask for an HR/payroll export and run `match_roster.py "$ROOT" <file> --premium "<names>"`; resolve what it reports with `--set` by **asking the operator**, then `--write`. When two people could own an email, present both neutrally: don't suggest which is likelier (from department, products used or anything else) and don't pre-fill either name in a command; a wrong guess files that person's spend under the wrong department. |
+| `roster_departments` | Show the one-person departments and ask whether any are typos. |
+| `dashboard` | References `daily-refresh.md` → One-time setup. Ask about `dashboard_visibility` first (see Hard rules). |
+| `mac_job` | `install_mac_job.py "$ROOT"` prints exactly what will run; show it, get a yes, then `--load`. |
+| `data_fresh` | Read `logs/daily.log`; the doctor's detail says what failed. |
+
+**When a step needs someone else** (the doctor's `role` isn't `Operator`), say
+so plainly, offer a short message the operator can forward to that person
+(what to do, where, and why it's needed), and carry on with the steps that
+don't depend on it. Setup resumes from the doctor whenever they're back.
+
+Two more settings to confirm before the first dashboard: the model-family
+patterns in `config/models.json` (they drive the model tab and the routing
+what-if) and `dashboard_visibility`.
+
+To remove the setup from a machine: `uninstall.py "$ROOT"` lists what it would
+remove; add `--yes` (and `--remove-login`, `--remove-key`, `--purge-data` as
+wanted). The dashboard and any cloud routine are deleted on claude.ai.
 
 ## Monthly run (target period = last full calendar month, `YYYY-MM`)
 
@@ -227,6 +219,13 @@ for the Claude Dashboard; `--datasets` on `run_pipeline.py` limits which).
 | `scripts/build_dashboard_datasets.py` | The Claude Dashboard's datasets (`dashboard/*.json` + manifest), filtered by `dashboard_visibility` |
 | `scripts/dashboard_page.html` | The Claude Dashboard's page (written once to the dashboard's `files/index.html`) |
 | `references/daily-refresh.md` | Daily refresh runbook: dashboard setup, publishing datasets, the cloud routine, the Mac job, the Chrome export step, failure handling |
+| `scripts/doctor.py` | Setup checks in order, each with its fix and who can do it; the next step; `--fix-config`; logs setup time |
+| `scripts/match_roster.py` | Fill the roster from an HR/payroll export (email or name matching; reports ambiguity, never guesses) |
+| `scripts/fetch_surface_b_browser.py` | Team-plan spend export by fixed script (`--login` once, `--check`, daily fetch with month-end catch-up) |
+| `scripts/install_mac_job.py` | Preview, then install, the daily launchd job (generated commands, nothing typed) |
+| `scripts/uninstall.py` | Remove the job, login, key or data — lists first, acts only with `--yes` |
+| `references/setup-pitfalls.md` | Every failure seen in real installs, mapped to the doctor check that catches it; the roles setup needs |
+| `references/security-overview.md` | One page for an IT/security reviewer: what data goes where, who can see it, what holds credentials |
 | `scripts/secure_key.py` | Move an Admin key from the `PASTE_ADMIN_KEY_HERE.txt` drop file into `.secrets/` (600), then delete the drop |
 | `scripts/artifact_template.html` | The dashboard template (config-driven; single file, no external calls) |
 | `config.example/` | Templated config (fake values) — the shape setup fills in |

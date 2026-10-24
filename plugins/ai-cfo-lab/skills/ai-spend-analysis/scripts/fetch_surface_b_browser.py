@@ -6,6 +6,8 @@ Usage:
   uv run --with playwright python fetch_surface_b_browser.py <workspace root> --login
       One-time (and whenever the login expires): opens Chrome on a profile kept in
       <root>/.browser-profile so an Owner or Primary Owner can sign in to claude.ai.
+  uv run --with playwright python fetch_surface_b_browser.py <workspace root> --check
+      Tests the saved login with the same request, saving nothing (doctor.py uses it).
   uv run --with playwright python fetch_surface_b_browser.py <workspace root> [YYYY-MM]
       Daily: fetches the export through yesterday for the month that contains
       yesterday (or the month given), first finishing the previous month if its
@@ -102,6 +104,26 @@ def request_export(context: BrowserContext, cfg: dict, covered: Coverage) -> tup
     return response, None
 
 
+def check(root: str, today: datetime.date) -> int:
+    """Make the daily request for yesterday alone and report whether it worked; save nothing."""
+    cfg = load_config(root)
+    if not cfg:
+        return 1
+    yesterday = today - datetime.timedelta(days=1)
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            context = open_profile(p, root, headless=True)
+            try:
+                _, error = request_export(context, cfg, Coverage(yesterday, yesterday, True))
+            finally:
+                context.close()
+    except Exception as err:  # report why the check couldn't run instead of a traceback
+        error = f"the export script couldn't run ({type(err).__name__}: {err})"
+    print(f"[surface_b_browser] {error}" if error else "[surface_b_browser] signed in; the export answers")
+    return 1 if error else 0
+
+
 def fetch(root: str, periods: list[str], today: datetime.date) -> int:
     cfg = load_config(root)
     if not cfg:
@@ -155,10 +177,13 @@ def main() -> int:
     parser.add_argument("root")
     parser.add_argument("period", nargs="?", help="YYYY-MM (default: the month containing yesterday)")
     parser.add_argument("--login", action="store_true", help="open Chrome to sign in to claude.ai once")
+    parser.add_argument("--check", action="store_true", help="test the saved login without saving anything")
     args = parser.parse_args()
     if args.login:
         return login(args.root)
     today = datetime.date.today()
+    if args.check:
+        return check(args.root, today)
     return fetch(args.root, target_periods(args.root, today, args.period), today)
 
 
