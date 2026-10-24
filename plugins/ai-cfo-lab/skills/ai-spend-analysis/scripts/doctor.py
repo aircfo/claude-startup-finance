@@ -363,11 +363,12 @@ def fix_config(root: str) -> Optional[list[str]]:
     """Add missing template settings. None, writing nothing, when the existing file
     isn't valid JSON: treating it as empty would replace the operator's settings."""
     path = os.path.join(root, "config", "pipeline.json")
+    if not os.path.exists(path):
+        raise SystemExit(f"[doctor] no workspace settings yet — set the workspace up first: "
+                         f"python3 {q(os.path.join(HERE, 'scaffold.py'))} {q(root)}")
     try:
         with open(path) as fh:
             cfg = json.load(fh)
-    except OSError:
-        cfg = {}
     except ValueError:
         return None
     added = {k: v for k, v in read_json(TEMPLATE).items() if k not in cfg}

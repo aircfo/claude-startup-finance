@@ -332,3 +332,24 @@ print(json.dumps([[p["display"] for p in same], [p["display"] for p in typo]]))`
   assert.strictEqual(r.status, 0, r.stderr);
   assert.deepStrictEqual(JSON.parse(r.stdout), [['Ada Byron Lovelace'], ['Sam Leigh', 'Sam Lee']]);
 });
+
+test('two current employees with one name are asked about; a name with no Latin letters is skipped, not fatal', { skip }, () => {
+  const r = spawnSync(PY, ['-c', `
+import json
+from match_roster import prefer_active, name_keys
+def person(display, active):
+    parts = display.split()
+    return {"display": display, "first": parts[0].lower(), "last": parts[-1].lower(), "active": active}
+twins = prefer_active([person("Sam Lee", True), person("Sam Lee", True)])
+departed = prefer_active([person("Sam Lee", False), person("Sam Lee", False)])
+print(json.dumps([len(twins), len(departed), sorted(name_keys({"first": "", "last": "lee"}))]))`], { encoding: 'utf8', cwd: SCRIPTS });
+  assert.strictEqual(r.status, 0, r.stderr);
+  assert.deepStrictEqual(JSON.parse(r.stdout), [2, 1, []]);
+});
+
+test('--fix-config on a workspace that isn’t set up points at scaffold.py', { skip }, () => {
+  const root = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'ai-spend-none-')), 'nothing-here');
+  const r = run('doctor.py', [root, '--offline', '--fix-config']);
+  assert.notStrictEqual(r.status, 0);
+  assert.match(r.stdout + r.stderr, /set the workspace up first: python3 .*scaffold\.py/);
+});

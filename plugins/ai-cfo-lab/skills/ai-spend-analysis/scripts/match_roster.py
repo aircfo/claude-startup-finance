@@ -85,6 +85,8 @@ def read_hr(path: str) -> list[dict]:
 
 def name_keys(person: dict) -> set[str]:
     first, last = person["first"], person["last"]
+    if not first:
+        return set()  # no Latin letters to match an email against; it can still match by email column or --set
     if not last:
         return {first}
     return {f"{first}.{last}", first + last, first[0] + last, first, first + last[0]}
@@ -97,7 +99,11 @@ def prefer_active(candidates: list[dict]) -> list[dict]:
     if len({(c["first"], c["last"]) for c in candidates}) != 1:
         return candidates
     active = [c for c in candidates if c["active"]]
-    return active if len(active) == 1 else candidates[:1]
+    if len(active) == 1:
+        return active
+    if not active:
+        return candidates[:1]  # one departed person listed more than once: their seat is still theirs
+    return candidates  # two current employees can share a name: ask
 
 
 def match(email: str, people: list[dict]) -> tuple[Optional[dict], list[dict]]:
