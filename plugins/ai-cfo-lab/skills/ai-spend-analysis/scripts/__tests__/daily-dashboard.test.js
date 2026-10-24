@@ -139,7 +139,8 @@ test('the browser export covers through yesterday and finishes a half-captured m
     fs.writeFileSync(path.join(root, 'raw', '2026-09', 'meta.json'), JSON.stringify({ partial: true }));
     const r = python(`
 import datetime, json
-from fetch_surface_b_browser import export_window, target_periods, looks_like_export
+from fetch_surface_b_browser import target_periods, looks_like_export
+from periods import coverage as export_window
 d = datetime.date
 show = lambda w: None if w is None else [w[0].isoformat(), w[1].isoformat(), w[2]]
 print(json.dumps({
@@ -148,6 +149,9 @@ print(json.dumps({
   "first_day": show(export_window("2026-10", d(2026, 10, 1))),
   "catch_up": target_periods(${JSON.stringify(root)}, d(2026, 10, 23)),
   "on_first": target_periods(${JSON.stringify(root)}, d(2026, 10, 1)),
+  "after_failed_close": (json.dump({"partial": False, "fetch_error": "signed out"},
+                                   open(${JSON.stringify(root)} + "/raw/2026-09/meta.json", "w")),
+                         target_periods(${JSON.stringify(root)}, d(2026, 10, 2)))[1],
   "export": looks_like_export("user_email,product,total_net_spend_usd\\nx"),
   "login_page": looks_like_export("<!doctype html><title>Sign in</title>")}))`);
     assert.strictEqual(r.status, 0, r.stderr);
@@ -157,6 +161,7 @@ print(json.dumps({
     assert.strictEqual(out.first_day, null, 'nothing to fetch for a month with no completed days');
     assert.deepStrictEqual(out.catch_up, ['2026-09', '2026-10'], 'a partial previous month is finished first');
     assert.deepStrictEqual(out.on_first, ['2026-09']);
+    assert.deepStrictEqual(out.after_failed_close, ['2026-09', '2026-10'], 'a month whose closing fetch failed is retried');
     assert.strictEqual(out.export, true);
     assert.strictEqual(out.login_page, false, 'a sign-in page is never saved as the export');
   });

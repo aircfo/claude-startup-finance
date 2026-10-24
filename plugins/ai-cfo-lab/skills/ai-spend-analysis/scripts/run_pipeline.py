@@ -19,13 +19,16 @@ Order:
   dashboard datasets (--datasets limits which are written).
 
 Never sends anything; read-only against every financial surface."""
+from __future__ import annotations
+
 import argparse, datetime, json, os, subprocess, sys
-from calendar import monthrange
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from periods import register_period
 
 
-def run(script, *args):
+def run(script: str, *args: str) -> int:
     r = subprocess.run([sys.executable, os.path.join(HERE, script), *args], capture_output=True, text=True)
     if r.stdout.strip():
         print(r.stdout.strip())
@@ -34,30 +37,15 @@ def run(script, *args):
     return r.returncode
 
 
-def pipeline_config(root):
+def pipeline_config(root: str) -> dict:
     path = os.path.join(root, "config", "pipeline.json")
-    return json.load(open(path)) if os.path.exists(path) else {}
+    if not os.path.exists(path):
+        return {}
+    with open(path) as fh:
+        return json.load(fh)
 
 
-def register_period(outdir, period, today):
-    """Write meta.json for a period that has none. The current month counts through
-    yesterday, because every source is a day behind."""
-    meta_path = os.path.join(outdir, "meta.json")
-    if os.path.exists(meta_path):
-        return
-    year, month = map(int, period.split("-"))
-    days_in_month = monthrange(year, month)[1]
-    current = today.strftime("%Y-%m")
-    if period == current:
-        days_covered, partial = max(today.day - 1, 0), True
-    else:
-        days_covered, partial = (days_in_month, False) if period < current else (0, True)
-    with open(meta_path, "w") as fh:
-        json.dump({"period": period, "days_covered": days_covered, "partial": partial,
-                   "source": "registered by run_pipeline (no export meta yet)"}, fh, indent=2)
-
-
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("period")

@@ -16,5 +16,7 @@
   "card_charges_source_note": "'ramp' adds Anthropic charges on employee cards from Ramp, shown beside the totals (not added to them). 'none' skips it.",
   "dashboard_url": null,
   "dashboard_visibility": "department",
-  "dashboard_visibility_note": "Who sees what on the shared Claude Dashboard: 'department' rolls people up to their department before anything is uploaded; 'person' uploads per-person rows (names, emails, spend). Everyone who can open the dashboard can download its rows, so choose 'person' only if that is your policy."
+  "dashboard_visibility_note": "Who sees what on the shared Claude Dashboard: 'department' rolls people up to their department before anything is uploaded; 'person' uploads per-person rows (names, emails, spend). Everyone who can open the dashboard can download its rows, so choose 'person' only if that is your policy.",
+  "api_cost_refreshed_by": "mac",
+  "api_cost_refreshed_by_note": "Which daily job refreshes API cost on the dashboard: 'mac' (the Mac job, default) or 'cloud' (a scheduled cloud routine reading Ramp, which keeps API cost current while the Mac is off)."
 }

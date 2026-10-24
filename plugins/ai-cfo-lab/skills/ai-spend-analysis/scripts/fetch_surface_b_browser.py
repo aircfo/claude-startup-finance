@@ -9,7 +9,8 @@ Usage:
   uv run --with playwright python fetch_surface_b_browser.py <workspace root> [YYYY-MM]
       Daily: fetches the export through yesterday for the month that contains
       yesterday (or the month given), first finishing the previous month if its
-      last fetch was partial. Writes raw/<period>/overage_spend.csv + meta.json.
+      last fetch was partial or failed. Writes raw/<period>/overage_spend.csv +
+      meta.json; a failed fetch keeps the last good export and records the error.
 
 Why a fixed script: Team plans have no spend API, and Claude Code's safety checks
 (rightly) refuse to let an unattended Claude session drive an Owner's claude.ai
@@ -22,61 +23,46 @@ period's meta.json as `fetch_error` (signed out, HTTP status, wrong content), an
 validate_surface_b.py surfaces it on the dashboard. The manual export button is
 always the fallback. Reads org_id and surface_b_endpoint from config/pipeline.json.
 """
+from __future__ import annotations
+
 import argparse, datetime, json, os, sys
-from calendar import monthrange
+from typing import TYPE_CHECKING, Optional
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from periods import Coverage, coverage, month_of, previous_month, read_meta, record_fetch_error, write_meta
+
+if TYPE_CHECKING:
+    from playwright.sync_api import APIResponse, BrowserContext, Playwright
 
 PROFILE_DIR = ".browser-profile"
 CLAUDE_URL = "https://claude.ai"
 REQUIRED_COLUMNS = ("user_email", "total_net_spend_usd")
 
 
-def export_window(period, today):
-    """(start, end, partial) for a period, ending yesterday — every source is a day behind."""
-    year, month = map(int, period.split("-"))
-    start = datetime.date(year, month, 1)
-    last = datetime.date(year, month, monthrange(year, month)[1])
-    end = min(last, today - datetime.timedelta(days=1))
-    if end < start:
-        return None
-    return start, end, end < last
-
-
-def target_periods(root, today, period=None):
+def target_periods(root: str, today: datetime.date, period: Optional[str] = None) -> list[str]:
     """The month that contains yesterday, preceded by last month when its last fetch
-    was partial (the Mac was off on the 1st) so no month is left half-captured."""
+    was partial (the Mac was off on the 1st) or failed (signed out at month end),
+    so no month is left half-captured."""
     if period:
         return [period]
-    current = (today - datetime.timedelta(days=1)).strftime("%Y-%m")
-    year, month = map(int, current.split("-"))
-    previous = f"{year - 1}-12" if month == 1 else f"{year}-{month - 1:02d}"
-    meta_path = os.path.join(root, "raw", previous, "meta.json")
-    previous_partial = os.path.exists(meta_path) and json.load(open(meta_path)).get("partial")
-    return [previous, current] if previous_partial else [current]
+    current = month_of(today - datetime.timedelta(days=1))
+    previous = previous_month(current)
+    meta = read_meta(os.path.join(root, "raw", previous))
+    unfinished = bool(meta) and (meta.get("partial") or meta.get("fetch_error"))
+    return [previous, current] if unfinished else [current]
 
 
-def looks_like_export(text):
+def looks_like_export(text: str) -> bool:
     first_line = text.split("\n", 1)[0]
     return all(column in first_line for column in REQUIRED_COLUMNS)
 
 
-def write_meta(root, period, window, source, fetch_error=None):
-    out_dir = os.path.join(root, "raw", period)
-    os.makedirs(out_dir, exist_ok=True)
-    start, end, partial = window
-    meta = {"period": period, "start": start.isoformat(), "end": end.isoformat(),
-            "days_covered": end.day, "partial": partial, "source": source}
-    if fetch_error:
-        meta["fetch_error"] = fetch_error
-    with open(os.path.join(out_dir, "meta.json"), "w") as fh:
-        json.dump(meta, fh, indent=2)
-
-
-def open_profile(playwright, root, headless):
+def open_profile(playwright: Playwright, root: str, headless: bool) -> BrowserContext:
     return playwright.chromium.launch_persistent_context(
         os.path.join(root, PROFILE_DIR), channel="chrome", headless=headless, accept_downloads=False)
 
 
-def login(root):
+def login(root: str) -> int:
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         context = open_profile(p, root, headless=False)
@@ -89,55 +75,66 @@ def login(root):
     return 0
 
 
-def fetch(root, periods, today):
-    cfg = json.load(open(os.path.join(root, "config", "pipeline.json")))
-    org_id = cfg.get("org_id")
-    endpoint = cfg.get("surface_b_endpoint")
-    if not org_id or not endpoint:
+def load_config(root: str) -> Optional[dict]:
+    with open(os.path.join(root, "config", "pipeline.json")) as fh:
+        cfg = json.load(fh)
+    if not cfg.get("org_id") or not cfg.get("surface_b_endpoint"):
         print("[surface_b_browser] org_id and surface_b_endpoint must be set in config/pipeline.json")
-        return 1
+        return None
     if not os.path.isdir(os.path.join(root, PROFILE_DIR)):
         print("[surface_b_browser] no browser profile yet — run once with --login")
-        return 1
+        return None
+    return cfg
 
+
+def request_export(context: BrowserContext, cfg: dict, covered: Coverage) -> tuple[APIResponse, Optional[str]]:
+    """The one request this script makes. Returns (response, error message or None)."""
+    url = CLAUDE_URL + cfg["surface_b_endpoint"].format(
+        org_id=cfg["org_id"], start=covered.start.isoformat(), end=covered.end.isoformat())
+    response = context.request.get(url)
+    if response.status in (401, 403):
+        return response, "claude.ai session signed out — run fetch_surface_b_browser.py --login"
+    if not response.ok:
+        return response, f"HTTP {response.status} from the spend export (endpoint may have changed)"
+    if not looks_like_export(response.text()):
+        return response, (f"response was not the spend export (content type "
+                          f"{response.headers.get('content-type', 'unknown')}) — signed out or endpoint changed")
+    return response, None
+
+
+def fetch(root: str, periods: list[str], today: datetime.date) -> int:
+    cfg = load_config(root)
+    if not cfg:
+        return 1
     from playwright.sync_api import sync_playwright
     stamp = today.isoformat()
     with sync_playwright() as p:
         context = open_profile(p, root, headless=True)
         try:
             for period in periods:
-                window = export_window(period, today)
-                if not window:
+                covered = coverage(period, today)
+                if not covered:
                     continue
-                start, end, _ = window
-                url = CLAUDE_URL + endpoint.format(org_id=org_id, start=start.isoformat(), end=end.isoformat())
-                response = context.request.get(url)
-                text = response.text()
-                if response.status in (401, 403):
-                    error = "claude.ai session signed out — run fetch_surface_b_browser.py --login"
-                elif not response.ok:
-                    error = f"HTTP {response.status} from the spend export (endpoint may have changed)"
-                elif not looks_like_export(text):
-                    error = (f"response was not the spend export (content type "
-                             f"{response.headers.get('content-type', 'unknown')}) — signed out or endpoint changed")
-                else:
-                    error = None
+                out_dir = os.path.join(root, "raw", period)
+                response, error = request_export(context, cfg, covered)
                 if error:
-                    write_meta(root, period, window, f"daily browser export {stamp} (failed)", error)
+                    # The last good export (if any) stays, with its own coverage, and the
+                    # error is recorded beside it so validation reports the gap.
+                    record_fetch_error(out_dir, period, today, error, f"daily browser export {stamp} (failed)")
                     print(f"[surface_b_browser] {period}: {error}")
                     continue
-                os.makedirs(os.path.join(root, "raw", period), exist_ok=True)
-                with open(os.path.join(root, "raw", period, "overage_spend.csv"), "wb") as fh:
+                os.makedirs(out_dir, exist_ok=True)
+                with open(os.path.join(out_dir, "overage_spend.csv"), "wb") as fh:
                     fh.write(response.body())
-                write_meta(root, period, window, f"daily browser export {stamp}")
-                print(f"[surface_b_browser] {period}: saved export {start}..{end} "
-                      f"({text.count(chr(10))} lines)")
+                write_meta(out_dir, period, covered, f"daily browser export {stamp}")
+                print(f"[surface_b_browser] {period}: saved export {covered.start}..{covered.end} "
+                      f"({response.text().count(chr(10))} lines)")
         finally:
             context.close()
     return 0
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("period", nargs="?", help="YYYY-MM (default: the month containing yesterday)")
