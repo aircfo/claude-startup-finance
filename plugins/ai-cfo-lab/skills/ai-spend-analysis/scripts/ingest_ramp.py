@@ -210,7 +210,7 @@ def read_saved(out_dir: str, raw_name: str, status_name: str, source: str, label
         return saved
     except ValueError as err:
         write_status(out_dir, status_name, source, "error", f"{raw_name} unreadable: {err}")
-        mark_imported(out_dir, raw_name)
+        mark_imported(out_dir, raw_name, raw_name.replace(".json", "_total.json"))
         return None
 
 

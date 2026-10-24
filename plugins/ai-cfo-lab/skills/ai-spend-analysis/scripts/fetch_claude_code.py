@@ -72,6 +72,8 @@ def fetch_day(day: datetime.date, key: str) -> list[dict]:
         if not data.get("has_more"):
             return records
         page = data.get("next_page")
+        if not page:
+            raise RuntimeError(f"the report for {day} said more pages follow but gave no next_page")
 
 
 def flatten(record: dict) -> list[dict]:

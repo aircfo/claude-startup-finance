@@ -255,3 +255,32 @@ test('--no-reports builds the dashboard datasets and skips the monthly reports',
     assert.ok(!fs.existsSync(path.join(root, 'workbooks', 'build_summary.json')), 'no workbooks were built');
   });
 });
+
+test('an unreadable saved answer retires its total too, so the next day is judged fresh', { skip }, () => {
+  withWorkspace({ api_cost_source: 'ramp' }, (root) => {
+    const juneDir = path.join(root, 'raw', '2026-06');
+    fs.writeFileSync(path.join(juneDir, 'ramp_api_cost.json'), '{not json');
+    run('ingest_ramp.py', root, '2026-06');
+    assert.strictEqual(readJson(juneDir, 'surface_c_status.json').state, 'error');
+    assert.ok(!fs.existsSync(path.join(juneDir, 'ramp_api_cost_total.json')), 'the old total is retired');
+  });
+});
+
+test('a report that promises more pages without a cursor fails instead of looping', { skip }, () => {
+  const r = python(`
+import json, fetch_claude_code as m
+class Fake:
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+    def read(self): return b'{"data": [{"x": 1}], "has_more": true}'
+m.urllib.request.urlopen = lambda req, timeout=60: Fake()
+m.json.load = lambda fh: json.loads(fh.read())
+import datetime
+try:
+    m.fetch_day(datetime.date(2026, 10, 1), "key")
+    print("looped-or-returned")
+except RuntimeError as err:
+    print("raised:", err)`);
+  assert.strictEqual(r.status, 0, r.stderr);
+  assert.match(r.stdout, /raised: the report for 2026-10-01 said more pages follow but gave no next_page/);
+});
