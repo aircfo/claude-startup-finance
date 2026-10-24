@@ -6,6 +6,8 @@ Usage:
   uv run --with playwright python fetch_surface_b_browser.py <workspace root> --login
       One-time (and whenever the login expires): opens Chrome on a profile kept in
       <root>/.browser-profile so an Owner or Primary Owner can sign in to claude.ai.
+  uv run --with playwright python fetch_surface_b_browser.py <workspace root> --check
+      Tests the saved login with the same request, saving nothing (doctor.py uses it).
   uv run --with playwright python fetch_surface_b_browser.py <workspace root> [YYYY-MM]
       Daily: fetches the export through yesterday for the month that contains
       yesterday (or the month given), first finishing the previous month if its
@@ -89,15 +91,50 @@ def login(root):
     return 0
 
 
-def fetch(root, periods, today):
+def request_export(context, cfg, start, end):
+    """The one request this script makes. Returns (response, error message or None)."""
+    url = CLAUDE_URL + cfg["surface_b_endpoint"].format(org_id=cfg["org_id"], start=start.isoformat(), end=end.isoformat())
+    response = context.request.get(url)
+    if response.status in (401, 403):
+        return response, "claude.ai session signed out — run fetch_surface_b_browser.py --login"
+    if not response.ok:
+        return response, f"HTTP {response.status} from the spend export (endpoint may have changed)"
+    if not looks_like_export(response.text()):
+        return response, (f"response was not the spend export (content type "
+                          f"{response.headers.get('content-type', 'unknown')}) — signed out or endpoint changed")
+    return response, None
+
+
+def load_config(root):
     cfg = json.load(open(os.path.join(root, "config", "pipeline.json")))
-    org_id = cfg.get("org_id")
-    endpoint = cfg.get("surface_b_endpoint")
-    if not org_id or not endpoint:
+    if not cfg.get("org_id") or not cfg.get("surface_b_endpoint"):
         print("[surface_b_browser] org_id and surface_b_endpoint must be set in config/pipeline.json")
-        return 1
+        return None
     if not os.path.isdir(os.path.join(root, PROFILE_DIR)):
         print("[surface_b_browser] no browser profile yet — run once with --login")
+        return None
+    return cfg
+
+
+def check(root, today):
+    cfg = load_config(root)
+    if not cfg:
+        return 1
+    yesterday = today - datetime.timedelta(days=1)
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        context = open_profile(p, root, headless=True)
+        try:
+            _, error = request_export(context, cfg, yesterday, yesterday)
+        finally:
+            context.close()
+    print(f"[surface_b_browser] {error}" if error else "[surface_b_browser] signed in; the export answers")
+    return 1 if error else 0
+
+
+def fetch(root, periods, today):
+    cfg = load_config(root)
+    if not cfg:
         return 1
 
     from playwright.sync_api import sync_playwright
@@ -110,18 +147,7 @@ def fetch(root, periods, today):
                 if not window:
                     continue
                 start, end, _ = window
-                url = CLAUDE_URL + endpoint.format(org_id=org_id, start=start.isoformat(), end=end.isoformat())
-                response = context.request.get(url)
-                text = response.text()
-                if response.status in (401, 403):
-                    error = "claude.ai session signed out — run fetch_surface_b_browser.py --login"
-                elif not response.ok:
-                    error = f"HTTP {response.status} from the spend export (endpoint may have changed)"
-                elif not looks_like_export(text):
-                    error = (f"response was not the spend export (content type "
-                             f"{response.headers.get('content-type', 'unknown')}) — signed out or endpoint changed")
-                else:
-                    error = None
+                response, error = request_export(context, cfg, start, end)
                 if error:
                     write_meta(root, period, window, f"daily browser export {stamp} (failed)", error)
                     print(f"[surface_b_browser] {period}: {error}")
@@ -131,7 +157,7 @@ def fetch(root, periods, today):
                     fh.write(response.body())
                 write_meta(root, period, window, f"daily browser export {stamp}")
                 print(f"[surface_b_browser] {period}: saved export {start}..{end} "
-                      f"({text.count(chr(10))} lines)")
+                      f"({response.text().count(chr(10))} lines)")
         finally:
             context.close()
     return 0
@@ -142,10 +168,13 @@ def main():
     parser.add_argument("root")
     parser.add_argument("period", nargs="?", help="YYYY-MM (default: the month containing yesterday)")
     parser.add_argument("--login", action="store_true", help="open Chrome to sign in to claude.ai once")
+    parser.add_argument("--check", action="store_true", help="test the saved login without saving anything")
     args = parser.parse_args()
     if args.login:
         return login(args.root)
     today = datetime.date.today()
+    if args.check:
+        return check(args.root, today)
     return fetch(args.root, target_periods(args.root, today, args.period), today)
 
 

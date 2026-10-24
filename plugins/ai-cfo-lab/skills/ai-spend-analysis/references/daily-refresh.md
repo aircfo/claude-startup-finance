@@ -63,9 +63,10 @@ cloud: the Analytics API replaces the export script.
 4. **Share it.** The dashboard is private until the owner shares it from its
    Share menu; the assistant cannot change sharing. Anyone it is shared with
    can download every dataset's rows from Sources.
-5. **Schedule the two jobs** (below). Both are proposals for the operator to
-   approve: show the full routine body and the launchd file before creating
-   either.
+5. **Schedule the jobs** (below). Both are proposals for the operator to
+   approve: show the full routine body, and `install_mac_job.py`'s preview,
+   before creating either. Without a cloud routine, the Mac job refreshes API
+   cost too (`api_cost_refreshed_by: "mac"`, the default).
 
 ## Publishing datasets (both jobs)
 
@@ -171,6 +172,14 @@ cd $ROOT && uv run --with playwright python $SKILL/scripts/fetch_surface_b_brows
 ```
 
 A Chrome window opens on the claude.ai login page; sign in, then close it.
+
+**Install it with `install_mac_job.py`, never by hand.** Run
+`python3 $SKILL/scripts/install_mac_job.py "$ROOT"` to print exactly the three
+files it would install (the script, the prompt, the launchd entry), show them
+to the operator, and only after a yes run it again with `--load`. It fills in
+real paths, the tool list for the sources that are configured, and whether this
+job also refreshes API cost (`api_cost_refreshed_by` in `pipeline.json`:
+`"mac"`, the default, or `"cloud"`). The shapes below are for reference.
 
 **`$ROOT/daily_refresh.sh`** (the job `launchd` runs):
 
