@@ -8,7 +8,7 @@ Usage:
 The roster (config/roster.xlsx or roster.csv, bootstrapped from the spend
 export) is keyed by each person's claude.ai login email. HR exports usually
 aren't: they have names, often old inactive rows, repeated first names, and
-contractors listed as "Allen (Fractional PM)". This matches each roster email
+contractors listed as "Robin (Fractional PM)". This matches each roster email
 to one HR row and reports, for a person to decide, everything it can't match
 with confidence. It never guesses between two candidates.
 
