@@ -23,7 +23,10 @@ it. The log holds statuses only — no keys, names or spend.
 Read-only except for --fix-config and the log line. See references/setup-pitfalls.md
 for the failures these checks come from.
 """
+from __future__ import annotations
+
 import argparse, csv, datetime, json, os, re, shutil, subprocess, sys, urllib.error, urllib.request
+from typing import Callable, Optional
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
@@ -38,30 +41,33 @@ RAMP_ADMIN = "Ramp admin"
 
 
 class Check:
-    def __init__(self, check_id, title, status, detail="", fix="", role=OPERATOR):
+    def __init__(self, check_id: str, title: str, status: str, detail: str = "", fix: str = "", role: str = OPERATOR) -> None:
         self.id, self.title, self.status = check_id, title, status
         self.detail, self.fix, self.role = detail, fix, role
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {"id": self.id, "title": self.title, "status": self.status,
                 "detail": self.detail, "fix": self.fix, "role": self.role}
 
 
-def read_json(path, default=None):
+def read_json(path: str) -> dict:
+    """The file's JSON object, or {} when it is absent or unreadable."""
     try:
-        return json.load(open(path))
+        with open(path) as fh:
+            data = json.load(fh)
+        return data if isinstance(data, dict) else {}
     except (OSError, ValueError):
-        return default
+        return {}
 
 
-def read_rows(path):
+def read_rows(path: str) -> list[dict]:
     try:
         return list(csv.DictReader(open(path)))
     except OSError:
         return []
 
 
-def admin_key(root):
+def admin_key(root: str) -> str:
     key = os.environ.get("ANTHROPIC_ADMIN_API_KEY", "").strip()
     path = os.path.join(root, ".secrets", "anthropic_admin_key")
     if not key and os.path.exists(path):
@@ -69,7 +75,7 @@ def admin_key(root):
     return key
 
 
-def anthropic_get(path, key):
+def anthropic_get(path: str, key: str) -> dict:
     req = urllib.request.Request(f"https://api.anthropic.com{path}",
                                  headers={"x-api-key": key, "anthropic-version": "2023-06-01"})
     with urllib.request.urlopen(req, timeout=30) as resp:
@@ -78,7 +84,7 @@ def anthropic_get(path, key):
 
 # ---- checks, in setup order ----
 
-def check_tools(ctx):
+def check_tools(ctx: dict) -> Check:
     missing = []
     if sys.version_info < (3, 9):
         missing.append("Python 3.9 or newer")
@@ -92,7 +98,7 @@ def check_tools(ctx):
     return Check("tools", "Tools installed", "ok")
 
 
-def check_workspace(ctx):
+def check_workspace(ctx: dict) -> Check:
     missing = [d for d in ("config", "raw", ".secrets") if not os.path.isdir(os.path.join(ctx["root"], d))]
     if missing:
         return Check("workspace", "Workspace folder", "fail", f"Not set up yet (missing {', '.join(missing)}).",
@@ -100,8 +106,8 @@ def check_workspace(ctx):
     return Check("workspace", "Workspace folder", "ok", ctx["root"])
 
 
-def check_config_complete(ctx):
-    template = read_json(TEMPLATE, {})
+def check_config_complete(ctx: dict) -> Check:
+    template = read_json(TEMPLATE)
     missing = [k for k in template if k not in ctx["cfg"] and not k.endswith("_note")]
     if missing:
         return Check("config_complete", "Settings up to date", "warn",
@@ -110,7 +116,7 @@ def check_config_complete(ctx):
     return Check("config_complete", "Settings up to date", "ok")
 
 
-def check_company(ctx):
+def check_company(ctx: dict) -> Check:
     name = ctx["cfg"].get("company_name") or ""
     if not name or name == "Example Co":
         return Check("company", "Company name", "fail", "Still the template's \"Example Co\".",
@@ -118,7 +124,7 @@ def check_company(ctx):
     return Check("company", "Company name", "ok", name)
 
 
-def check_seat_prices(ctx):
+def check_seat_prices(ctx: dict) -> Check:
     rates = ctx["cfg"].get("seat_rates") or {}
     if not rates:
         return Check("seat_prices_confirmed", "Seat prices", "fail", "No seat_rates set.",
@@ -131,7 +137,7 @@ def check_seat_prices(ctx):
     return Check("seat_prices_confirmed", "Seat prices", "ok", ", ".join(f"{k} ${v}" for k, v in rates.items()))
 
 
-def check_org_id(ctx):
+def check_org_id(ctx: dict) -> Check:
     if not ctx["team"]:
         return Check("org_id", "claude.ai organization id", "skip", "Enterprise plans don't need it.")
     org_id = ctx["cfg"].get("org_id") or ""
@@ -143,7 +149,7 @@ def check_org_id(ctx):
     return Check("org_id", "claude.ai organization id", "ok")
 
 
-def check_admin_key(ctx):
+def check_admin_key(ctx: dict) -> Check:
     if not ctx["key"]:
         return Check("admin_key", "Admin API key", "warn",
                      "None yet. Optional: it adds Console API cost (unless Ramp supplies it) and the Claude Code report.",
@@ -153,7 +159,7 @@ def check_admin_key(ctx):
     return Check("admin_key", "Admin API key", "ok", "stored in .secrets/")
 
 
-def check_admin_key_org(ctx):
+def check_admin_key_org(ctx: dict) -> Check:
     if not ctx["key"] or ctx["offline"]:
         return Check("admin_key_org", "Admin key's organization", "skip")
     try:
@@ -174,7 +180,7 @@ def check_admin_key_org(ctx):
     return Check("admin_key_org", "Admin key's organization", "ok", detail)
 
 
-def check_claude_code_visibility(ctx):
+def check_claude_code_visibility(ctx: dict) -> Check:
     if not ctx["key"] or ctx["offline"]:
         return Check("claude_code_visibility", "Claude Code report covers people", "skip")
     day = (datetime.date.today() - datetime.timedelta(days=2)).isoformat()
@@ -195,7 +201,7 @@ def check_claude_code_visibility(ctx):
     return Check("claude_code_visibility", "Claude Code report covers people", "ok", f"{people} people on {day}")
 
 
-def check_export_login(ctx):
+def check_export_login(ctx: dict) -> Check:
     if not ctx["team"]:
         return Check("export_login", "Daily export can sign in", "skip", "Enterprise uses the Analytics API.")
     if not os.path.isdir(os.path.join(ctx["root"], ".browser-profile")):
@@ -218,7 +224,7 @@ def check_export_login(ctx):
                  f"\"{ctx['root']}\" --login", OWNER)
 
 
-def check_first_export(ctx):
+def check_first_export(ctx: dict) -> Check:
     periods = sorted(p for p in os.listdir(os.path.join(ctx["root"], "raw"))
                      if os.path.exists(os.path.join(ctx["root"], "raw", p, "overage_spend.csv"))) \
         if os.path.isdir(os.path.join(ctx["root"], "raw")) else []
@@ -229,7 +235,7 @@ def check_first_export(ctx):
     return Check("first_export", "First spend export saved", "ok", f"latest: {periods[-1]}")
 
 
-def check_roster_real(ctx):
+def check_roster_real(ctx: dict) -> Check:
     org = read_rows(os.path.join(ctx["root"], "config", "org_chart.csv"))
     samples = [r for r in org if (r.get("email") or "").lower().endswith("@example.com")]
     if samples:
@@ -244,7 +250,7 @@ def check_roster_real(ctx):
     return Check("roster_real", "Roster is your people", "ok", f"{len(org)} people")
 
 
-def check_roster_complete(ctx):
+def check_roster_complete(ctx: dict) -> Check:
     org = read_rows(os.path.join(ctx["root"], "config", "org_chart.csv"))
     seats = read_rows(os.path.join(ctx["root"], "config", "seats.csv"))
     if not org:
@@ -261,9 +267,9 @@ def check_roster_complete(ctx):
     return Check("roster_complete", "Roster filled in", "ok", f"{len(org)} people, {premium} premium")
 
 
-def check_roster_departments(ctx):
+def check_roster_departments(ctx: dict) -> Check:
     org = read_rows(os.path.join(ctx["root"], "config", "org_chart.csv"))
-    counts = {}
+    counts: dict[str, int] = {}
     for r in org:
         dept = (r.get("department") or "").strip()
         if dept:
@@ -276,7 +282,7 @@ def check_roster_departments(ctx):
     return Check("roster_departments", "Department names consistent", "ok", f"{len(counts)} departments")
 
 
-def check_dashboard(ctx):
+def check_dashboard(ctx: dict) -> Check:
     url = ctx["cfg"].get("dashboard_url") or ""
     if not url:
         return Check("dashboard", "Dashboard created", "fail", "No dashboard_url in config/pipeline.json.",
@@ -284,7 +290,7 @@ def check_dashboard(ctx):
     return Check("dashboard", "Dashboard created", "ok", url)
 
 
-def check_mac_job(ctx):
+def check_mac_job(ctx: dict) -> Check:
     label = ctx["cfg"].get("mac_job_label")
     if sys.platform != "darwin":
         return Check("mac_job", "Daily job scheduled", "skip", "macOS only.")
@@ -298,7 +304,7 @@ def check_mac_job(ctx):
     return Check("mac_job", "Daily job scheduled", "ok", label)
 
 
-def check_data_fresh(ctx):
+def check_data_fresh(ctx: dict) -> Check:
     metas = []
     raw = os.path.join(ctx["root"], "raw")
     for period in sorted(os.listdir(raw)) if os.path.isdir(raw) else []:
@@ -324,17 +330,17 @@ CHECKS = [check_tools, check_workspace, check_config_complete, check_company, ch
           check_dashboard, check_mac_job, check_data_fresh]
 
 
-def fix_config(root):
+def fix_config(root: str) -> list[str]:
     path = os.path.join(root, "config", "pipeline.json")
-    cfg = read_json(path, {})
-    added = {k: v for k, v in read_json(TEMPLATE, {}).items() if k not in cfg}
+    cfg = read_json(path)
+    added = {k: v for k, v in read_json(TEMPLATE).items() if k not in cfg}
     if added:
         cfg.update(added)
         open(path, "w").write(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n")
     return sorted(k for k in added if not k.endswith("_note"))
 
 
-def log_run(root, checks):
+def log_run(root: str, checks: list[Check]) -> None:
     logs = os.path.join(root, "logs")
     if not os.path.isdir(root):
         return
@@ -345,7 +351,7 @@ def log_run(root, checks):
         fh.write(json.dumps(line) + "\n")
 
 
-def setup_minutes(root):
+def setup_minutes(root: str) -> Optional[int]:
     """Minutes from the first doctor run to the first run with no failures, or None."""
     try:
         runs = [json.loads(line) for line in open(os.path.join(root, "logs", "setup.jsonl"))]
@@ -358,7 +364,7 @@ def setup_minutes(root):
     return round((datetime.datetime.fromisoformat(green["at"]) - start).total_seconds() / 60)
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("--offline", action="store_true")
@@ -369,7 +375,7 @@ def main():
     if args.fix_config:
         added = fix_config(root)
         print(f"[doctor] added settings: {', '.join(added)}" if added else "[doctor] settings already up to date")
-    cfg = read_json(os.path.join(root, "config", "pipeline.json"), {})
+    cfg = read_json(os.path.join(root, "config", "pipeline.json"))
     ctx = {"root": root, "cfg": cfg, "offline": args.offline, "key": admin_key(root),
            "team": (cfg.get("plan_tier") or "team").lower() == "team"}
     checks = [check(ctx) for check in CHECKS]

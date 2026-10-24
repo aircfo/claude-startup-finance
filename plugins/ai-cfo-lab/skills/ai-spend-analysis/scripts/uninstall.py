@@ -15,12 +15,14 @@ It never touches the claude.ai dashboard or a cloud routine — those live in th
 operator's account: delete the dashboard from its menu on claude.ai and any
 routine at claude.ai/code/routines.
 """
+from __future__ import annotations
+
 import argparse, json, os, shutil, subprocess, sys
 
 DATA_DIRS = ("raw", "workbooks", "artifacts", "dashboard")
 
 
-def plan(root, cfg, args):
+def plan(root: str, cfg: dict, args: argparse.Namespace) -> list[tuple[str, tuple[str, str]]]:
     steps = []
     label = cfg.get("mac_job_label")
     if label:
@@ -38,7 +40,7 @@ def plan(root, cfg, args):
     return steps
 
 
-def remove(cfg_path, cfg, kind, target):
+def remove(cfg_path: str, cfg: dict, kind: str, target: str) -> None:
     if kind == "job":
         subprocess.run(["launchctl", "bootout", f"gui/{os.getuid()}/{target}"], capture_output=True)
         plist = os.path.expanduser(f"~/Library/LaunchAgents/{target}.plist")
@@ -52,7 +54,7 @@ def remove(cfg_path, cfg, kind, target):
         shutil.rmtree(target)
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("--remove-login", action="store_true")

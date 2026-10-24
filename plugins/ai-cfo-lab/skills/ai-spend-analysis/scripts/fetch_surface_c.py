@@ -50,6 +50,8 @@ def paged(path, params, key):
         if not data.get("has_more"):
             return items
         page = data.get("next_page")
+        if not page:
+            raise RuntimeError(f"{path} said more pages follow but gave no next_page")
 
 
 def main():

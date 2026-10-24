@@ -17,17 +17,20 @@ wrong (a space-separated --allowedTools list swallows the prompt). Whether the
 job also refreshes API cost follows `api_cost_refreshed_by` in pipeline.json:
 "mac" (the default) or "cloud" when a scheduled cloud routine owns it.
 """
+from __future__ import annotations
+
 import argparse, json, os, plistlib, re, shutil, subprocess, sys
+from typing import Optional
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 
 
-def slug(text):
+def slug(text: Optional[str]) -> str:
     return re.sub(r"[^a-z0-9]+", "-", (text or "workspace").lower()).strip("-") or "workspace"
 
 
-def datasets(cfg, mac_owns_api_cost):
+def datasets(cfg: dict, mac_owns_api_cost: bool) -> list[str]:
     ids = ["periods", "seats", "overage", "claude_code", "flags", "status"]
     if cfg.get("card_charges_source") == "ramp":
         ids.insert(4, "card_charges")
@@ -36,7 +39,7 @@ def datasets(cfg, mac_owns_api_cost):
     return ids
 
 
-def allowed_tools(cfg, mac_owns_api_cost):
+def allowed_tools(cfg: dict, mac_owns_api_cost: bool) -> list[str]:
     tools = ["Bash(python3:*)", "Bash(date:*)", "Read", "Write", "ToolSearch", "Artifact", "ArtifactData"]
     if cfg.get("card_charges_source") == "ramp":
         tools.append("mcp__claude_ai_Ramp__ramp_get_transactions")
@@ -45,7 +48,7 @@ def allowed_tools(cfg, mac_owns_api_cost):
     return tools
 
 
-def prompt_text(root, cfg, mac_owns_api_cost):
+def prompt_text(root: str, cfg: dict, mac_owns_api_cost: bool) -> str:
     runbook = os.path.join(SKILL, "references", "daily-refresh.md")
     steps = [
         f"Read every {root}/raw/*/meta.json written today by the export script. Each period it touched "
@@ -55,6 +58,7 @@ def prompt_text(root, cfg, mac_owns_api_cost):
     if cfg.get("card_charges_source") == "ramp":
         steps.append("Card charges: call ramp_get_transactions (all_transactions_across_entire_business, merchant "
                      "filter Anthropic, from_date START, to_date END, page_size 200), following next_page_cursor. "
+                     "Save it fresh every run (yesterday's answer has already been imported). "
                      f"Save the pages to {root}/raw/PERIOD/ramp_card_transactions.json as described under "
                      "\"Saved Ramp answers\" in the runbook.")
     if mac_owns_api_cost and cfg.get("api_cost_source") == "ramp":
@@ -62,7 +66,8 @@ def prompt_text(root, cfg, mac_owns_api_cost):
                      "group_by [model], rollup daily, start_at START, end_at the day after END), then the same with "
                      f"rollup all. Save them to {root}/raw/PERIOD/ramp_api_cost.json and ramp_api_cost_total.json as "
                      "described under \"Saved Ramp answers\".")
-    steps.append(f"Run: python3 {HERE}/run_pipeline.py {root} PERIOD --datasets {','.join(datasets(cfg, mac_owns_api_cost))}")
+    steps.append(f"Run: python3 {HERE}/run_pipeline.py {root} PERIOD --datasets "
+                 f"{','.join(datasets(cfg, mac_owns_api_cost))} --no-reports")
     steps.append(f"Publish what {root}/dashboard/manifest.json lists to {cfg.get('dashboard_url')}, following "
                  "\"Publishing datasets\" in the runbook, with job name \"Daily Mac refresh\".")
     steps.append(f"Reply with one line per dataset (published, or failed and why) and each source's state from "
@@ -73,7 +78,7 @@ def prompt_text(root, cfg, mac_owns_api_cost):
             f"visit claude.ai: the spend export was already fetched by script.\n\n{numbered}\n")
 
 
-def script_text(root, claude, uv, tools):
+def script_text(root: str, claude: str, uv: str, tools: list[str]) -> str:
     return f"""#!/bin/zsh -l
 # Daily AI spend refresh (written by install_mac_job.py; re-run it to change this file).
 # Stage 1 is a fixed script with no AI; stage 2 a headless Claude run limited to the listed tools.
@@ -84,14 +89,14 @@ echo "=== $(date) ==="
 """
 
 
-def plist_data(label, root, hour, minute):
+def plist_data(label: str, root: str, hour: int, minute: int) -> dict:
     log = os.path.join(root, "logs", "daily.log")
     return {"Label": label, "ProgramArguments": [os.path.join(root, "daily_refresh.sh")],
             "StartCalendarInterval": {"Hour": hour, "Minute": minute},
             "StandardOutPath": log, "StandardErrorPath": log}
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("--hour", type=int, default=7)

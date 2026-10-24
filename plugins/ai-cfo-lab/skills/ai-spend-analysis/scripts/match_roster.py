@@ -27,7 +27,10 @@ Without --write it only reports. --premium marks those people's seats premium
 (everyone else standard). --set resolves what it reported: an email, then the
 HR name, then optionally a department after "|" for people HR doesn't list.
 """
+from __future__ import annotations
+
 import argparse, csv, os, re, sys, unicodedata
+from typing import Iterable, Optional, Union
 
 NAME_COLUMNS = ("employee", "name", "full name", "employee name")
 EMAIL_COLUMNS = ("email", "work email", "email address")
@@ -36,18 +39,18 @@ ACTIVE_COLUMNS = ("active", "active t/f", "status", "employment status")
 INACTIVE_WORDS = ("false", "inactive", "terminated", "no", "0")
 
 
-def plain(text):
+def plain(text: str) -> str:
     """Lowercase ASCII letters only, so "O'Brien" and "Óbrien" compare equal."""
     ascii_text = unicodedata.normalize("NFKD", text or "").encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z]", "", ascii_text.lower())
 
 
-def pick_column(header, candidates):
+def pick_column(header: Iterable[str], candidates: tuple[str, ...]) -> Optional[str]:
     lowered = {h.strip().lower(): h for h in header}
     return next((lowered[c] for c in candidates if c in lowered), None)
 
 
-def read_hr(path):
+def read_hr(path: str) -> list[dict]:
     rows = list(csv.DictReader(open(path, newline="", encoding="utf-8-sig")))
     if not rows:
         return []
@@ -76,19 +79,19 @@ def read_hr(path):
     return people
 
 
-def name_keys(person):
+def name_keys(person: dict) -> set[str]:
     first, last = person["first"], person["last"]
     if not last:
         return {first}
     return {f"{first}.{last}", first + last, first[0] + last, first, first + last[0]}
 
 
-def prefer_active(candidates):
+def prefer_active(candidates: list[dict]) -> list[dict]:
     active = [c for c in candidates if c["active"]]
     return active if len(active) == 1 else candidates
 
 
-def match(email, people):
+def match(email: str, people: list[dict]) -> tuple[Optional[dict], list[dict]]:
     """(person or None, candidate list) for one roster email."""
     by_email = [p for p in people if p["email"] and p["email"] == email]
     if by_email:
@@ -102,7 +105,7 @@ def match(email, people):
     return (found[0] if len(found) == 1 else None), found
 
 
-def load_roster(root):
+def load_roster(root: str) -> tuple[str, Union[str, tuple], list[list]]:
     xlsx, csv_path = os.path.join(root, "config", "roster.xlsx"), os.path.join(root, "config", "roster.csv")
     if os.path.exists(xlsx):
         import openpyxl
@@ -117,8 +120,9 @@ def load_roster(root):
     raise SystemExit("No config/roster.xlsx or roster.csv yet — run bootstrap_roster.py on a spend export first.")
 
 
-def save_roster(kind, handle, filled):
-    if kind == "xlsx":
+def save_roster(handle: Union[str, tuple], filled: dict[str, tuple[str, str, str]]) -> None:
+    """handle is the roster.csv path, or (roster.xlsx path, workbook, sheet)."""
+    if isinstance(handle, tuple):
         path, book, sheet = handle
         for row in sheet.iter_rows(min_row=2):
             email = str(row[0].value or "").lower()
@@ -126,7 +130,8 @@ def save_roster(kind, handle, filled):
                 row[1].value, row[2].value, row[3].value = filled[email]
         book.save(path)
     else:
-        rows = list(csv.DictReader(open(handle)))
+        with open(handle) as fh:
+            rows = list(csv.DictReader(fh))
         for r in rows:
             if r["email"].lower() in filled:
                 r["name"], r["department"], r["seat_type"] = filled[r["email"].lower()]
@@ -136,7 +141,7 @@ def save_roster(kind, handle, filled):
             writer.writerows(rows)
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("hr_export")
@@ -147,32 +152,38 @@ def main():
 
     people = read_hr(args.hr_export)
     premium = {plain(n) for n in args.premium.split(",") if n.strip()}
-    overrides = {}
+    overrides: dict[str, tuple[str, str]] = {}
     for item in args.set:
         email, _, rest = item.partition("=")
         name, _, dept = rest.partition("|")
         overrides[email.strip().lower()] = (name.strip(), dept.strip())
 
-    kind, handle, roster = load_roster(args.root)
-    filled, ambiguous, unmatched = {}, [], []
+    _, handle, roster = load_roster(args.root)
+    filled: dict[str, tuple[str, str, str]] = {}
+    ambiguous: list[tuple[str, list[str]]] = []
+    unmatched: list[str] = []
     for email, *_ in roster:
         email = str(email).lower()
         if email in overrides:
             name, dept = overrides[email]
-            listed = next((p for p in people if plain(p["name"]) == plain(name) and p["active"]), None) \
-                or next((p for p in people if plain(p["name"]) == plain(name)), None)
-            if not dept and not listed:
+            same_name = [p for p in people if plain(p["name"]) == plain(name)]
+            active = [p for p in same_name if p["active"]]
+            listed: Optional[dict] = active[0] if active else (same_name[0] if same_name else None)
+            if listed is None and not dept:
                 unmatched.append(email)
                 continue
             person = {"display": listed["display"] if listed else name,
                       "name": listed["name"] if listed else name,
-                      "department": dept or listed["department"]}
+                      "department": dept if dept else (listed["department"] if listed else "")}
         else:
-            person, candidates = match(email, people)
-            if not person:
-                (ambiguous if candidates else unmatched).append(
-                    (email, [c["name"] for c in candidates]) if candidates else email)
+            matched, candidates = match(email, people)
+            if matched is None:
+                if candidates:
+                    ambiguous.append((email, [c["name"] for c in candidates]))
+                else:
+                    unmatched.append(email)
                 continue
+            person = matched
         seat = "premium" if plain(person["name"]) in premium or plain(person["display"]) in premium else "standard"
         filled[email] = (person["display"], person["department"], seat)
 
@@ -186,7 +197,7 @@ def main():
     for email in unmatched:
         print(f"  ✗ {email} isn't in the HR export  →  --set \"{email}=<Full Name>|<Department>\"")
     if args.write:
-        save_roster(kind, handle, filled)
+        save_roster(handle, filled)
         print(f"Wrote {len(filled)} people to the roster. Anyone listed above is unchanged.")
     else:
         print("Nothing written (report only). Add --write to fill the roster.")

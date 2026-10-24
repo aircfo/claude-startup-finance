@@ -21,6 +21,7 @@ the cloud.
 | `claude_code` | Claude Code usage and estimated cost, per person or API key | Mac job, daily | Admin key in `$ROOT/.secrets/` (see the note below) |
 | `card_charges` | Anthropic charges on employee cards | Mac job, daily | Ramp connector (`card_charges_source: "ramp"`) |
 | `seats`, `periods`, `flags`, `status` | Roster cost, month coverage, flags, source health | Mac job, daily | The workspace |
+| `api_status` | Whether API cost refreshed cleanly | Cloud job, with `api_cost` | — (only when a cloud routine owns API cost) |
 
 **What the Claude Code report can see.** The Admin key belongs to a Console
 (developer-platform) organization, and the report covers Claude Code usage in
@@ -40,8 +41,9 @@ If the Mac is off, the Mac-owned sections go stale on the page (each dataset
 says how old it is, and shows as stale after 48 hours) while the cloud-owned
 API cost keeps refreshing. Nothing is silently zeroed.
 
-Orgs without the cloud job can let the Mac job own `api_cost` too (drop the
-`--datasets` filter in its run). Orgs on Enterprise can move everything to the
+Orgs without the cloud job let the Mac job own `api_cost` too
+(`api_cost_refreshed_by: "mac"`, the default); with a cloud job, set it to
+`"cloud"` so the Mac job neither saves nor reports API cost. Orgs on Enterprise can move everything to the
 cloud: the Analytics API replaces the export script.
 
 ## One-time setup
@@ -71,8 +73,10 @@ cloud: the Analytics API replaces the export script.
 ## Publishing datasets (both jobs)
 
 After `run_pipeline.py` (or `build_dashboard_datasets.py`) writes
-`$ROOT/dashboard/`, publish what `dashboard/manifest.json` lists — and only
-that. For each `datasets.<id>` entry:
+`$ROOT/dashboard/`, publish what `dashboard/manifest.json` lists under
+`datasets` — and only that. Datasets under `skipped` failed at their source
+this run (the reason is beside each); leave them as they are on the dashboard,
+which then shows their true age, and mention them in the job's reply. For each `datasets.<id>` entry:
 
 1. Upload the file: `Artifact` publish with `url` = `<dashboard>`,
    `file_path` = `$ROOT/dashboard/<file>`, `asset: true`. Keep the returned
@@ -99,9 +103,13 @@ import compares the card pages with Ramp's `total_count` and each model's daily
 API cost with Ramp's own total, and marks the source `error` (publishing nothing
 new for it) on any mismatch. Ramp's answers are mostly empty fields, so save
 only the ones the import reads — for API cost `period_start_at`, `model`,
-`total_cost` (under `cost.data`); for transactions `spent_by_user`,
-`original_amount`, `state`, `transaction_time`, `spend_allocation_name`, and
-each page's `total_count` — copied exactly. Never round, reformat or summarize.
+`total_cost` (under `cost.data`); for transactions `spent_by_user`, `amount`,
+`original_amount`, `original_currency`, `state`, `transaction_time`,
+`spend_allocation_name`, and each page's `total_count` — copied exactly. Never
+round, reformat or summarize. A page set without `total_count`, a charge
+without its amount, or a non-USD charge without its dollar `amount`, is
+rejected. Each saved answer is imported once and then renamed
+`<name>.imported.json`, so it has to be saved fresh every run.
 
 If an upload or write fails, leave that dataset as it was — the page keeps the
 last good file and its age shows — and say which one failed in the job's final
@@ -139,7 +147,7 @@ Company: <company>
    /tmp/ws/raw/PERIOD/ramp_api_cost_total.json
    (the import checks the daily rows add up to it). If either call fails, stop
    and report it.
-4. Run: python3 <skill>/scripts/run_pipeline.py /tmp/ws PERIOD --datasets api_cost
+4. Run: python3 <skill>/scripts/run_pipeline.py /tmp/ws PERIOD --datasets api_cost,api_status --no-reports
 5. Publish the datasets in /tmp/ws/dashboard/manifest.json to the dashboard,
    following "Publishing datasets" in <skill>/references/daily-refresh.md, with
    job name "Daily cloud refresh".
@@ -220,7 +228,7 @@ comma-separated list, and the prompt arrives on stdin.
 
 ```text
 Daily refresh of the AI spend dashboard. Nobody is watching. Follow
-<skill>/references/daily-refresh.md, section "The Mac job", stage 2 steps 1–5,
+<skill>/references/daily-refresh.md, section "The Mac job", stage 2 steps 1–6,
 for the workspace <$ROOT>, then stop. Never retry a failed step. Do not open a
 browser or visit claude.ai: the spend export was already fetched by script.
 ```
@@ -239,12 +247,19 @@ Stage 2 steps:
    `$ROOT/raw/PERIOD/ramp_card_transactions.json`, keeping the fields listed
    under "Saved Ramp answers" and each page's `total_count`: the import rejects
    the file if the pages don't hold exactly that many transactions.
-3. **Pipeline.** `python3 <skill>/scripts/run_pipeline.py $ROOT PERIOD
-   --datasets periods,seats,overage,claude_code,card_charges,flags,status`
-   (leave out `card_charges` when it isn't configured; drop the whole
-   `--datasets` flag when this job also owns `api_cost`).
-4. **Publish** per "Publishing datasets", job name "Daily Mac refresh".
-5. **Reply** with one line per dataset (published / failed and why) and the
+3. **API cost** (only when this job owns it: `api_cost_refreshed_by` is
+   `"mac"` and `api_cost_source` is `"ramp"`). Call
+   `ramp_get_ai_token_spend_aggregates` with metric `cost`, providers
+   `["ANTHROPIC"]`, group_by `["model"]`, rollup `daily`, start_at START, end_at
+   the day after END; then the same with rollup `all`. Save them to
+   `$ROOT/raw/PERIOD/ramp_api_cost.json` and `ramp_api_cost_total.json` as
+   described under "Saved Ramp answers".
+4. **Pipeline.** `python3 <skill>/scripts/run_pipeline.py $ROOT PERIOD
+   --datasets periods,seats,overage,claude_code,card_charges,flags,status --no-reports`
+   (leave out `card_charges` when it isn't configured; add `api_cost` when this
+   job owns it).
+5. **Publish** per "Publishing datasets", job name "Daily Mac refresh".
+6. **Reply** with one line per dataset (published / failed and why) and the
    status of each source from `$ROOT/dashboard/status.json`. It goes to the
    log; never send it anywhere.
 

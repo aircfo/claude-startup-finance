@@ -15,17 +15,21 @@ Order:
     references/daily-refresh.md — drops it at raw/<period>/overage_spend.csv first.
   Then, for both tiers: Surface C via the Admin API (skipped when Ramp supplies
   API cost) -> Claude Code usage report -> validate Surface B -> (apply roster if
-  a config/roster.xlsx|csv is present) -> workbooks -> artifact -> Slack draft ->
-  dashboard datasets (--datasets limits which are written).
+  a config/roster.xlsx|csv is present) -> dashboard datasets (--datasets limits
+  which are written) -> workbooks -> artifact -> Slack draft (all three skipped
+  with --no-reports, which the daily jobs use).
 
 Never sends anything; read-only against every financial surface."""
+from __future__ import annotations
+
 import argparse, datetime, json, os, subprocess, sys
-from calendar import monthrange
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from periods import register_period
 
 
-def run(script, *args):
+def run(script: str, *args: str) -> int:
     r = subprocess.run([sys.executable, os.path.join(HERE, script), *args], capture_output=True, text=True)
     if r.stdout.strip():
         print(r.stdout.strip())
@@ -34,34 +38,21 @@ def run(script, *args):
     return r.returncode
 
 
-def pipeline_config(root):
+def pipeline_config(root: str) -> dict:
     path = os.path.join(root, "config", "pipeline.json")
-    return json.load(open(path)) if os.path.exists(path) else {}
+    if not os.path.exists(path):
+        return {}
+    with open(path) as fh:
+        return json.load(fh)
 
 
-def register_period(outdir, period, today):
-    """Write meta.json for a period that has none. The current month counts through
-    yesterday, because every source is a day behind."""
-    meta_path = os.path.join(outdir, "meta.json")
-    if os.path.exists(meta_path):
-        return
-    year, month = map(int, period.split("-"))
-    days_in_month = monthrange(year, month)[1]
-    current = today.strftime("%Y-%m")
-    if period == current:
-        days_covered, partial = max(today.day - 1, 0), True
-    else:
-        days_covered, partial = (days_in_month, False) if period < current else (0, True)
-    with open(meta_path, "w") as fh:
-        json.dump({"period": period, "days_covered": days_covered, "partial": partial,
-                   "source": "registered by run_pipeline (no export meta yet)"}, fh, indent=2)
-
-
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("period")
     parser.add_argument("--datasets", default="", help="comma-separated dashboard dataset ids (default: all)")
+    parser.add_argument("--no-reports", action="store_true",
+                        help="skip the monthly workbooks, HTML file and Slack draft (the daily jobs need only the dashboard)")
     args = parser.parse_args()
     root, period = args.root, args.period
     cfg = pipeline_config(root)
@@ -80,15 +71,16 @@ def main():
     cfg_dir = os.path.join(root, "config")
     if os.path.exists(os.path.join(cfg_dir, "roster.xlsx")) or os.path.exists(os.path.join(cfg_dir, "roster.csv")):
         run("apply_roster.py", root)  # roster is the source of truth when present; regenerates org_chart.csv + seats.csv
-    if run("build_workbooks.py", root):
-        return 1
-    if run("build_artifact.py", root):
+    # The dashboard comes first and stands alone, so a problem in the monthly
+    # reports never holds back the daily refresh.
+    dataset_args = ["--only", args.datasets] if args.datasets else []
+    failed = run("build_dashboard_datasets.py", root, *dataset_args) != 0
+    if args.no_reports:
+        return 1 if failed else 0
+    if run("build_workbooks.py", root) or run("build_artifact.py", root):
         return 1
     run("draft_slack.py", root)
-    dataset_args = ["--only", args.datasets] if args.datasets else []
-    if run("build_dashboard_datasets.py", root, *dataset_args):
-        return 1
-    return 0
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

@@ -74,6 +74,33 @@ optional and off until configured.
   shown beside the totals, not in them). Each saved Ramp answer is checked
   against Ramp's own transaction count or total before anything is published.
 
+**Hardened after code review** (each has a test in `refresh-robustness.test.js`):
+- A failed export no longer leaves the previous file looking current: the last
+  good export keeps its own coverage, the month is reported `stale` with the
+  reason, and a month whose closing fetch failed is retried the next day.
+- A dataset whose source failed this run is left out of the upload
+  (`manifest.json` → `skipped`) instead of being republished with a fresh
+  timestamp.
+- A month first registered mid-month is refreshed once it ends, so its
+  projection doesn't stay scaled up.
+- A multi-month Ramp API-cost pull is filed under each row's own month, replacing
+  that month's table, so months never mix or double count.
+- Card charges require Ramp's `total_count`, and non-USD charges use Ramp's
+  settled dollar `amount`.
+- `api_cost_refreshed_by` ("mac" / "cloud") says which job owns API cost; the
+  other neither imports nor flags it.
+- One shared month-coverage rule (`periods.py`); the Claude Code fetch asks only
+  for new days plus the two still settling (days with no usage are remembered);
+  new modules are type-hinted and pass mypy.
+- A manual export saved after a failed fetch counts as current; the export script
+  records a failure even when it can't start (no network, locked profile).
+- Saved Ramp answers are imported once (renamed `.imported.json`); a charge
+  without an amount, or an API-cost bucket without a date, is rejected.
+- A cloud routine that owns API cost publishes `api_status`, so its failures
+  reach the dashboard banner.
+- Dashboard datasets are built before the monthly reports, and the daily jobs
+  skip those reports (`run_pipeline.py --no-reports`).
+
 **Changed / fixed:**
 - `run_pipeline.py` registers a period with no export yet (writes `meta.json`),
   so a missing month is flagged rather than absent.

@@ -18,6 +18,8 @@ wrong roster, a key for the wrong organization.
 
 Exit 0 when every judged surface passes, 1 otherwise. Read-only.
 """
+from __future__ import annotations
+
 import argparse, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -27,11 +29,11 @@ ABSOLUTE_TOLERANCE = 1.00
 RELATIVE_TOLERANCE = 0.005
 
 
-def tolerance(invoice):
+def tolerance(invoice: float) -> float:
     return max(ABSOLUTE_TOLERANCE, abs(invoice) * RELATIVE_TOLERANCE)
 
 
-def dashboard_figures(root, period):
+def dashboard_figures(root: str, period: str) -> dict[str, float]:
     org, seats, thr, keymap, periods, b_rows, c_rows, meta, models, pipeline = load(root)
     if period not in periods:
         raise SystemExit(f"{period} isn't in the workspace (raw/{period}/ has no export or meta.json).")
@@ -48,7 +50,7 @@ def dashboard_figures(root, period):
     }
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("root")
     parser.add_argument("period")
