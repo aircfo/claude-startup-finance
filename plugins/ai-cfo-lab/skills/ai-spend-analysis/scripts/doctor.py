@@ -20,12 +20,14 @@ Each run appends one line to logs/setup.jsonl (time + each check's status), so
 time from first run to first fully green run is measured without anyone timing
 it. The log holds statuses only — no keys, names or spend.
 
-Read-only except for --fix-config and the log line. See references/setup-pitfalls.md
-for the failures these checks come from.
+Read-only except for --fix-config, the log line, and moving a key someone pasted
+into PASTE_ADMIN_KEY_HERE.txt into .secrets/ (secure_key.py), so pasting the key
+is all it takes. See references/setup-pitfalls.md for the failures these checks
+come from.
 """
 from __future__ import annotations
 
-import argparse, csv, datetime, json, os, re, shutil, subprocess, sys, urllib.error, urllib.request
+import argparse, csv, datetime, json, os, re, shlex, shutil, subprocess, sys, urllib.error, urllib.request
 from typing import Callable, Optional
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +35,8 @@ SKILL = os.path.dirname(HERE)
 TEMPLATE = os.path.join(SKILL, "config.example", "pipeline.json")
 TEMPLATE_SEAT_RATES = {"standard": 30, "premium": 150}
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
+
+q = shlex.quote  # every path in a suggested command, so folders with spaces still work
 
 OPERATOR = "Operator"
 OWNER = "claude.ai Owner"
@@ -102,7 +106,7 @@ def check_workspace(ctx: dict) -> Check:
     missing = [d for d in ("config", "raw", ".secrets") if not os.path.isdir(os.path.join(ctx["root"], d))]
     if missing:
         return Check("workspace", "Workspace folder", "fail", f"Not set up yet (missing {', '.join(missing)}).",
-                     f"python3 {HERE}/scaffold.py \"{ctx['root']}\"")
+                     f"python3 {q(os.path.join(HERE, 'scaffold.py'))} {q(ctx['root'])}")
     return Check("workspace", "Workspace folder", "ok", ctx["root"])
 
 
@@ -112,7 +116,7 @@ def check_config_complete(ctx: dict) -> Check:
     if missing:
         return Check("config_complete", "Settings up to date", "warn",
                      f"Settings added in newer versions are missing: {', '.join(missing)}.",
-                     f"python3 {HERE}/doctor.py \"{ctx['root']}\" --fix-config")
+                     f"python3 {q(os.path.join(HERE, 'doctor.py'))} {q(ctx['root'])} --fix-config")
     return Check("config_complete", "Settings up to date", "ok")
 
 
@@ -206,8 +210,8 @@ def check_export_login(ctx: dict) -> Check:
         return Check("export_login", "Daily export can sign in", "skip", "Enterprise uses the Analytics API.")
     if not os.path.isdir(os.path.join(ctx["root"], ".browser-profile")):
         return Check("export_login", "Daily export can sign in", "fail", "The export's browser profile isn't signed in yet.",
-                     f"cd \"{ctx['root']}\" && uv run --with playwright python {HERE}/fetch_surface_b_browser.py "
-                     f"\"{ctx['root']}\" --login   (sign in to claude.ai in the window, then close it)", OWNER)
+                     f"cd {q(ctx['root'])} && uv run --with playwright python {q(os.path.join(HERE, 'fetch_surface_b_browser.py'))} "
+                     f"{q(ctx['root'])} --login   (sign in to claude.ai in the window, then close it)", OWNER)
     if ctx["offline"]:
         return Check("export_login", "Daily export can sign in", "skip", "Profile present; not tested offline.")
     try:
@@ -220,8 +224,8 @@ def check_export_login(ctx: dict) -> Check:
     if result.returncode == 0:
         return Check("export_login", "Daily export can sign in", "ok", message)
     return Check("export_login", "Daily export can sign in", "fail", message,
-                 f"cd \"{ctx['root']}\" && uv run --with playwright python {HERE}/fetch_surface_b_browser.py "
-                 f"\"{ctx['root']}\" --login", OWNER)
+                 f"cd {q(ctx['root'])} && uv run --with playwright python {q(os.path.join(HERE, 'fetch_surface_b_browser.py'))} "
+                 f"{q(ctx['root'])} --login", OWNER)
 
 
 def check_first_export(ctx: dict) -> Check:
@@ -230,47 +234,72 @@ def check_first_export(ctx: dict) -> Check:
         if os.path.isdir(os.path.join(ctx["root"], "raw")) else []
     if not periods:
         return Check("first_export", "First spend export saved", "fail", "No export in raw/ yet.",
-                     f"cd \"{ctx['root']}\" && uv run --with playwright python {HERE}/fetch_surface_b_browser.py \"{ctx['root']}\"")
+                     f"cd {q(ctx['root'])} && uv run --with playwright python {q(os.path.join(HERE, 'fetch_surface_b_browser.py'))} {q(ctx['root'])}")
     ctx["latest_export"] = periods[-1]
     return Check("first_export", "First spend export saved", "ok", f"latest: {periods[-1]}")
 
 
+def roster_people(root: str) -> list[dict]:
+    """The roster the operator edits (config/roster.xlsx or .csv) when there is one;
+    otherwise the config CSVs the pipeline builds from it. Reading the roster
+    itself means a filled-in roster turns these checks green straight away,
+    before the next pipeline run regenerates org_chart.csv and seats.csv."""
+    cfg_dir = os.path.join(root, "config")
+    xlsx, csv_path = os.path.join(cfg_dir, "roster.xlsx"), os.path.join(cfg_dir, "roster.csv")
+    rows: list[dict] = []
+    if os.path.exists(xlsx):
+        try:
+            import openpyxl
+        except ImportError:
+            openpyxl = None
+        if openpyxl is not None:
+            book = openpyxl.load_workbook(xlsx, read_only=True)
+            sheet = book["Roster"] if "Roster" in book.sheetnames else book.worksheets[0]
+            values = list(sheet.iter_rows(values_only=True))
+            header = [str(h or "").strip().lower() for h in (values[0] if values else [])]
+            rows = [dict(zip(header, (str(v) if v is not None else "" for v in row))) for row in values[1:]]
+    elif os.path.exists(csv_path):
+        rows = read_rows(csv_path)
+    if not rows:
+        seat_type = {r.get("email", "").lower(): r.get("seat_type", "") for r in read_rows(os.path.join(cfg_dir, "seats.csv"))}
+        rows = [{**r, "seat_type": seat_type.get(r.get("email", "").lower(), "")}
+                for r in read_rows(os.path.join(cfg_dir, "org_chart.csv"))]
+    return [r for r in rows if "@" in (r.get("email") or "")]
+
+
 def check_roster_real(ctx: dict) -> Check:
-    org = read_rows(os.path.join(ctx["root"], "config", "org_chart.csv"))
-    samples = [r for r in org if (r.get("email") or "").lower().endswith("@example.com")]
+    people = roster_people(ctx["root"])
+    samples = [r for r in people if r["email"].lower().endswith("@example.com")]
     if samples:
         return Check("roster_real", "Roster is your people", "fail",
                      f"{len(samples)} sample @example.com people from the template are still in config/.",
-                     f"python3 {HERE}/bootstrap_roster.py \"{ctx['root']}\" <YYYY-MM> to start a real roster "
-                     "from your export (it replaces the samples when applied).")
-    has_roster = any(os.path.exists(os.path.join(ctx["root"], "config", n)) for n in ("roster.xlsx", "roster.csv"))
-    if not has_roster and not org:
+                     f"python3 {q(os.path.join(HERE, 'bootstrap_roster.py'))} {q(ctx['root'])} <YYYY-MM> to start a "
+                     "real roster from your export (it replaces the samples when applied).")
+    if not people:
         return Check("roster_real", "Roster is your people", "fail", "No roster yet.",
-                     f"python3 {HERE}/bootstrap_roster.py \"{ctx['root']}\" <YYYY-MM>")
-    return Check("roster_real", "Roster is your people", "ok", f"{len(org)} people")
+                     f"python3 {q(os.path.join(HERE, 'bootstrap_roster.py'))} {q(ctx['root'])} <YYYY-MM>")
+    return Check("roster_real", "Roster is your people", "ok", f"{len(people)} people")
 
 
 def check_roster_complete(ctx: dict) -> Check:
-    org = read_rows(os.path.join(ctx["root"], "config", "org_chart.csv"))
-    seats = read_rows(os.path.join(ctx["root"], "config", "seats.csv"))
-    if not org:
+    people = roster_people(ctx["root"])
+    if not people:
         return Check("roster_complete", "Roster filled in", "skip")
-    no_dept = [r["email"] for r in org if not (r.get("department") or "").strip()]
-    premium = sum(1 for s in seats if (s.get("seat_type") or "").strip() == "premium")
+    no_dept = [r["email"] for r in people if not (r.get("department") or "").strip()]
+    premium = sum(1 for r in people if (r.get("seat_type") or "").strip().lower() == "premium")
     if no_dept:
         return Check("roster_complete", "Roster filled in", "fail", f"{len(no_dept)} people have no department.",
-                     f"Fill config/roster.xlsx, or match your HR export: python3 {HERE}/match_roster.py "
-                     f"\"{ctx['root']}\" <hr_export.csv>")
+                     f"Fill config/roster.xlsx, or match your HR export: python3 "
+                     f"{q(os.path.join(HERE, 'match_roster.py'))} {q(ctx['root'])} <hr_export.csv>")
     if premium == 0 and "premium" in (ctx["cfg"].get("seat_rates") or {}):
         return Check("roster_complete", "Roster filled in", "warn", "No premium seats marked; everyone counts as standard.",
                      "Mark premium seats in config/roster.xlsx (or pass --premium to match_roster.py).")
-    return Check("roster_complete", "Roster filled in", "ok", f"{len(org)} people, {premium} premium")
+    return Check("roster_complete", "Roster filled in", "ok", f"{len(people)} people, {premium} premium")
 
 
 def check_roster_departments(ctx: dict) -> Check:
-    org = read_rows(os.path.join(ctx["root"], "config", "org_chart.csv"))
     counts: dict[str, int] = {}
-    for r in org:
+    for r in roster_people(ctx["root"]):
         dept = (r.get("department") or "").strip()
         if dept:
             counts[dept] = counts.get(dept, 0) + 1
@@ -296,11 +325,11 @@ def check_mac_job(ctx: dict) -> Check:
         return Check("mac_job", "Daily job scheduled", "skip", "macOS only.")
     if not label:
         return Check("mac_job", "Daily job scheduled", "fail", "Not installed.",
-                     f"python3 {HERE}/install_mac_job.py \"{ctx['root']}\"  (shows everything first; add --load to install)")
+                     f"python3 {q(os.path.join(HERE, 'install_mac_job.py'))} {q(ctx['root'])}  (shows everything first; add --load to install)")
     loaded = subprocess.run(["launchctl", "list", label], capture_output=True).returncode == 0
     if not loaded:
         return Check("mac_job", "Daily job scheduled", "fail", f"{label} is written but not loaded.",
-                     f"python3 {HERE}/install_mac_job.py \"{ctx['root']}\" --load")
+                     f"python3 {q(os.path.join(HERE, 'install_mac_job.py'))} {q(ctx['root'])} --load")
     return Check("mac_job", "Daily job scheduled", "ok", label)
 
 
@@ -330,9 +359,17 @@ CHECKS = [check_tools, check_workspace, check_config_complete, check_company, ch
           check_dashboard, check_mac_job, check_data_fresh]
 
 
-def fix_config(root: str) -> list[str]:
+def fix_config(root: str) -> Optional[list[str]]:
+    """Add missing template settings. None, writing nothing, when the existing file
+    isn't valid JSON: treating it as empty would replace the operator's settings."""
     path = os.path.join(root, "config", "pipeline.json")
-    cfg = read_json(path)
+    try:
+        with open(path) as fh:
+            cfg = json.load(fh)
+    except OSError:
+        cfg = {}
+    except ValueError:
+        return None
     added = {k: v for k, v in read_json(TEMPLATE).items() if k not in cfg}
     if added:
         cfg.update(added)
@@ -374,18 +411,29 @@ def main() -> int:
     root = os.path.abspath(os.path.expanduser(args.root))
     if args.fix_config:
         added = fix_config(root)
+        if added is None:
+            print("[doctor] config/pipeline.json isn't valid JSON (often a trailing comma); fix it first — "
+                  "nothing was changed.")
+            return 1
         print(f"[doctor] added settings: {', '.join(added)}" if added else "[doctor] settings already up to date")
+    moved = subprocess.run([sys.executable, os.path.join(HERE, "secure_key.py"), root], capture_output=True, text=True)
+    if moved.stdout.strip() and not args.json:
+        print(moved.stdout.strip())  # a key pasted into PASTE_ADMIN_KEY_HERE.txt is now in .secrets/
     cfg = read_json(os.path.join(root, "config", "pipeline.json"))
     ctx = {"root": root, "cfg": cfg, "offline": args.offline, "key": admin_key(root),
            "team": (cfg.get("plan_tier") or "team").lower() == "team"}
     checks = [check(ctx) for check in CHECKS]
     log_run(root, checks)
-    next_step = next((c for c in checks if c.status == "fail"), None) or next((c for c in checks if c.status == "warn"), None)
+    # Warnings never block "All set": some have nothing to fix (a report that can't see
+    # seat users) or are optional. They are listed for a look, not made the next step.
+    next_step = next((c for c in checks if c.status == "fail"), None)
+    warnings = [c for c in checks if c.status == "warn"]
     minutes = setup_minutes(root)
 
     if args.json:
         print(json.dumps({"checks": [c.as_dict() for c in checks],
-                          "next": next_step.as_dict() if next_step else None, "setup_minutes": minutes}, indent=2))
+                          "next": next_step.as_dict() if next_step else None,
+                          "warnings": [c.as_dict() for c in warnings], "setup_minutes": minutes}, indent=2))
         return 1 if any(c.status == "fail" for c in checks) else 0
 
     marks = {"ok": "✓", "warn": "!", "fail": "✗", "skip": "·"}
@@ -396,6 +444,8 @@ def main() -> int:
         print(f"\nNext: {next_step.title} — {next_step.detail}\n  Fix ({next_step.role}): {next_step.fix}")
     else:
         print("\nAll set." + (f" Setup took {minutes} minutes." if minutes is not None else ""))
+    if warnings:
+        print("\nWorth a look (not blocking): " + "; ".join(f"{c.title} — {c.fix or c.detail}" for c in warnings))
     if waiting:
         print(f"\nWaiting on someone else: {', '.join(waiting)}. Their steps are marked above.")
     return 1 if any(c.status == "fail" for c in checks) else 0

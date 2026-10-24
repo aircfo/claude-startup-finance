@@ -32,6 +32,15 @@ approve. Built from the friction of the first real install
   run caught the skill nudging an operator toward one of two same-named people;
   `SKILL.md` now presents both neutrally.
 - CI: the offline tests run on every pull request (`.github/workflows/tests.yml`).
+- Hardened after code review: the doctor reads the roster being edited (not the
+  generated CSVs), moves a pasted Admin key into `.secrets/`, reports "All set"
+  whenever nothing fails (warnings are listed, not blocking), refuses
+  `--fix-config` on an unreadable config instead of replacing it, and quotes every
+  path it suggests. The roster matcher never separates two different people by
+  who is active (same first and last name only), keeps existing seat types unless
+  `--premium` is given, reads T/F and Y/N active columns, and finds roster
+  columns by header. The job installer handles Enterprise (no org id, no browser
+  stage) and quotes paths. New modules pass `mypy --disallow-untyped-defs`.
 
 ## v0.2.0 — Unreleased
 

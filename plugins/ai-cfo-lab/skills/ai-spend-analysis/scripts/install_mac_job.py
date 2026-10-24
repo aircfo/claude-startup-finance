@@ -19,7 +19,7 @@ job also refreshes API cost follows `api_cost_refreshed_by` in pipeline.json:
 """
 from __future__ import annotations
 
-import argparse, json, os, plistlib, re, shutil, subprocess, sys
+import argparse, json, os, plistlib, re, shlex, shutil, subprocess, sys
 from typing import Optional
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -50,11 +50,15 @@ def allowed_tools(cfg: dict, mac_owns_api_cost: bool) -> list[str]:
 
 def prompt_text(root: str, cfg: dict, mac_owns_api_cost: bool) -> str:
     runbook = os.path.join(SKILL, "references", "daily-refresh.md")
-    steps = [
-        f"Read every {root}/raw/*/meta.json written today by the export script. Each period it touched "
-        "(normally one; two when it finished last month first) gets the steps below, oldest first. "
-        "START is the period's first day; END is its `end`.",
-    ]
+    q = shlex.quote  # paths go into commands the unattended run executes; spaces must survive
+    if (cfg.get("plan_tier") or "team").lower() == "team":
+        first = (f"Read every {root}/raw/*/meta.json written today by the export script. Each period it touched "
+                 "(normally one; two when it finished last month first) gets the steps below, oldest first. "
+                 "START is the period's first day; END is its `end` (or yesterday if the export failed).")
+    else:
+        first = ("Run `date +%Y-%m-%d`. PERIOD is the month that contains yesterday; START is its first day and "
+                 "END is yesterday. The steps below run for PERIOD.")
+    steps = [first]
     if cfg.get("card_charges_source") == "ramp":
         steps.append("Card charges: call ramp_get_transactions (all_transactions_across_entire_business, merchant "
                      "filter Anthropic, from_date START, to_date END, page_size 200), following next_page_cursor. "
@@ -66,26 +70,30 @@ def prompt_text(root: str, cfg: dict, mac_owns_api_cost: bool) -> str:
                      "group_by [model], rollup daily, start_at START, end_at the day after END), then the same with "
                      f"rollup all. Save them to {root}/raw/PERIOD/ramp_api_cost.json and ramp_api_cost_total.json as "
                      "described under \"Saved Ramp answers\".")
-    steps.append(f"Run: python3 {HERE}/run_pipeline.py {root} PERIOD --datasets "
+    steps.append(f"Run: python3 {q(os.path.join(HERE, 'run_pipeline.py'))} {q(root)} PERIOD --datasets "
                  f"{','.join(datasets(cfg, mac_owns_api_cost))} --no-reports")
     steps.append(f"Publish what {root}/dashboard/manifest.json lists to {cfg.get('dashboard_url')}, following "
                  "\"Publishing datasets\" in the runbook, with job name \"Daily Mac refresh\".")
     steps.append(f"Reply with one line per dataset (published, or failed and why) and each source's state from "
                  f"{root}/dashboard/status.json. Nothing else; it goes to the log.")
     numbered = "\n".join(f"{i}. {s}" for i, s in enumerate(steps, 1))
+    export_note = ("the spend export was already fetched by script" if (cfg.get("plan_tier") or "team").lower() == "team"
+                   else "the pipeline fetches the spend data from the Analytics API")
     return (f"Daily refresh of the {cfg.get('company_name') or 'AI'} spend dashboard. Nobody is watching. Runbook: "
             f"{runbook}. Follow these steps exactly, then stop. Never retry a failed step. Do not open a browser or "
-            f"visit claude.ai: the spend export was already fetched by script.\n\n{numbered}\n")
+            f"visit claude.ai: {export_note}.\n\n{numbered}\n")
 
 
-def script_text(root: str, claude: str, uv: str, tools: list[str]) -> str:
+def script_text(root: str, claude: str, uv: str, tools: list[str], team: bool) -> str:
+    # Team plans fetch the spend export by script first; Enterprise gets it from the
+    # Analytics API inside the pipeline, so there is no browser stage.
+    export = (f'"{uv}" run --with playwright python "{HERE}/fetch_surface_b_browser.py" "{root}"\n' if team else "")
     return f"""#!/bin/zsh -l
 # Daily AI spend refresh (written by install_mac_job.py; re-run it to change this file).
-# Stage 1 is a fixed script with no AI; stage 2 a headless Claude run limited to the listed tools.
+# Stage 1 (Team plans) is a fixed script with no AI; stage 2 a headless Claude run limited to the listed tools.
 cd "{root}" || exit 1
 echo "=== $(date) ==="
-"{uv}" run --with playwright python "{HERE}/fetch_surface_b_browser.py" "{root}"
-"{claude}" -p --permission-mode dontAsk --allowedTools "{','.join(tools)}" < "{root}/daily_prompt.txt"
+{export}"{claude}" -p --permission-mode dontAsk --allowedTools "{','.join(tools)}" < "{root}/daily_prompt.txt"
 """
 
 
@@ -109,11 +117,14 @@ def main() -> int:
         return 1
     cfg_path = os.path.join(root, "config", "pipeline.json")
     cfg = json.load(open(cfg_path))
-    missing = [k for k in ("company_name", "dashboard_url", "org_id") if not cfg.get(k)]
-    claude, uv = shutil.which("claude"), shutil.which("uv")
-    if missing or not claude or not uv:
+    team = (cfg.get("plan_tier") or "team").lower() == "team"
+    required = ("company_name", "dashboard_url", "org_id") if team else ("company_name", "dashboard_url")
+    missing = [k for k in required if not cfg.get(k)]
+    claude, uv = shutil.which("claude"), shutil.which("uv") or ""
+    if missing or not claude or (team and not uv):
         problems = [f"{k} not set in config/pipeline.json" for k in missing]
-        problems += [f"{name} not found on PATH" for name, path in (("claude", claude), ("uv", uv)) if not path]
+        problems += [f"{name} not found on PATH" for name, path in (("claude", claude), ("uv", uv if team else "-"))
+                     if not path]
         print("Not ready to install:\n  " + "\n  ".join(problems) + "\nRun doctor.py to see each fix.")
         return 1
 
@@ -122,7 +133,7 @@ def main() -> int:
     label = f"com.aispend.{slug(cfg.get('company_name'))}"
     plist_path = os.path.expanduser(f"~/Library/LaunchAgents/{label}.plist")
     files = {
-        os.path.join(root, "daily_refresh.sh"): script_text(root, claude, uv, tools),
+        os.path.join(root, "daily_refresh.sh"): script_text(root, claude, uv, tools, team),
         os.path.join(root, "daily_prompt.txt"): prompt_text(root, cfg, mac_owns_api_cost),
         plist_path: plistlib.dumps(plist_data(label, root, args.hour, args.minute)).decode(),
     }

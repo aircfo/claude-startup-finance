@@ -18,13 +18,17 @@ Matching, in order:
      first, firstl;
   3. for first.last emails with no full-name match, a single person listed by
      first name only (contractor rows);
-  then, among several candidates, the one active row if exactly one is active.
+  then, when several rows are the *same* person (same first and last name, such
+  as an old inactive row beside the current one), the one active row. Two different people are never
+  separated by who is active — a departed employee with a seat still billed is
+  exactly what this should surface — so that is reported, not guessed.
 
 Columns are found by name (Employee/Name, Email, Department/Team,
 Active/Status); rows with no department are treated as section headings.
 
 Without --write it only reports. --premium marks those people's seats premium
-(everyone else standard). --set resolves what it reported: an email, then the
+and everyone else's standard; without it, seat types already in the roster are
+kept. --set resolves what it reported: an email, then the
 HR name, then optionally a department after "|" for people HR doesn't list.
 """
 from __future__ import annotations
@@ -36,7 +40,7 @@ NAME_COLUMNS = ("employee", "name", "full name", "employee name")
 EMAIL_COLUMNS = ("email", "work email", "email address")
 DEPT_COLUMNS = ("department", "dept", "team")
 ACTIVE_COLUMNS = ("active", "active t/f", "status", "employment status")
-INACTIVE_WORDS = ("false", "inactive", "terminated", "no", "0")
+INACTIVE_WORDS = ("false", "f", "no", "n", "0", "inactive", "terminated", "former")
 
 
 def plain(text: str) -> str:
@@ -87,8 +91,13 @@ def name_keys(person: dict) -> set[str]:
 
 
 def prefer_active(candidates: list[dict]) -> list[dict]:
+    """Collapse duplicate rows for one person to the active one; leave different people alone.
+    Rows are one person when first and last names match (a middle name may come and go);
+    a different surname, even one letter off, is a different person to ask about."""
+    if len({(c["first"], c["last"]) for c in candidates}) != 1:
+        return candidates
     active = [c for c in candidates if c["active"]]
-    return active if len(active) == 1 else candidates
+    return active if len(active) == 1 else candidates[:1]
 
 
 def match(email: str, people: list[dict]) -> tuple[Optional[dict], list[dict]]:
@@ -105,14 +114,31 @@ def match(email: str, people: list[dict]) -> tuple[Optional[dict], list[dict]]:
     return (found[0] if len(found) == 1 else None), found
 
 
+ROSTER_COLUMNS = ("email", "name", "department", "seat_type")
+
+
+def roster_columns(header: list) -> dict[str, int]:
+    """Where each roster column is, by its header, so a reordered sheet still lines up."""
+    positions = {str(h or "").strip().lower(): i for i, h in enumerate(header)}
+    missing = [c for c in ROSTER_COLUMNS if c not in positions]
+    if missing:
+        raise SystemExit(f"The roster sheet is missing column(s): {', '.join(missing)}.")
+    return {c: positions[c] for c in ROSTER_COLUMNS}
+
+
 def load_roster(root: str) -> tuple[str, Union[str, tuple], list[list]]:
     xlsx, csv_path = os.path.join(root, "config", "roster.xlsx"), os.path.join(root, "config", "roster.csv")
     if os.path.exists(xlsx):
-        import openpyxl
+        try:
+            import openpyxl
+        except ImportError:
+            raise SystemExit("config/roster.xlsx needs the openpyxl library (uv pip install openpyxl), "
+                             "or save the roster as config/roster.csv instead.")
         book = openpyxl.load_workbook(xlsx)
         sheet = book["Roster"] if "Roster" in book.sheetnames else book.worksheets[0]
-        rows = [[cell.value for cell in row[:4]] for row in sheet.iter_rows(min_row=2)]
-        return "xlsx", (xlsx, book, sheet), [r for r in rows if r[0] and "@" in str(r[0])]
+        columns = roster_columns([cell.value for cell in sheet[1]])
+        rows = [[row[columns[name]].value for name in ROSTER_COLUMNS] for row in sheet.iter_rows(min_row=2)]
+        return "xlsx", (xlsx, book, sheet, columns), [r for r in rows if r[0] and "@" in str(r[0])]
     if os.path.exists(csv_path):
         rows = [[r.get("email"), r.get("name"), r.get("department"), r.get("seat_type")]
                 for r in csv.DictReader(open(csv_path))]
@@ -123,11 +149,14 @@ def load_roster(root: str) -> tuple[str, Union[str, tuple], list[list]]:
 def save_roster(handle: Union[str, tuple], filled: dict[str, tuple[str, str, str]]) -> None:
     """handle is the roster.csv path, or (roster.xlsx path, workbook, sheet)."""
     if isinstance(handle, tuple):
-        path, book, sheet = handle
+        path, book, sheet, columns = handle
         for row in sheet.iter_rows(min_row=2):
-            email = str(row[0].value or "").lower()
+            email = str(row[columns["email"]].value or "").lower()
             if email in filled:
-                row[1].value, row[2].value, row[3].value = filled[email]
+                name, department, seat = filled[email]
+                row[columns["name"]].value = name
+                row[columns["department"]].value = department
+                row[columns["seat_type"]].value = seat
         book.save(path)
     else:
         with open(handle) as fh:
@@ -162,6 +191,7 @@ def main() -> int:
     filled: dict[str, tuple[str, str, str]] = {}
     ambiguous: list[tuple[str, list[str]]] = []
     unmatched: list[str] = []
+    current_seat = {str(r[0]).lower(): (r[3] or "") for r in roster}
     for email, *_ in roster:
         email = str(email).lower()
         if email in overrides:
@@ -184,7 +214,10 @@ def main() -> int:
                     unmatched.append(email)
                 continue
             person = matched
-        seat = "premium" if plain(person["name"]) in premium or plain(person["display"]) in premium else "standard"
+        if premium:
+            seat = "premium" if plain(person["name"]) in premium or plain(person["display"]) in premium else "standard"
+        else:
+            seat = current_seat.get(email) or "standard"
         filled[email] = (person["display"], person["department"], seat)
 
     found_premium = {plain(n) for n, _, s in filled.values() if s == "premium"}
