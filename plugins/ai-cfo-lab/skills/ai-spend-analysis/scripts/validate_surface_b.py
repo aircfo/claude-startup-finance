@@ -4,13 +4,23 @@ Writes surface_b_status.json next to the file. Exit 0 = valid, 1 = invalid (fail
 
 States: ok, missing (no export), invalid (schema drift / bad rows), and stale — a
 valid export exists but the latest scheduled fetch failed, so the data stops at
-the last good day; the detail says why and through when."""
+the last good day; the detail says why and through when. An export saved after
+the failure (the manual fallback) is newer than `failed_at`, so it counts as
+current and the error is cleared."""
 from __future__ import annotations
 
-import csv, json, os, sys
+import csv, datetime, json, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from periods import read_meta
+from periods import clear_fetch_error, read_meta
+
+
+def saved_after_failure(path: str, meta: dict) -> bool:
+    failed_at = meta.get("failed_at")
+    if not failed_at:
+        return False
+    saved = datetime.datetime.fromtimestamp(os.path.getmtime(path), datetime.timezone.utc)
+    return saved > datetime.datetime.fromisoformat(failed_at)
 
 REQUIRED = {"user_email", "product", "model", "total_requests", "total_prompt_tokens",
             "total_completion_tokens", "total_net_spend_usd", "total_gross_spend_usd"}
@@ -44,7 +54,9 @@ def main() -> int:
         write("invalid", "non-numeric spend values"); return 1
     if bad > len(rows) * 0.05:
         write("invalid", f"{bad} rows with malformed user_email"); return 1
-    if meta.get("fetch_error"):
+    if meta.get("fetch_error") and saved_after_failure(path, meta):
+        clear_fetch_error(os.path.dirname(path))
+    elif meta.get("fetch_error"):
         through = meta.get("end") or "the last good export"
         write("stale", f"{meta['fetch_error']} — showing the export through {through}", len(rows))
         return 1

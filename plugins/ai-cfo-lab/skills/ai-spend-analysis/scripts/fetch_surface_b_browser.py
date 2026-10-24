@@ -106,32 +106,48 @@ def fetch(root: str, periods: list[str], today: datetime.date) -> int:
     cfg = load_config(root)
     if not cfg:
         return 1
-    from playwright.sync_api import sync_playwright
     stamp = today.isoformat()
-    with sync_playwright() as p:
-        context = open_profile(p, root, headless=True)
-        try:
-            for period in periods:
-                covered = coverage(period, today)
-                if not covered:
-                    continue
-                out_dir = os.path.join(root, "raw", period)
-                response, error = request_export(context, cfg, covered)
-                if error:
-                    # The last good export (if any) stays, with its own coverage, and the
-                    # error is recorded beside it so validation reports the gap.
-                    record_fetch_error(out_dir, period, today, error, f"daily browser export {stamp} (failed)")
-                    print(f"[surface_b_browser] {period}: {error}")
-                    continue
-                os.makedirs(out_dir, exist_ok=True)
-                with open(os.path.join(out_dir, "overage_spend.csv"), "wb") as fh:
-                    fh.write(response.body())
-                write_meta(out_dir, period, covered, f"daily browser export {stamp}")
-                print(f"[surface_b_browser] {period}: saved export {covered.start}..{covered.end} "
-                      f"({response.text().count(chr(10))} lines)")
-        finally:
-            context.close()
+    pending = [p for p in periods if coverage(p, today)]
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            context = open_profile(p, root, headless=True)
+            try:
+                while pending:
+                    period = pending[0]
+                    fetch_period(context, cfg, root, period, today, stamp)
+                    pending.pop(0)
+            finally:
+                context.close()
+    except Exception as err:  # no network, a locked profile, Playwright missing: record it, don't vanish
+        message = f"the export script couldn't run ({type(err).__name__}: {err})"
+        for period in pending:
+            record_fetch_error(os.path.join(root, "raw", period), period, today, message,
+                               f"daily browser export {stamp} (failed)")
+        print(f"[surface_b_browser] {message}")
+        return 1
     return 0
+
+
+def fetch_period(context: BrowserContext, cfg: dict, root: str, period: str,
+                 today: datetime.date, stamp: str) -> None:
+    covered = coverage(period, today)
+    if not covered:
+        return
+    out_dir = os.path.join(root, "raw", period)
+    response, error = request_export(context, cfg, covered)
+    if error:
+        # The last good export (if any) stays, with its own coverage, and the
+        # error is recorded beside it so validation reports the gap.
+        record_fetch_error(out_dir, period, today, error, f"daily browser export {stamp} (failed)")
+        print(f"[surface_b_browser] {period}: {error}")
+        return
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, "overage_spend.csv"), "wb") as fh:
+        fh.write(response.body())
+    write_meta(out_dir, period, covered, f"daily browser export {stamp}")
+    print(f"[surface_b_browser] {period}: saved export {covered.start}..{covered.end} "
+          f"({response.text().count(chr(10))} lines)")
 
 
 def main() -> int:

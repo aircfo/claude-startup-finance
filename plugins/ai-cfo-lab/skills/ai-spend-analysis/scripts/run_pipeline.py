@@ -15,8 +15,9 @@ Order:
     references/daily-refresh.md — drops it at raw/<period>/overage_spend.csv first.
   Then, for both tiers: Surface C via the Admin API (skipped when Ramp supplies
   API cost) -> Claude Code usage report -> validate Surface B -> (apply roster if
-  a config/roster.xlsx|csv is present) -> workbooks -> artifact -> Slack draft ->
-  dashboard datasets (--datasets limits which are written).
+  a config/roster.xlsx|csv is present) -> dashboard datasets (--datasets limits
+  which are written) -> workbooks -> artifact -> Slack draft (all three skipped
+  with --no-reports, which the daily jobs use).
 
 Never sends anything; read-only against every financial surface."""
 from __future__ import annotations
@@ -50,6 +51,8 @@ def main() -> int:
     parser.add_argument("root")
     parser.add_argument("period")
     parser.add_argument("--datasets", default="", help="comma-separated dashboard dataset ids (default: all)")
+    parser.add_argument("--no-reports", action="store_true",
+                        help="skip the monthly workbooks, HTML file and Slack draft (the daily jobs need only the dashboard)")
     args = parser.parse_args()
     root, period = args.root, args.period
     cfg = pipeline_config(root)
@@ -68,15 +71,16 @@ def main() -> int:
     cfg_dir = os.path.join(root, "config")
     if os.path.exists(os.path.join(cfg_dir, "roster.xlsx")) or os.path.exists(os.path.join(cfg_dir, "roster.csv")):
         run("apply_roster.py", root)  # roster is the source of truth when present; regenerates org_chart.csv + seats.csv
-    if run("build_workbooks.py", root):
-        return 1
-    if run("build_artifact.py", root):
+    # The dashboard comes first and stands alone, so a problem in the monthly
+    # reports never holds back the daily refresh.
+    dataset_args = ["--only", args.datasets] if args.datasets else []
+    failed = run("build_dashboard_datasets.py", root, *dataset_args) != 0
+    if args.no_reports:
+        return 1 if failed else 0
+    if run("build_workbooks.py", root) or run("build_artifact.py", root):
         return 1
     run("draft_slack.py", root)
-    dataset_args = ["--only", args.datasets] if args.datasets else []
-    if run("build_dashboard_datasets.py", root, *dataset_args):
-        return 1
-    return 0
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

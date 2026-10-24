@@ -82,7 +82,21 @@ DATASETS = {
         "description": "Whether each source refreshed cleanly for the latest month, and what to do when one didn't.",
         "schedule": "Each daily refresh", "stale_after_hours": 48,
     },
+    "api_status": {
+        "title": "API cost status",
+        "description": "Whether the API cost refreshed cleanly, published by the job that owns API cost when that is a cloud routine.",
+        "schedule": "Each API cost refresh", "stale_after_hours": 48,
+    },
 }
+
+# Every refreshed source: its dataset, how the status banner names it, and the
+# status file its fetch or import writes for the period.
+SOURCES = [
+    ("overage", "Seat overage (claude.ai export)", "surface_b_status.json"),
+    ("api_cost", "API cost", "surface_c_status.json"),
+    ("claude_code", "Claude Code usage", "claude_code_status.json"),
+    ("card_charges", "Anthropic card charges", "card_charges_status.json"),
+]
 
 # The Ramp connector calls behind Ramp-sourced datasets, kept with the file so an
 # editor can see the query behind the numbers. `{start}`/`{end}` are filled per run.
@@ -107,7 +121,7 @@ def period_files(root: str, periods: list[str], filename: str) -> list[Row]:
     return rows
 
 
-def month_of(date: str, folder_period: str) -> str:
+def row_month(date: str, folder_period: str) -> str:
     """A daily row's month comes from its own date: one Ramp pull can span several months."""
     return date[:7] if date else folder_period
 
@@ -117,7 +131,7 @@ def roll_up(rows: list[Row], key_fields: list[str], sum_fields: list[str]) -> li
     grouped: dict[tuple, Row] = {}
     for row in rows:
         key = tuple(row[field] for field in key_fields)
-        bucket = grouped.setdefault(key, {**{f: row[f] for f in key_fields}, **{f: 0.0 for f in sum_fields}})
+        bucket = grouped.setdefault(key, {**{field: row[field] for field in key_fields}, **{field: 0.0 for field in sum_fields}})
         for field in sum_fields:
             bucket[field] += row[field]
     for bucket in grouped.values():
@@ -150,7 +164,7 @@ def build_overage(ctx: Context) -> list[Row]:
 
 
 def build_api_cost(ctx: Context) -> list[Row]:
-    rows = [{"period": month_of(r["date"], r["period"]), "date": r["date"], "model": r["model"] or "(not broken out)",
+    rows = [{"period": row_month(r["date"], r["period"]), "date": r["date"], "model": r["model"] or "(not broken out)",
              "family": ctx["classify"](r["model"]), "cost_usd": r["cost_usd"]}
             for r in ctx["c_rows"] if r["record_type"] == "cost"]
     return roll_up(rows, ["period", "date", "model", "family"], ["cost_usd"])
@@ -161,7 +175,7 @@ def build_claude_code(ctx: Context) -> list[Row]:
     for r in period_files(ctx["root"], ctx["periods"], "claude_code_usage.csv"):
         person = ctx["org"].get(r["email"], {})
         is_user = r["actor_type"] == "user"
-        rows.append({"period": month_of(r["date"], r["period"]), "date": r["date"],
+        rows.append({"period": row_month(r["date"], r["period"]), "date": r["date"],
                      "email": r["email"] if is_user else "",
                      "name": person.get("name", "") if is_user else f"API key: {r['api_key_name']}",
                      "department": (person.get("department") or UNMAPPED) if is_user else "(API keys)",
@@ -179,7 +193,7 @@ def build_card_charges(ctx: Context) -> list[Row]:
     rows = []
     for r in period_files(ctx["root"], ctx["periods"], "card_charges.csv"):
         person = by_name.get(r["cardholder"].strip().lower(), {})
-        rows.append({"period": month_of(r["date"], r["period"]), "date": r["date"], "cardholder": r["cardholder"],
+        rows.append({"period": row_month(r["date"], r["period"]), "date": r["date"], "cardholder": r["cardholder"],
                      "department": person.get("department") or UNMAPPED,
                      "allocation": r["allocation"], "amount_usd": f(r["amount_usd"]), "charges": 1.0})
     keys = ["period", "date", "department", "allocation"]
@@ -199,29 +213,34 @@ def build_flags(ctx: Context) -> list[Row]:
     return rows
 
 
-STATUS_FILES = [
-    ("Seat overage (claude.ai export)", "surface_b_status.json"),
-    ("API cost", "surface_c_status.json"),
-    ("Claude Code usage", "claude_code_status.json"),
-    ("Anthropic card charges", "card_charges_status.json"),
-]
-
-
-def build_status(ctx: Context) -> list[Row]:
+def status_rows(ctx: Context, dataset_ids: list[str]) -> list[Row]:
     latest = ctx["periods"][-1]
     rows = []
-    for label, filename in STATUS_FILES:
+    for dataset_id, label, filename in SOURCES:
         path = os.path.join(ctx["root"], "raw", latest, filename)
-        if os.path.exists(path):
-            state = json.load(open(path))
+        if dataset_id in dataset_ids and os.path.exists(path):
+            with open(path) as fh:
+                state = json.load(fh)
             rows.append({"source": label, "period": latest, "state": state.get("state", "unknown"),
                          "detail": state.get("detail", "")})
     return rows
 
 
+def build_status(ctx: Context) -> list[Row]:
+    """Every source this workspace refreshes; API cost is left to api_status when a
+    cloud routine owns it."""
+    owned = [d for d, _, _ in SOURCES if not (d == "api_cost" and ctx["api_cost_by_cloud"])]
+    return status_rows(ctx, owned)
+
+
+def build_api_status(ctx: Context) -> list[Row]:
+    return status_rows(ctx, ["api_cost"])
+
+
 BUILDERS: dict[str, Callable[[Context], list[Row]]] = {"periods": build_periods, "seats": build_seats, "overage": build_overage,
             "api_cost": build_api_cost, "claude_code": build_claude_code,
-            "card_charges": build_card_charges, "flags": build_flags, "status": build_status}
+            "card_charges": build_card_charges, "flags": build_flags, "status": build_status,
+            "api_status": build_api_status}
 
 
 RAMP_SOURCE_SETTINGS = {"api_cost": "api_cost_source", "card_charges": "card_charges_source"}
@@ -237,15 +256,12 @@ def ramp_request(dataset_id: str, rows: list[Row], periods: list[str]) -> dict:
     return json.loads(text)
 
 
-# The status file that says whether each sourced dataset refreshed cleanly.
-SOURCE_STATUS = {"overage": "surface_b_status.json", "api_cost": "surface_c_status.json",
-                 "claude_code": "claude_code_status.json", "card_charges": "card_charges_status.json"}
 NOT_PUBLISHABLE = {"error", "missing", "stale", "invalid"}
 
 
 def failed_source(root: str, period: str, dataset_id: str) -> str:
     """Why this dataset's source failed for the period, or "" when it is fine to publish."""
-    filename = SOURCE_STATUS.get(dataset_id)
+    filename = next((name for d, _, name in SOURCES if d == dataset_id), None)
     path = os.path.join(root, "raw", period, filename) if filename else ""
     if not path or not os.path.exists(path):
         return ""
@@ -275,7 +291,8 @@ def main() -> int:
 
     ctx = {"root": args.root, "org": org, "seats": seats, "thr": thr, "keymap": keymap, "periods": periods,
            "b_rows": b_rows, "c_rows": c_rows, "meta": meta, "classify": family_classifier(models),
-           "per_person": visibility == "person"}
+           "per_person": visibility == "person",
+           "api_cost_by_cloud": pipeline.get("api_cost_refreshed_by", "mac") == "cloud"}
     out_dir = os.path.join(args.root, "dashboard")
     os.makedirs(out_dir, exist_ok=True)
     published: dict[str, dict] = {}

@@ -32,6 +32,10 @@ figure must not reach the dashboard:
     within a cent.
 A failed check sets the status to "error" and writes no table.
 
+Each saved answer is used once: after it is read (whatever the outcome) it is
+renamed `<name>.imported.json`, so a day when Claude saved nothing new reports
+"missing" instead of quietly re-importing yesterday's answer as fresh.
+
 Only the fields read here need saving, copied exactly: for API cost
 period_start_at, model, total_cost; for transactions spent_by_user, amount,
 original_amount, original_currency, state, transaction_time,
@@ -88,9 +92,12 @@ def api_cost_rows(saved: Saved) -> list[Row]:
     rows = []
     for response in as_responses(saved):
         for bucket in ((response.get("cost") or {}).get("data") or []):
+            date = (bucket.get("period_start_at") or "")[:10]
+            if len(date) != 10:
+                raise IncompleteAnswer("a saved API-cost bucket has no period_start_at date")
             rows.append({
                 "record_type": "cost",
-                "date": (bucket.get("period_start_at") or "")[:10],
+                "date": date,
                 "workspace_id": "(via Ramp)",
                 "api_key_id": "",
                 "model": bucket.get("model") or "",
@@ -159,7 +166,9 @@ def usd_amount(txn: dict) -> float:
     """The charge in US dollars. Ramp's original_amount is in the merchant's currency,
     so a non-USD charge uses Ramp's settled `amount` (shown as "$1,234.56")."""
     if (txn.get("original_currency") or "USD").upper() == "USD":
-        return round(float(txn.get("original_amount") or 0), 2)
+        if txn.get("original_amount") in (None, ""):
+            raise IncompleteAnswer("a saved charge has no original_amount")
+        return round(float(txn["original_amount"]), 2)
     settled = str(txn.get("amount") or "").strip()
     if not settled.startswith("$"):
         raise IncompleteAnswer(f"a {txn.get('original_currency')} charge was saved without its US-dollar `amount`")
@@ -183,6 +192,13 @@ def card_rows(saved: Saved) -> list[Row]:
 
 # ---- shared ----
 
+def mark_imported(out_dir: str, *names: str) -> None:
+    for name in names:
+        path = os.path.join(out_dir, name)
+        if os.path.exists(path):
+            os.replace(path, path[: -len(".json")] + ".imported.json")
+
+
 def read_saved(out_dir: str, raw_name: str, status_name: str, source: str, label: str) -> Optional[Saved]:
     raw_path = os.path.join(out_dir, raw_name)
     if not os.path.exists(raw_path):
@@ -194,6 +210,7 @@ def read_saved(out_dir: str, raw_name: str, status_name: str, source: str, label
         return saved
     except ValueError as err:
         write_status(out_dir, status_name, source, "error", f"{raw_name} unreadable: {err}")
+        mark_imported(out_dir, raw_name)
         return None
 
 
@@ -206,13 +223,15 @@ def ingest(out_dir: str, raw_name: str, status_name: str, source: str, label: st
     try:
         rows = build(saved)
         check(saved, rows)
+        where = write(rows)
     except IncompleteAnswer as err:
         write_status(out_dir, status_name, source, "error", f"{raw_name} incomplete: {err} — not published")
         return
     except (TypeError, AttributeError, ValueError) as err:
         write_status(out_dir, status_name, source, "error", f"{raw_name} unreadable: {err}")
         return
-    where = write(rows)
+    finally:
+        mark_imported(out_dir, raw_name, raw_name.replace(".json", "_total.json"))
     write_status(out_dir, status_name, source, "ok", f"{len(rows)} rows from Ramp{where}", len(rows))
 
 

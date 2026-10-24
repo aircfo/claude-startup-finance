@@ -21,6 +21,7 @@ the cloud.
 | `claude_code` | Claude Code usage and estimated cost, per person or API key | Mac job, daily | Admin key in `$ROOT/.secrets/` (see the note below) |
 | `card_charges` | Anthropic charges on employee cards | Mac job, daily | Ramp connector (`card_charges_source: "ramp"`) |
 | `seats`, `periods`, `flags`, `status` | Roster cost, month coverage, flags, source health | Mac job, daily | The workspace |
+| `api_status` | Whether API cost refreshed cleanly | Cloud job, with `api_cost` | — (only when a cloud routine owns API cost) |
 
 **What the Claude Code report can see.** The Admin key belongs to a Console
 (developer-platform) organization, and the report covers Claude Code usage in
@@ -104,8 +105,10 @@ only the ones the import reads — for API cost `period_start_at`, `model`,
 `total_cost` (under `cost.data`); for transactions `spent_by_user`, `amount`,
 `original_amount`, `original_currency`, `state`, `transaction_time`,
 `spend_allocation_name`, and each page's `total_count` — copied exactly. Never
-round, reformat or summarize. A page set without `total_count`, or a non-USD
-charge without its dollar `amount`, is rejected.
+round, reformat or summarize. A page set without `total_count`, a charge
+without its amount, or a non-USD charge without its dollar `amount`, is
+rejected. Each saved answer is imported once and then renamed
+`<name>.imported.json`, so it has to be saved fresh every run.
 
 If an upload or write fails, leave that dataset as it was — the page keeps the
 last good file and its age shows — and say which one failed in the job's final
@@ -143,7 +146,7 @@ Company: <company>
    /tmp/ws/raw/PERIOD/ramp_api_cost_total.json
    (the import checks the daily rows add up to it). If either call fails, stop
    and report it.
-4. Run: python3 <skill>/scripts/run_pipeline.py /tmp/ws PERIOD --datasets api_cost
+4. Run: python3 <skill>/scripts/run_pipeline.py /tmp/ws PERIOD --datasets api_cost,api_status --no-reports
 5. Publish the datasets in /tmp/ws/dashboard/manifest.json to the dashboard,
    following "Publishing datasets" in <skill>/references/daily-refresh.md, with
    job name "Daily cloud refresh".
@@ -243,7 +246,7 @@ Stage 2 steps:
    `$ROOT/raw/PERIOD/ramp_api_cost.json` and `ramp_api_cost_total.json` as
    described under "Saved Ramp answers".
 4. **Pipeline.** `python3 <skill>/scripts/run_pipeline.py $ROOT PERIOD
-   --datasets periods,seats,overage,claude_code,card_charges,flags,status`
+   --datasets periods,seats,overage,claude_code,card_charges,flags,status --no-reports`
    (leave out `card_charges` when it isn't configured; add `api_cost` when this
    job owns it).
 5. **Publish** per "Publishing datasets", job name "Daily Mac refresh".

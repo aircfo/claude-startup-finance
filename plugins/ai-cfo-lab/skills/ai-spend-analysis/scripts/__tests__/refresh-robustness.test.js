@@ -105,7 +105,8 @@ test('a multi-month Ramp pull is filed by month and replaces each month instead 
       { period_start_at: '2026-06-10T00:00:00+00:00', model: 'claude-opus-4-1', total_cost: 13 }] } };
     writeJson(path.join(juneDir, 'ramp_api_cost.json'), pull);
     run('ingest_ramp.py', root, '2026-06');
-    run('ingest_ramp.py', root, '2026-06'); // the next day's pull covers the same months again
+    writeJson(path.join(juneDir, 'ramp_api_cost.json'), pull); // the next day's pull covers the same months again
+    run('ingest_ramp.py', root, '2026-06');
     const costs = (month) => fs.readFileSync(path.join(root, 'raw', month, 'api_usage_cost.csv'), 'utf8')
       .trim().split(/\r?\n/).slice(1).map((line) => Number(line.split(',')[10]));
     assert.deepStrictEqual(costs('2026-04'), [7]);
@@ -137,7 +138,13 @@ test('card pages without Ramp’s count, or a foreign charge without its dollar 
     assert.match(readJson(juneDir, 'card_charges_status.json').detail, /don't include Ramp's total_count/);
 
     pages[0].total_count = 7;
-    pages[0].transactions[0] = { ...pages[0].transactions[0], original_currency: 'EUR', original_amount: '40.00' };
+    const usd = pages[0].transactions[0];
+    pages[0].transactions[0] = { ...usd, original_amount: undefined };
+    writeJson(savedPath, pages);
+    run('ingest_ramp.py', root, '2026-06');
+    assert.match(readJson(juneDir, 'card_charges_status.json').detail, /a saved charge has no original_amount/);
+
+    pages[0].transactions[0] = { ...usd, original_currency: 'EUR', original_amount: '40.00' };
     writeJson(savedPath, pages);
     run('ingest_ramp.py', root, '2026-06');
     assert.match(readJson(juneDir, 'card_charges_status.json').detail, /EUR charge was saved without its US-dollar/);
@@ -160,4 +167,91 @@ have = {d.isoformat() for d in days if d.day not in (5,)}
 print(json.dumps([d.isoformat() for d in days_needed(days, have)]))`);
   assert.strictEqual(r.status, 0, r.stderr);
   assert.deepStrictEqual(JSON.parse(r.stdout), ['2026-10-05', '2026-10-21', '2026-10-22']);
+});
+
+test('a saved Ramp answer is used once, so a day with nothing new reports missing', { skip }, () => {
+  withWorkspace({ card_charges_source: 'ramp' }, (root) => {
+    const juneDir = path.join(root, 'raw', '2026-06');
+    run('ingest_ramp.py', root, '2026-06');
+    assert.strictEqual(readJson(juneDir, 'card_charges_status.json').state, 'ok');
+    assert.ok(fs.existsSync(path.join(juneDir, 'ramp_card_transactions.imported.json')));
+    run('ingest_ramp.py', root, '2026-06');
+    assert.strictEqual(readJson(juneDir, 'card_charges_status.json').state, 'missing',
+      "yesterday's answer is not re-imported as fresh");
+  });
+});
+
+test('an API-cost bucket without a date is rejected without stopping the card import', { skip }, () => {
+  withWorkspace({ api_cost_source: 'ramp', card_charges_source: 'ramp' }, (root) => {
+    const juneDir = path.join(root, 'raw', '2026-06');
+    fs.rmSync(path.join(juneDir, 'ramp_api_cost_total.json'));
+    writeJson(path.join(juneDir, 'ramp_api_cost.json'), { cost: { data: [{ model: 'm', total_cost: 1 }] } });
+    assert.strictEqual(run('ingest_ramp.py', root, '2026-06').status, 0);
+    assert.match(readJson(juneDir, 'surface_c_status.json').detail, /no period_start_at date/);
+    assert.strictEqual(readJson(juneDir, 'card_charges_status.json').state, 'ok');
+  });
+});
+
+test('a manual export saved after a failed fetch counts as current', { skip }, () => {
+  withWorkspace({}, (root) => {
+    const monthDir = path.join(root, 'raw', '2026-06');
+    const csvPath = path.join(monthDir, 'overage_spend.csv');
+    const meta = readJson(monthDir, 'meta.json');
+    writeJson(path.join(monthDir, 'meta.json'), { ...meta, fetch_error: 'signed out', failed_at: '2026-06-21T07:15:00+00:00' });
+    fs.utimesSync(csvPath, new Date('2026-06-20T07:00:00Z'), new Date('2026-06-20T07:00:00Z'));
+    run('validate_surface_b.py', csvPath, '2026-06');
+    assert.strictEqual(readJson(monthDir, 'surface_b_status.json').state, 'stale', 'the leftover file is stale');
+
+    fs.utimesSync(csvPath, new Date('2026-06-21T09:00:00Z'), new Date('2026-06-21T09:00:00Z'));
+    run('validate_surface_b.py', csvPath, '2026-06');
+    assert.strictEqual(readJson(monthDir, 'surface_b_status.json').state, 'ok', 'a newer manual export is current');
+    assert.ok(!readJson(monthDir, 'meta.json').fetch_error, 'the error is cleared');
+  });
+});
+
+test('when the export script cannot run at all, every month it owed is flagged', { skip }, () => {
+  const playwright = spawnSync(PY, ['-c', 'import playwright']).status === 0;
+  withWorkspace({ org_id: 'org-test' }, (root) => {
+    if (playwright) return; // this test needs Playwright to be absent, so the script fails to start
+    fs.mkdirSync(path.join(root, '.browser-profile'));
+    const r = run('fetch_surface_b_browser.py', root, '2026-07');
+    assert.strictEqual(r.status, 1);
+    const meta = readJson(root, 'raw', '2026-07', 'meta.json');
+    assert.match(meta.fetch_error, /couldn't run \(ModuleNotFoundError/);
+    assert.match(meta.source, /registered by run_pipeline/, 'a month with no export stays self-registered');
+  });
+});
+
+test('a failed fetch on a month with no export keeps refreshing its coverage and its error', { skip }, () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-spend-period-'));
+  try {
+    const r = python(`
+import datetime, json
+from periods import record_fetch_error, register_period
+d = ${JSON.stringify(dir)} + "/m"
+record_fetch_error(d, "2026-11", datetime.date(2026, 11, 5), "signed out", "failed")
+register_period(d, "2026-11", datetime.date(2026, 11, 9))
+m = json.load(open(d + "/meta.json"))
+print(json.dumps([m["days_covered"], m["fetch_error"], m["source"].startswith("registered")]))`);
+    assert.strictEqual(r.status, 0, r.stderr);
+    assert.deepStrictEqual(JSON.parse(r.stdout), [8, 'signed out', true]);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('a cloud-owned API cost reports through api_status, not the Mac status', { skip }, () => {
+  withWorkspace({ api_cost_refreshed_by: 'cloud' }, (root) => {
+    assert.strictEqual(run('build_dashboard_datasets.py', root, '--only', 'status,api_status').status, 0);
+    const sources = (id) => readJson(root, 'dashboard', `${id}.json`).rows.map((r) => r.source);
+    assert.ok(!sources('status').includes('API cost'));
+    assert.deepStrictEqual(sources('api_status'), ['API cost']);
+  });
+});
+
+test('--no-reports builds the dashboard datasets and skips the monthly reports', { skip }, () => {
+  withWorkspace({}, (root) => {
+    const r = run('run_pipeline.py', root, '2026-06', '--datasets', 'periods,overage', '--no-reports');
+    assert.strictEqual(r.status, 0, r.stderr);
+    assert.ok(fs.existsSync(path.join(root, 'dashboard', 'overage.json')));
+    assert.ok(!fs.existsSync(path.join(root, 'workbooks', 'build_summary.json')), 'no workbooks were built');
+  });
 });

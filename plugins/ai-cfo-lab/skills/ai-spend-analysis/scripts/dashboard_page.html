@@ -49,7 +49,7 @@
     </p>
   </header>
 
-  <div class="as-banner" id="source-issues" data-source="status" hidden></div>
+  <div class="as-banner" id="source-issues" data-source="status api_status" hidden></div>
 
   <nav class="as-tabs" role="tablist" aria-label="Dashboard sections">
     <button class="as-tab" role="tab" id="tab-overview" aria-controls="overview" aria-selected="true">Overview</button>
@@ -509,8 +509,12 @@
 
   function drawIssues() {
     const banner = document.getElementById('source-issues');
-    const d = dash.data('status');
-    const issues = d.status === 'ok' ? d.data.filter((s) => s.state !== 'ok' && s.state !== 'not_configured') : [];
+    // A cloud routine that owns API cost publishes its own api_status; either may be absent.
+    const rows = ['status', 'api_status'].flatMap((id) => {
+      const d = dash.data(id);
+      return d.status === 'ok' ? d.data : [];
+    });
+    const issues = rows.filter((s) => s.state !== 'ok' && s.state !== 'not_configured');
     banner.hidden = !issues.length;
     banner.replaceChildren(...issues.map((s) => {
       const line = document.createElement('div');

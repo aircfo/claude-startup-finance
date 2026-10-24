@@ -57,8 +57,16 @@ optional and off until configured.
 - `api_cost_refreshed_by` ("mac" / "cloud") says which job owns API cost; the
   other neither imports nor flags it.
 - One shared month-coverage rule (`periods.py`); the Claude Code fetch asks only
-  for new days plus the two still settling; new modules are type-hinted and
-  pass mypy.
+  for new days plus the two still settling (days with no usage are remembered);
+  new modules are type-hinted and pass mypy.
+- A manual export saved after a failed fetch counts as current; the export script
+  records a failure even when it can't start (no network, locked profile).
+- Saved Ramp answers are imported once (renamed `.imported.json`); a charge
+  without an amount, or an API-cost bucket without a date, is rejected.
+- A cloud routine that owns API cost publishes `api_status`, so its failures
+  reach the dashboard banner.
+- Dashboard datasets are built before the monthly reports, and the daily jobs
+  skip those reports (`run_pipeline.py --no-reports`).
 
 **Changed / fixed:**
 - `run_pipeline.py` registers a period with no export yet (writes `meta.json`),

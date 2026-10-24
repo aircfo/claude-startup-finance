@@ -60,18 +60,32 @@ def write_meta(out_dir: str, period: str, covered: Coverage, source: str) -> Non
 
 def record_fetch_error(out_dir: str, period: str, today: datetime.date, error: str, source: str) -> None:
     """Note a failed fetch without pretending the window moved: the coverage of the
-    last good export stays as it was, so the dashboard keeps its true age."""
+    last good export stays as it was, so the dashboard keeps its true age.
+
+    `failed_at` lets validation tell a later manual export (newer than the
+    failure) from the stale file the failure left behind. A month with no export
+    yet stays self-registered, so register_period keeps refreshing it."""
     meta = read_meta(out_dir)
     if not meta:
-        covered = coverage(period, today)
-        meta = {"period": period, "days_covered": 0, "partial": True}
-        if covered:
-            meta.update(start=covered.start.isoformat(), end=None)
+        register_period(out_dir, period, today)
+        meta = read_meta(out_dir)
+    if meta.get("source") != SELF_REGISTERED:
+        meta["source"] = source
     meta["fetch_error"] = error
-    meta["source"] = source
+    meta["failed_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
+
+
+def clear_fetch_error(out_dir: str) -> None:
+    """A newer export replaced the failed fetch's leftovers: drop the error."""
+    meta = read_meta(out_dir)
+    if "fetch_error" in meta:
+        meta.pop("fetch_error")
+        meta.pop("failed_at", None)
+        with open(os.path.join(out_dir, "meta.json"), "w") as fh:
+            json.dump(meta, fh, indent=2)
 
 
 def register_period(out_dir: str, period: str, today: datetime.date) -> None:
@@ -82,10 +96,15 @@ def register_period(out_dir: str, period: str, today: datetime.date) -> None:
     meta = read_meta(out_dir)
     if meta and meta.get("source") != SELF_REGISTERED:
         return
+    carried = {k: meta[k] for k in ("fetch_error", "failed_at") if k in meta}
     covered = coverage(period, today)
     if covered:
         write_meta(out_dir, period, covered, SELF_REGISTERED)
-        return
-    os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "meta.json"), "w") as fh:
-        json.dump({"period": period, "days_covered": 0, "partial": True, "source": SELF_REGISTERED}, fh, indent=2)
+        fresh = read_meta(out_dir)
+    else:
+        fresh = {"period": period, "days_covered": 0, "partial": True, "source": SELF_REGISTERED}
+    if carried or not covered:
+        fresh.update(carried)
+        os.makedirs(out_dir, exist_ok=True)
+        with open(os.path.join(out_dir, "meta.json"), "w") as fh:
+            json.dump(fresh, fh, indent=2)

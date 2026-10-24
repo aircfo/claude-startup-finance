@@ -12,10 +12,11 @@ It reports on the Admin key's own Console organization. When the claude.ai Team
 workspace is a separate organization, it sees only Claude Code run on API keys
 (customer_type "api") and no Team-seat users.
 
-The report returns one UTC day per call. Each run fetches the period's days that
-aren't in raw/<period>/claude_code_usage.csv yet, plus the two most recent days
-(their figures can still settle), and keeps the rest — so a daily run makes a
-few calls, not one per day of the month.
+The report returns one UTC day per call. Each run fetches the period's days it
+hasn't fetched yet, plus the two most recent days (their figures can still
+settle), and keeps the rest — so a daily run makes a few calls, not one per day
+of the month. Fetched days are listed in raw/<period>/claude_code_days.json, so
+days with no usage (no rows) aren't asked for again.
 
 Uses the same Admin API key as Surface C (ANTHROPIC_ADMIN_API_KEY, or
 <root>/.secrets/anthropic_admin_key). Graceful-missing: no key -> status
@@ -113,11 +114,15 @@ def main() -> int:
         status(out_dir, "not_configured", f"{period} has no completed days yet")
         return 0
     out_path = os.path.join(out_dir, "claude_code_usage.csv")
+    days_path = os.path.join(out_dir, "claude_code_days.json")
     saved: list[dict] = []
-    if os.path.exists(out_path):
+    fetched: set[str] = set()
+    if os.path.exists(out_path) and os.path.exists(days_path):
         with open(out_path) as fh:
             saved = list(csv.DictReader(fh))
-    wanted = days_needed(days, {r["date"] for r in saved})
+        with open(days_path) as fh:
+            fetched = set(json.load(fh))
+    wanted = days_needed(days, fetched)
     refetched = {d.isoformat() for d in wanted}
     rows = [r for r in saved if r["date"] not in refetched]
     try:
@@ -136,6 +141,8 @@ def main() -> int:
         writer = csv.DictWriter(fh, fieldnames=COLUMNS)
         writer.writeheader()
         writer.writerows(rows)
+    with open(days_path, "w") as fh:
+        json.dump(sorted(fetched | refetched), fh)
     through = days[-1].isoformat()
     status(out_dir, "ok", f"{len(rows)} rows through {through}", len(rows), through)
     return 0
