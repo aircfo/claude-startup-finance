@@ -45,6 +45,11 @@ forward.
   row and follow-along section, every plugin README footer, and the issue-template contact
   links.
 
+### Fixed
+
+- `build_workbooks.py` no longer aborts the whole build when one period's `meta.json` is
+  invalid JSON; the period is flagged in `build_summary.json`'s `meta_alerts` instead.
+
 ### Changed
 
 - `plugins/ai-cfo-lab/README.md` now presents the plugin as the index of AI CFO newsletter
