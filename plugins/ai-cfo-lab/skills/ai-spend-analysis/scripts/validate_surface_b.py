@@ -1,23 +1,45 @@
 #!/usr/bin/env python3
 """Validate a Surface B overage_spend.csv. Usage: validate_surface_b.py <csv> <YYYY-MM>
-Writes surface_b_status.json next to the file. Exit 0 = valid, 1 = invalid (fail loud)."""
-import csv, json, os, sys
+Writes surface_b_status.json next to the file. Exit 0 = valid, 1 = invalid (fail loud).
+
+States: ok, missing (no export), invalid (schema drift / bad rows), and stale — a
+valid export exists but the latest scheduled fetch failed, so the data stops at
+the last good day; the detail says why and through when. An export saved after
+the failure (the manual fallback) is newer than `failed_at`, so it counts as
+current and the error is cleared."""
+from __future__ import annotations
+
+import csv, datetime, json, os, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from periods import clear_fetch_error, read_meta
+
+
+def saved_after_failure(path: str, meta: dict) -> bool:
+    failed_at = meta.get("failed_at")
+    if not failed_at:
+        return False
+    saved = datetime.datetime.fromtimestamp(os.path.getmtime(path), datetime.timezone.utc)
+    return saved > datetime.datetime.fromisoformat(failed_at)
 
 REQUIRED = {"user_email", "product", "model", "total_requests", "total_prompt_tokens",
             "total_completion_tokens", "total_net_spend_usd", "total_gross_spend_usd"}
 
 
-def main():
+def main() -> int:
     path, period = sys.argv[1], sys.argv[2]
     out = os.path.join(os.path.dirname(path), "surface_b_status.json")
+    meta = read_meta(os.path.dirname(path))
 
-    def write(state, detail, rows=0):
+    def write(state: str, detail: str, rows: int = 0) -> None:
         json.dump({"surface": "B", "state": state, "detail": detail, "rows": rows, "period": period},
                   open(out, "w"), indent=2)
         print(f"[surface_b] {state}: {detail}")
 
     if not os.path.exists(path) or os.path.getsize(path) == 0:
-        write("missing", "overage_spend.csv absent or empty — export failed or not yet fetched"); return 1
+        # A scheduled fetch records why it failed; say that rather than a generic gap.
+        write("missing", meta.get("fetch_error") or "overage_spend.csv absent or empty — export failed or not yet fetched")
+        return 1
     with open(path) as fh:
         rows = list(csv.DictReader(fh))
     if not rows:
@@ -32,6 +54,12 @@ def main():
         write("invalid", "non-numeric spend values"); return 1
     if bad > len(rows) * 0.05:
         write("invalid", f"{bad} rows with malformed user_email"); return 1
+    if meta.get("fetch_error") and saved_after_failure(path, meta):
+        clear_fetch_error(os.path.dirname(path))
+    elif meta.get("fetch_error"):
+        through = meta.get("end") or "the last good export"
+        write("stale", f"{meta['fetch_error']} — showing the export through {through}", len(rows))
+        return 1
     write("ok", f"{len(rows)} rows, ${total:.2f} net overage", len(rows))
     return 0
 

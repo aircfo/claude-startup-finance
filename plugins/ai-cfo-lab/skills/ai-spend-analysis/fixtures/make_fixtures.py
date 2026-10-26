@@ -16,6 +16,10 @@ panel the pipeline computes:
   - a consistently-over user (Ada, >= $50 every month) -> consistent_overage
   - a synthetic Surface-C api_usage_cost.csv incl. an unmapped key -> unowned_api_key
     and an unassigned-workspace API bucket
+  - for the partial month: per-person Claude Code usage (incl. an API-key actor),
+    and saved Ramp answers for daily API cost (with its matching total) and
+    Anthropic card charges (incl. a cardholder missing from the roster, a
+    declined charge, and Ramp's total_count)
 
 Contains ZERO real data — every email is @example.com, every name invented.
 Regenerating with the same seed reproduces byte-identical output."""
@@ -112,6 +116,69 @@ def write_csv(path, cols, rows):
         w = csv.DictWriter(fh, fieldnames=cols); w.writeheader(); w.writerows(rows)
 
 
+# The daily sources get their own seeded generator so adding them left every
+# file the original generator writes byte-identical.
+DAILY_RNG = random.Random(7)
+DAILY_MONTH = "2026-06"
+CLAUDE_CODE_USERS = ["ada@example.com", "alan@example.com", "grace@example.com", "steve@example.com"]
+CLAUDE_CODE_COLS = ["date", "actor_type", "email", "api_key_name", "customer_type", "subscription_type",
+                    "is_remote", "model", "input_tokens", "output_tokens", "cache_read_tokens",
+                    "cache_creation_tokens", "est_cost_usd"]
+# Ramp names cardholders, not emails. "Pat Example" is not on the roster, so the
+# card-charges view has an unmapped bucket to show.
+CARDHOLDERS = [("Ada Lovelace", 42.0), ("Steve Wozniak", 21.0), ("Pat Example", 20.0)]
+
+
+def write_daily_sources(raw):
+    """Claude Code usage, Ramp API cost and Ramp card charges for the partial month."""
+    mdir = os.path.join(raw, DAILY_MONTH)
+    days = range(1, PARTIAL_DAYS[DAILY_MONTH] + 1)
+
+    code_rows = []
+    for day in days:
+        date = f"{DAILY_MONTH}-{day:02d}"
+        for email in CLAUDE_CODE_USERS:
+            for model, share in ((FRONTIER, 0.7), (SONNET, 0.3)):
+                tokens = int(DAILY_RNG.uniform(200_000, 900_000) * share)
+                code_rows.append({"date": date, "actor_type": "user", "email": email, "api_key_name": "",
+                                  "customer_type": "subscription", "subscription_type": "team",
+                                  "is_remote": "False", "model": model, "input_tokens": tokens // 4,
+                                  "output_tokens": tokens // 8, "cache_read_tokens": tokens // 2,
+                                  "cache_creation_tokens": tokens // 8,
+                                  "est_cost_usd": round(tokens / 1e6 * (9.0 if model == FRONTIER else 3.0), 4)})
+        code_rows.append({"date": date, "actor_type": "api_key", "email": "", "api_key_name": "ci-bot",
+                          "customer_type": "api", "subscription_type": "", "is_remote": "True",
+                          "model": SONNET, "input_tokens": 50_000, "output_tokens": 8_000,
+                          "cache_read_tokens": 20_000, "cache_creation_tokens": 4_000, "est_cost_usd": 0.31})
+    write_csv(os.path.join(mdir, "claude_code_usage.csv"), CLAUDE_CODE_COLS, code_rows)
+
+    # Shaped like ramp_get_ai_token_spend_aggregates (metric "cost", rollup "daily", group_by ["model"]).
+    api_buckets = [{"period_start_at": f"{DAILY_MONTH}-{day:02d}T00:00:00+00:00", "model": model,
+                    "total_cost": round(DAILY_RNG.uniform(0.5, 4.0) * weight, 6)}
+                   for day in days for model, weight in ((FRONTIER, 3.0), (SONNET, 1.0))]
+    json.dump({"cost": {"data": api_buckets}, "usage": None},
+              open(os.path.join(mdir, "ramp_api_cost.json"), "w"), indent=2)
+    # The same call with rollup "all": the total the daily rows must add up to.
+    totals = {}
+    for bucket in api_buckets:
+        totals[bucket["model"]] = totals.get(bucket["model"], 0) + bucket["total_cost"]
+    json.dump({"cost": {"data": [{"model": m, "total_cost": round(t, 6)} for m, t in totals.items()]}, "usage": None},
+              open(os.path.join(mdir, "ramp_api_cost_total.json"), "w"), indent=2)
+
+    # Shaped like ramp_get_transactions pages (only the fields the importer reads).
+    transactions = []
+    for index, (cardholder, typical) in enumerate(CARDHOLDERS * 2):
+        transactions.append({"transaction_uuid": f"txn_{index:04d}", "spent_by_user": cardholder,
+                             "original_amount": str(round(typical * DAILY_RNG.uniform(0.95, 1.05), 2)),
+                             "original_currency": "USD", "state": "CLEARED",
+                             "transaction_time": f"{DAILY_MONTH}-{3 + index * 3:02d}T12:00:00+00:00",
+                             "merchant_name": "Anthropic", "spend_allocation_name": "AI Tooling"})
+    transactions.append({**transactions[0], "transaction_uuid": "txn_declined", "state": "DECLINED"})
+    json.dump([{"transactions": transactions[:4], "total_count": len(transactions)},
+               {"transactions": transactions[4:]}],
+              open(os.path.join(mdir, "ramp_card_transactions.json"), "w"), indent=2)
+
+
 def main():
     target = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
     cfg, raw = os.path.join(target, "config"), os.path.join(target, "raw")
@@ -191,6 +258,7 @@ def main():
                    "detail": f"synthetic fixture — {len(api_rows)} rows", "rows": len(api_rows)},
                   open(os.path.join(mdir, "surface_c_status.json"), "w"), indent=2)
 
+    write_daily_sources(raw)
     print(f"✓ fixtures written to {target} ({len(MONTHS)} months, {len(USERS)} users)")
     return 0
 

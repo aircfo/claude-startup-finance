@@ -60,7 +60,7 @@ Two plugins, in order:
 | --- | --- | --- | --- | --- |
 | Plugin | **`finance-contextos`** | Builds your ContextOS from QuickBooks — account map, finance profile, tie-out. Start here. | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/finance-contextos/README.md) · [ContextOS explainer](https://aircfo.github.io/claude-startup-finance/finance-profile-explainer.html) |
 | Plugin | **`all-systems-go`** | Adds Stripe, Ramp, and Mercury connectors plus cross-system workflows: runway & burn, revenue reconciliation, board metrics. | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/all-systems-go/README.md) · [Use cases](https://aircfo.github.io/claude-startup-finance/use-cases.html) |
-| Plugin | **`ai-cfo-lab`** | Skills shipped alongside the AI CFO newsletter. Today: `ai-spend-analysis` (org-wide Claude spend dashboard). | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/ai-cfo-lab/README.md) |
+| Plugin | **`ai-cfo-lab`** | Skills shipped alongside the AI CFO newsletter. Today: `ai-spend-analysis` (org-wide Claude spend dashboard, optionally refreshed daily). | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/ai-cfo-lab/README.md) |
 | MCP server | **`qbo-mcp`** | The read-only QuickBooks MCP server behind `finance-contextos`. Runs on airCFO infrastructure by default; self-host it if you'd rather your books never touch ours. | Separate repo — [`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp) | [Self-hosting guide](https://aircfo.github.io/claude-startup-finance/self-hosting.html) |
 
 Anything airCFO publishes publicly for Claude — plugins, MCP servers, standalone skills —

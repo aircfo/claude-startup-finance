@@ -1,0 +1,207 @@
+{
+  "cost": {
+    "data": [
+      {
+        "period_start_at": "2026-06-01T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 10.564913
+      },
+      {
+        "period_start_at": "2026-06-01T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 2.936689
+      },
+      {
+        "period_start_at": "2026-06-02T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 4.24171
+      },
+      {
+        "period_start_at": "2026-06-02T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 1.783449
+      },
+      {
+        "period_start_at": "2026-06-03T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 3.253941
+      },
+      {
+        "period_start_at": "2026-06-03T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.201783
+      },
+      {
+        "period_start_at": "2026-06-04T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 7.09222
+      },
+      {
+        "period_start_at": "2026-06-04T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.226692
+      },
+      {
+        "period_start_at": "2026-06-05T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 4.961482
+      },
+      {
+        "period_start_at": "2026-06-05T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 1.280646
+      },
+      {
+        "period_start_at": "2026-06-06T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 10.020868
+      },
+      {
+        "period_start_at": "2026-06-06T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.947241
+      },
+      {
+        "period_start_at": "2026-06-07T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 10.452602
+      },
+      {
+        "period_start_at": "2026-06-07T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.321275
+      },
+      {
+        "period_start_at": "2026-06-08T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 10.092496
+      },
+      {
+        "period_start_at": "2026-06-08T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.089556
+      },
+      {
+        "period_start_at": "2026-06-09T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 3.880765
+      },
+      {
+        "period_start_at": "2026-06-09T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 2.311736
+      },
+      {
+        "period_start_at": "2026-06-10T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 5.233407
+      },
+      {
+        "period_start_at": "2026-06-10T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 0.601431
+      },
+      {
+        "period_start_at": "2026-06-11T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 1.793339
+      },
+      {
+        "period_start_at": "2026-06-11T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 1.477965
+      },
+      {
+        "period_start_at": "2026-06-12T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 4.221331
+      },
+      {
+        "period_start_at": "2026-06-12T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 2.923827
+      },
+      {
+        "period_start_at": "2026-06-13T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 11.543408
+      },
+      {
+        "period_start_at": "2026-06-13T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 2.065297
+      },
+      {
+        "period_start_at": "2026-06-14T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 11.338723
+      },
+      {
+        "period_start_at": "2026-06-14T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.958133
+      },
+      {
+        "period_start_at": "2026-06-15T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 11.527507
+      },
+      {
+        "period_start_at": "2026-06-15T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 1.776226
+      },
+      {
+        "period_start_at": "2026-06-16T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 3.814854
+      },
+      {
+        "period_start_at": "2026-06-16T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 1.29396
+      },
+      {
+        "period_start_at": "2026-06-17T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 3.565415
+      },
+      {
+        "period_start_at": "2026-06-17T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 1.215307
+      },
+      {
+        "period_start_at": "2026-06-18T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 8.052697
+      },
+      {
+        "period_start_at": "2026-06-18T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.651079
+      },
+      {
+        "period_start_at": "2026-06-19T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 10.324573
+      },
+      {
+        "period_start_at": "2026-06-19T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 2.178157
+      },
+      {
+        "period_start_at": "2026-06-20T00:00:00+00:00",
+        "model": "claude-opus-4-1",
+        "total_cost": 8.356269
+      },
+      {
+        "period_start_at": "2026-06-20T00:00:00+00:00",
+        "model": "claude-sonnet-4-5",
+        "total_cost": 3.298753
+      }
+    ]
+  },
+  "usage": null
+}

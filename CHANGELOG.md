@@ -150,6 +150,41 @@ forward.
 
 ## `ai-cfo-lab`
 
+### [0.3.0] — Unreleased
+
+#### Added
+
+- `ai-spend-analysis` setup an operator can finish alone: a `doctor` checkup that names
+  each next step and who can do it (and resumes anywhere), roster matching from an HR
+  export, a previewed installer and an uninstaller for the daily job, invoice
+  reconciliation, a one-page security overview, and a first-install test guide.
+- Plugin evals for seven setup decision points (`plugins/ai-cfo-lab/evals/`).
+- CI runs the skill's offline tests on every pull request.
+
+### [0.2.0] — Unreleased
+
+#### Added
+
+- `ai-spend-analysis` can keep a shared **Claude Dashboard** current every day: a cloud
+  routine refreshes API cost from Ramp (no keys, no per-person data), and a job on the
+  operator's Mac pulls the claude.ai spend export with a fixed script (no AI in the loop) through
+  a dedicated, signed-in browser profile. Runbook in
+  the skill's `references/daily-refresh.md`.
+- Optional Ramp sources: API cost from Ramp's AI-spend connection, and Anthropic charges
+  on company cards (shown beside the totals, not added to them).
+- Claude Code usage per person or API key from the Admin API's Claude Code usage report.
+- A `dashboard_visibility` setting, defaulting to department level: names and emails are
+  filtered out before anything is uploaded.
+
+#### Changed
+
+- Reversed two roadmap items previously marked "not planned" (Ramp ingestion and
+  scheduled jobs); the reasoning is in the skill's design-decisions notes.
+
+#### Fixed
+
+- The API cost pull no longer drops the last second of each month.
+
 ### [0.1.0] — 2026-07-23
 
 #### Added

@@ -31,41 +31,62 @@ tokens** — that's correct, not a gap.
 
 ## Before you start
 
-- **A Claude for Work org** (Team or Enterprise) and **admin/owner access** — the
-  spend data is admin-only.
-- **The skill installed** in your Claude workspace (see the repository's README for
-  install steps).
-- **Excel files are optional.** You always get the interactive dashboard and the
-  Slack draft. To also get the two `.xlsx` workbooks, the Python library `openpyxl`
-  must be available (`pip install openpyxl`). On the web/Cowork this is usually
-  already there; on a local machine you may need to install it once.
+**Who you'll need.** Setup touches three systems, and each has its own admin.
+If that's not all you, line these people up first; Claude will tell you
+exactly what to ask each of them, and you can keep going while you wait.
+
+| Who | What they do | How long |
+|---|---|---|
+| A **claude.ai Owner** (Primary Owner or Owner) | Sign the daily export in once, in a window that opens on your computer; tell you the organization id | 2 minutes |
+| Your **Console admin** (platform.claude.com) | Create an Admin API key and paste it into a file in your workspace | 3 minutes. Optional: only for API cost and the Claude Code report |
+| Your **Ramp admin** | Connect Anthropic in Ramp's AI-spend settings, using a key from the *same* Console organization | 5 minutes. Optional: only if you use Ramp |
+| **You** | Everything else | About 30 minutes, plus filling in departments |
+
+**What to have ready:** your seat prices (claude.ai → Settings → Billing), and
+an export of your company roster from HR or payroll (a spreadsheet with names
+and departments; emails help).
+
+**On your computer:** the skill installed (see the repository's README), Python
+3.9 or newer, [uv](https://docs.astral.sh/uv/), and Google Chrome. The Excel
+workbooks are optional; everything else works without them.
 
 ---
 
-## Getting started (first run)
+## Getting started
 
-Just ask, in plain English:
+Ask, in plain English:
 
 > "Set up AI spend tracking."  *(or run `/ai-spend-analysis`)*
 
-Claude walks you through a short, friendly setup — you mostly **confirm**, you
-don't fill out forms:
+Claude runs a **checkup** (the "doctor") that looks at everything setup needs
+and tells you the one next thing to do, who can do it, and how. You do that
+step, the checkup runs again, and so on until everything is green. You mostly
+confirm; there are no forms.
 
-1. **Where to keep your data.** Claude proposes a folder (e.g.
-   `~/Desktop/AI-Spend-Analytics`). Pick somewhere easy to find and **outside any
-   code repository** — it will hold real per-person spend. Claude locks it down so
-   the data can't be committed to version control.
-2. **A few basics.** Your company name (for the dashboard title), your plan
-   (**Team** or **Enterprise**), and your seat prices (e.g. standard $30, premium
-   $150). The Organization ID is **optional** — you can skip it.
-3. **Your roster comes later, automatically** — see below. No need to prepare one.
+**You can stop at any time.** Setup picks up where you left off: the checkup
+works out where you are from your workspace, so nothing is lost if you close
+the chat, wait on someone, or come back next week. Just ask again.
+
+What the checkup will walk you through, in order:
+
+1. A folder for your data, **outside any code repository** (it holds real
+   per-person spend).
+2. Your company name and seat prices.
+3. The organization id and the export sign-in (a claude.ai Owner).
+4. Optionally, the Admin key (Console admin) and Ramp (Ramp admin).
+5. Your first spend export, and your roster from it.
+6. The dashboard, and the daily refresh.
+
+To run the checkup yourself at any point: ask Claude "check my AI spend
+setup", or run `python3 <skill folder>/scripts/doctor.py <your workspace>`.
 
 ---
 
-## The one manual step: your monthly spend export
+## Your spend export
 
-This is the only thing Claude can't fetch for you on the Team plan (it lives behind
-a button in your account):
+With the daily refresh set up, this happens automatically every morning (a small
+script fetches it with the sign-in your Owner did once). Without it, or as a
+fallback, it's one manual step a month:
 
 1. Go to **claude.ai → Settings → Analytics**.
 2. Find **"How much is Claude costing?"** → **Export spend report** → **Last
@@ -94,9 +115,12 @@ straight out of your spend export and creates a **fill-in spreadsheet** at
 That's it — the **dollar amounts fill themselves** from the seat prices you gave
 during setup, so there's no money column to touch.
 
-**Don't want to type?** Paste your roster into the chat — even a rough one
-("Engineering: ada, alan; Finance: grace; these three are premium") — and Claude
-will fill the spreadsheet for you.
+**Don't want to type?** Give Claude your HR or payroll export and tell it who
+has premium seats. It matches each person's claude.ai email to your roster by
+email or name, prefers current employees over old entries, and **asks you
+about anyone it isn't sure of** (two people with the same first name, someone
+not on the HR list) instead of guessing. A rough list pasted into the chat
+works too.
 
 The very first dashboard (before you fill the roster) shows everyone under
 **"(unmapped)"** — that's expected. Fill the roster and re-run to get real
@@ -110,7 +134,7 @@ If your organization uses the Anthropic **API or Developer Console** (separate f
 Claude seats), you can fold that cash into the dashboard. It needs an **Admin API
 key**.
 
-1. At **console.anthropic.com → Settings → Admin keys**, create a key (you must be
+1. At **platform.claude.com → Settings → Admin keys**, create a key (you must be
    an Organization Owner/Admin). An Admin key is different from a regular API key.
 2. In your workspace you'll find a file named **`PASTE_ADMIN_KEY_HERE.txt`**. Open
    it, paste the whole key (it starts with `sk-ant-…`) on the line at the bottom,
@@ -165,16 +189,58 @@ file — no internet needed).
 
 ---
 
+## Optional: a daily dashboard your team can open
+
+Instead of a file you open once a month, you can keep a **Claude Dashboard**
+current every morning and share its link with your team. Ask Claude to "set up
+a daily AI spend dashboard for my team" and it walks you through it.
+
+How it stays current:
+
+- **A cloud job** refreshes your API (Console) cost from Ramp each morning. It
+  holds no passwords or keys and touches no individual's data.
+- **A job on your Mac** pulls the claude.ai spend export each morning with a
+  small fixed script (no AI involved) that uses its own Chrome profile, which
+  you sign into claude.ai once. It also picks up your Ramp card charges at
+  Anthropic. It needs your Mac to be awake at some point in the morning; if it
+  isn't, those sections show their age and catch up next time.
+
+Before you share it, decide what your team should see. The default shows
+departments only, with no names. You can choose per-person detail instead, but
+anyone you share the link with can download every row, so make that a
+deliberate decision.
+
+Claude proposes both scheduled jobs and creates them only after you say yes.
+The full runbook is in [`references/daily-refresh.md`](references/daily-refresh.md).
+
+---
+
 ## Privacy & security
 
 - **Admin-only.** The dashboard and workbooks name individuals and their spend.
   Decide who can see them before you share, and treat inputs and outputs as
   admin-only.
 - **Your data stays yours.** Everything lives in your local workspace folder, which
-  is gitignored. Nothing is uploaded or sent anywhere by the skill.
+  is gitignored. Nothing leaves it unless you set up the daily dashboard, and
+  then only the datasets that your visibility setting allows (departments only,
+  by default).
 - **Keys are protected.** API keys live only in environment variables or the hidden
   `.secrets/` folder — never in config, workbooks, the dashboard, logs, or chat.
 - **Nothing is auto-sent.** The Slack summary is a `.txt` draft. You send it.
+
+---
+
+## Removing it
+
+Ask Claude to "remove the AI spend setup from this Mac", or run
+`python3 <skill folder>/scripts/uninstall.py <your workspace>`. It lists what it
+would remove and does nothing until you confirm. By default it removes only the
+daily job; you choose separately whether to remove the saved claude.ai sign-in,
+the Admin key (revoke it in platform.claude.com too), and the spend history.
+The dashboard itself is deleted from its menu on claude.ai.
+
+For your IT or security team, [`references/security-overview.md`](references/security-overview.md)
+is a one-page summary of what this reads, stores and shares.
 
 ---
 
@@ -187,6 +253,9 @@ file — no internet needed).
 | Everyone shows as **"(unmapped)"** | Fill in departments in `config/roster.xlsx` and re-run. |
 | API spend all lands in an **"unassigned"** bucket | Map keys to owners in `config/api_key_map.csv`. |
 | **Surface C says "not configured"** | Add an Admin key via `PASTE_ADMIN_KEY_HERE.txt` (optional). |
+| Dashboard says **"claude.ai session signed out"** | The export script's login expired. Ask Claude to "sign the AI spend export back in to claude.ai" (it reopens the sign-in window); the next run recovers the whole month. |
+| Dashboard sections say they're **stale** | The Mac job hasn't run (Mac off or asleep all morning). It catches up on the next run. |
+| **Claude Code tab shows only API keys**, no people | Your Admin key belongs to a different organization than your claude.ai Team workspace. Per-person detail comes from the spend export instead. |
 | Your key **wasn't picked up** | Make sure you pasted it into `PASTE_ADMIN_KEY_HERE.txt` and saved, then re-run. |
 
 ---

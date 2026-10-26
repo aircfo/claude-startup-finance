@@ -16,8 +16,11 @@ airCFO data, no shared secrets, read-only wherever it touches money.
   conversational first run sets up a local workspace; monthly runs rebuild two
   Excel workbooks + a self-contained interactive HTML dashboard and draft (never
   send) a summary. It never modifies seats, billing, or org settings, and ships
-  with synthetic fixtures only. Run it by asking "run the AI spend analysis" or
-  invoking `/ai-spend-analysis`.
+  with synthetic fixtures only. It can also keep a shared Claude Dashboard
+  current every day (department-level by default), with the scheduled jobs
+  proposed for your approval. Setup is guided by a checkup that names each
+  next step and who can do it, so an Ops lead can run it without help. Run it
+  by asking "set up AI spend tracking" or invoking `/ai-spend-analysis`.
 
 ## How to use
 
