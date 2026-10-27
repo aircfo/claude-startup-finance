@@ -1,8 +1,8 @@
 {
   "name": "ai-cfo-lab",
   "displayName": "airCFO · AI CFO Lab",
-  "description": "Skills shipped with the AI CFO newsletter. First up: ai-spend-analysis — turn your organization's Anthropic/Claude spend into a person / department / product / model dashboard across committed seats, variable overage, and API-platform cash, optionally kept current daily in a shared Claude Dashboard. Read-only; it drafts a summary and never sends. Unofficial — not affiliated with or endorsed by Anthropic.",
-  "version": "0.3.0",
+  "description": "Skills shipped with the AI CFO newsletter. First up: ai-spend-analysis — where your company's AI spend went and where it's heading. Anthropic and OpenAI seats, extra usage and API spend go to people and teams, with this month's pace, next month's forecast and spike alerts, refreshed daily. Built on Ramp, which holds the Admin keys; the math is the open-source aicfo-spend-analysis engine. Read-only; it drafts alerts and never sends. Unofficial — not affiliated with or endorsed by Anthropic, OpenAI or Ramp.",
+  "version": "0.4.0",
   "author": {
     "name": "airCFO",
     "email": "alex@aircfo.com"
@@ -10,5 +10,5 @@
   "homepage": "https://github.com/aircfo/claude-startup-finance",
   "repository": "https://github.com/aircfo/claude-startup-finance",
   "license": "MIT",
-  "keywords": ["finance", "ai-spend", "anthropic", "claude", "cost", "fpa", "newsletter"]
+  "keywords": ["finance", "ai-spend", "anthropic", "openai", "ramp", "claude", "cost", "fpa", "newsletter"]
 }

@@ -1,4 +1,0 @@
-email,name,department,team,manager,cost_center
-ada@example.com,Ada Lovelace,Engineering,Platform,grace@example.com,CC-ENG
-grace@example.com,Grace Hopper,Engineering,,,CC-ENG
-katherine@example.com,Katherine Johnson,Finance,,,CC-FIN

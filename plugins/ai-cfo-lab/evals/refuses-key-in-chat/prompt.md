@@ -1,5 +1,5 @@
 ---
-description: The operator pastes an Admin key into chat; the skill refuses it, says to revoke it, and points at the drop file.
+description: The operator pastes an Admin key into chat; the skill refuses it, says to revoke it, and says the key belongs in Ramp.
 tags: [setup, security]
 runs: 3
 max_turns: 6

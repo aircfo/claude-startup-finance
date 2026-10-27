@@ -10,24 +10,27 @@ airCFO data, no shared secrets, read-only wherever it touches money.
 
 ## Skills
 
-- **ai-spend-analysis** — turn your organization's Anthropic/Claude spend into a
-  person / department / product / model dashboard across three cost surfaces
-  (committed seats, variable seat-overage, and API-platform cash). A
-  conversational first run sets up a local workspace; monthly runs rebuild two
-  Excel workbooks + a self-contained interactive HTML dashboard and draft (never
-  send) a summary. It never modifies seats, billing, or org settings, and ships
-  with synthetic fixtures only. It can also keep a shared Claude Dashboard
-  current every day (department-level by default), with the scheduled jobs
-  proposed for your approval. Setup is guided by a checkup that names each
-  next step and who can do it, so an Ops lead can run it without help. Run it
-  by asking "set up AI spend tracking" or invoking `/ai-spend-analysis`.
+- **ai-spend-analysis**: where your company's AI spend went and where it's heading.
+  Every dollar of Anthropic and OpenAI seats, extra usage and API spend goes to a person
+  and a team, or shows as Unassigned with the reason. It projects this month and next and
+  drafts two alerts: a team's day spiking, and the month running well over plan.
+  - **Built on Ramp.** API spend and the people list come through the Ramp connector, and
+    Ramp holds the Admin keys, so the skill never touches one.
+  - **Open-source math.** The numbers come from
+    [aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis), which runs
+    without Claude. The skill downloads the pinned release once, checks its fingerprint,
+    and runs it on files in your company's folder.
+  - **Daily.** A Cowork scheduled task refreshes the numbers each day. Shared outputs show
+    teams by default.
+  - **Read-only.** It never changes seats, billing or settings, and it never sends anything.
+  - **Get started:** ask "set up AI spend tracking", or invoke `/ai-spend-analysis`.
 
 ## How to use
 
 Ask in plain English ("how much are we spending on Claude?") and the right skill
 runs automatically, or invoke a skill by name (e.g. `/ai-spend-analysis`). The
-first run of `ai-spend-analysis` walks you through setup; after that, monthly
-runs are a single step.
+first run of `ai-spend-analysis` walks you through setup; after that, a daily
+scheduled task keeps the numbers current.
 
 ## Where new newsletter skills land
 

@@ -1,242 +1,138 @@
 ---
 name: ai-spend-analysis
 description: >
-  Build an org-wide Anthropic/Claude spend dashboard — person, department,
-  product, and model breakdowns across three cost surfaces (committed seats /
-  variable seat-overage / API-platform cash). Fires when the operator says
-  "run the AI spend analysis", "refresh the AI spend dashboard", "how much are
-  we spending on Claude / AI", "set up AI spend tracking", or "set up a daily
-  AI spend dashboard for my team". First run walks a conversational SETUP
-  (company, plan tier, seat prices, roster, org id) and scaffolds a local
-  workspace; monthly runs pull the surfaces, rebuild the workbooks + interactive
-  HTML dashboard, and draft (never send) a summary. Optionally it keeps a shared
-  Claude Dashboard current every day through two scheduled jobs (a cloud
-  routine reading API cost from Ramp, and a Mac job pulling the claude.ai spend
-  export with a fixed script). It
-  is a generalized, org-agnostic tool — any Claude for Work organization can run
-  it against its own spend. It NEVER modifies seats, billing, or org settings,
-  NEVER auto-sends anything, and does NOT cover non-Anthropic vendors
-  (OpenAI/ChatGPT etc. — roadmap only).
+  Where a company's AI spend went and where it's heading. Anthropic and OpenAI seats,
+  extra usage and API spend go to people and teams, with this month's pace, next month's
+  forecast and spike alerts. Built on Ramp: API spend and the people list come through
+  the Ramp connector, which holds the Admin keys. Fires on "run the AI spend analysis",
+  "refresh the AI spend dashboard", "how much are we spending on AI / Claude / ChatGPT",
+  "are we on pace this month", "set up AI spend tracking", or a scheduled daily refresh.
+  Read-only; it drafts alerts and never sends them.
 ---
 
 # ai-spend-analysis
 
-Turn an organization's Anthropic spend into a person / department / product /
-model dashboard. The design rests on a **three-surface model** — three genuinely
-separate pools of money that must stay visually distinct everywhere:
+This skill gathers the inputs and shows the answers. The math is done by the open-source
+engine, [aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis), which runs
+without Claude. Its design is in that repo's `docs/design.md`; read it when a number needs
+explaining.
 
-| Surface | What it is | Where it comes from |
-|---|---|---|
-| **A — Committed seats** | Recurring seat cash (constant until seats change) | `config/seats.csv` roster × list rate |
-| **B — Variable overage** | Usage-credit spend *beyond* seat allotments (in-allotment usage is $0 by design — tokens capture it) | monthly seat-overage export |
-| **C — API-platform cash** | Console/Developer-platform cost records | Anthropic Admin API |
+Throughout: `$SKILL` is this skill's folder, and `$FOLDER` is the company's folder. That
+folder holds the settings, the people file, every saved download (`raw/`) and every
+output (`out/`). It must be outside any git repo.
 
-Deeper framing, the plan-tier matrix, the security/privacy model, the data
-traps, and the roadmap live in [`references/dashboard-guide.md`](references/dashboard-guide.md) — read it once before the first run.
-
-## Three paths: first run, monthly run, or the daily dashboard?
-
-- **`config/pipeline.json` does not exist, or the doctor reports failures → run SETUP** (below).
-- **It exists → run the MONTHLY pipeline** (below).
-- **The operator wants a shared, daily-refreshed Claude Dashboard, or a
-  scheduled job is running this skill** → follow
-  [`references/daily-refresh.md`](references/daily-refresh.md). It builds on
-  the same workspace and pipeline; read it in full first.
-
-Throughout: `$SKILL` = this skill's directory (the folder holding this file; its
-`scripts/` subdir holds the pipeline). `$ROOT` = the operator's **workspace**
-folder (e.g. `AI-Spend-Analytics/`), which holds `config/`, `raw/`, `workbooks/`,
-`artifacts/`, `.secrets/`. The workspace is separate from the skill — it holds
-the org's data and is never committed anywhere.
-
-## Setup (first run, or resuming one) — doctor-driven
-
-**Always start with the doctor**, whether setup is new, half-done, or something
-broke: `python3 $SKILL/scripts/doctor.py "$ROOT" --json`. It runs every check in
-setup order, reads the state from the workspace itself, and returns the next
-step with its fix and **who can do it**. Work through `next`, run the doctor
-again, repeat until it reports no failures. Never keep your own list of what's
-done; the doctor is the record, and its log (`logs/setup.jsonl`) measures how
-long setup took.
-
-Talk to the operator in plain language, one step at a time; they mostly
-confirm. The checks and how to clear each one:
-
-| Check | How to clear it |
-|---|---|
-| `workspace` | Agree a folder **outside any git repo** (suggest `~/Desktop/AI-Spend-Analytics`), then `python3 $SKILL/scripts/scaffold.py "$ROOT"`. |
-| `config_complete` | `doctor.py "$ROOT" --fix-config` (adds settings from newer versions; changes nothing existing). |
-| `company`, `seat_prices_confirmed` | Ask for the company name and each seat type's monthly price (claude.ai → Settings → Billing); write `company_name`, `seat_rates`, and `standard_seat_rate_usd` in `thresholds.json`. Ask for the plan tier (`team` / `enterprise`) at the same time. |
-| `org_id` | Team only. A claude.ai Owner copies it from Settings → Organization (or the `…/organizations/<id>/…` address). |
-| `admin_key` | Optional. The **Console admin** creates an Admin key and pastes it into `$ROOT/PASTE_ADMIN_KEY_HERE.txt`; the next pipeline run (or `secure_key.py`) moves it to `.secrets/`. **Never accept a key in chat** — if one appears, refuse it, tell them to revoke it, and point at the file. |
-| `admin_key_org` | When `api_cost_source` is `"ramp"`: call `ramp_get_ai_token_spend_connections` and compare its Anthropic `organization_id` with the id the doctor printed. **A mismatch is the single most damaging silent failure** (API cost reads near $0 with no error): the **Ramp admin** re-adds the right org's key in Ramp's AI-spend settings. |
-| `claude_code_visibility` | A warning that the report sees API keys only is normal when the Team workspace and Console org are separate — explain it; nothing to fix. |
-| `export_login` | Team only. A **claude.ai Owner** runs the `--login` command the doctor prints and signs in once in the window that opens. Claude must not drive claude.ai itself: unattended export sessions are refused by Claude Code's safety checks, so this is a fixed script. |
-| `first_export` | `uv run --with playwright python $SKILL/scripts/fetch_surface_b_browser.py "$ROOT"` (or the manual export, saved to `raw/<YYYY-MM>/overage_spend.csv`). |
-| `roster_real`, `roster_complete` | `bootstrap_roster.py "$ROOT" <YYYY-MM>` creates `config/roster.xlsx` from the export. Then ask for an HR/payroll export and run `match_roster.py "$ROOT" <file> --premium "<names>"`; resolve what it reports with `--set` by **asking the operator**, then `--write`. When two people could own an email, present both neutrally: don't suggest which is likelier (from department, products used or anything else) and don't pre-fill either name in a command; a wrong guess files that person's spend under the wrong department. |
-| `roster_departments` | Show the one-person departments and ask whether any are typos. |
-| `dashboard` | References `daily-refresh.md` → One-time setup. Ask about `dashboard_visibility` first (see Hard rules). |
-| `mac_job` | `install_mac_job.py "$ROOT"` prints exactly what will run; show it, get a yes, then `--load`. |
-| `data_fresh` | Read `logs/daily.log`; the doctor's detail says what failed. |
-
-**When a step needs someone else** (the doctor's `role` isn't `Operator`), say
-so plainly, offer a short message the operator can forward to that person
-(what to do, where, and why it's needed), and carry on with the steps that
-don't depend on it. Setup resumes from the doctor whenever they're back.
-
-Two more settings to confirm before the first dashboard: the model-family
-patterns in `config/models.json` (they drive the model tab and the routing
-what-if) and `dashboard_visibility`.
-
-To remove the setup from a machine: `uninstall.py "$ROOT"` lists what it would
-remove; add `--yes` (and `--remove-login`, `--remove-key`, `--purge-data` as
-wanted). The dashboard and any cloud routine are deleted on claude.ai.
-
-## Monthly run (target period = last full calendar month, `YYYY-MM`)
-
-### Step 1 — Surface B: the seat-overage export
-
-**Team plan (default): manual export is the primary, documented path.** It works
-everywhere, including plain Claude Code with no browser. The operator:
-claude.ai → **Settings → Analytics → "How much is Claude costing?" → Export spend
-report → Last Month**, then drops the CSV at `$ROOT/raw/<YYYY-MM>/overage_spend.csv`
-and writes `raw/<YYYY-MM>/meta.json`:
-`{"period":"YYYY-MM","days_covered":<n>,"partial":false,"source":"manual export <date>"}`.
-
-> **90-day window — do not skip a month.** claude.ai only exports the trailing
-> ~90 days; a missed month is unrecoverable. If a month is missing at run time,
-> lead the summary with the gap — never backfill silently later.
-
-*Optional automation (Team):* for unattended daily pulls use the fixed script
-`fetch_surface_b_browser.py` (see `references/daily-refresh.md`) — an unattended
-Claude session is refused this by Claude Code's safety checks. Interactively, with
-Claude-in-Chrome: an authenticated in-page
-fetch of the same export over an **unofficial** endpoint (`org_id` + pattern in
-`pipeline.json`). It is the operator's own Owner session pulling their own export
-— same data as the button — but undocumented, so it can drift. Use only if a
-browser is available; fail loud (the validator + banner catch drift); never
-treat it as required. Details in `references/dashboard-guide.md`; the daily
-version (scheduled on the operator's Mac) is in `references/daily-refresh.md`.
-
-**Enterprise plan:** no browser step — `run_pipeline.py` (Step 2) fetches Surface
-B via the documented Analytics API (`fetch_surface_b_enterprise.py`). See the
-"Enterprise" caveat in the reference guide (built from docs, awaiting a live
-validator — see the roadmap).
-
-**On any failure** (not logged in, non-200, non-CSV): do not fabricate or skip
-silently. Write `meta.json` anyway so the period registers; validation stamps the
-gap; the dashboard and summary lead with the "Surface B missing" banner.
-
-### Step 2 — Scripted remainder
+**Run the engine only through the launcher.** It downloads the pinned engine release
+into `$FOLDER/.engine/` once, checks its fingerprint, and runs it:
 
 ```
-python3 $SKILL/scripts/run_pipeline.py "$ROOT" YYYY-MM
+python3 "$SKILL/scripts/aicfo_spend.py" "$FOLDER" <command> [arguments]
 ```
 
-In order: register the period (writes `raw/<period>/meta.json` if nothing has,
-so a month with no export still shows — flagged); `secure_key.py` (ingest a
-dropped `PASTE_ADMIN_KEY_HERE.txt`, if present); `ingest_ramp.py` (only when
-`api_cost_source` or `card_charges_source` is `"ramp"` — parses the Ramp answers
-saved into `raw/<period>/`); (Enterprise only) `fetch_surface_b_enterprise.py`;
-then `fetch_surface_c.py` (Admin API via key, when `api_cost_source` is
-`"admin_api"`, the default; gracefully `not_configured` if unset),
-`fetch_claude_code.py` (the Admin API's Claude Code usage report → per-person
-or per-key Claude Code usage; `not_configured` without a key),
-`validate_surface_b.py` (schema + sanity → `surface_b_status.json`),
-`apply_roster.py` (only when a `config/roster.xlsx|csv` exists — regenerates
-`config/org_chart.csv` + `config/seats.csv` from it),
-`build_workbooks.py` (rebuilds both `.xlsx` from **all** periods in `raw/`; writes
-`build_summary.json`), `build_artifact.py` (writes `artifacts/<period>_ai_spend.html`),
-`draft_slack.py` (writes `artifacts/<period>_slack_draft.txt`),
-`build_dashboard_datasets.py` (writes `dashboard/<id>.json` + `manifest.json`
-for the Claude Dashboard; `--datasets` on `run_pipeline.py` limits which).
+It needs Python 3.10 or later. If `python3` is older (macOS's built-in one is 3.9), say so
+and stop; don't install anything else. Commands: `init`, `settings`, `save`, `report`,
+`pace`, `forecast`, `dashboard`; each has `--help`.
 
-> **openpyxl is optional.** Without it, the summary, dashboard, and Slack draft
-> still build; only the two `.xlsx` workbooks are skipped. Install it for the
-> Excel files: `pip install openpyxl`.
+## Which path
 
-### Step 3 — Verify before reporting
+- **There's no `aicfo-spend.json` in the folder:** run Setup.
+- **Otherwise, a refresh was asked for or a scheduled task is running:** run the Daily refresh.
+- **Otherwise, a question about the numbers:** answer it from the latest
+  `out/<month>/dashboard.json` and `report` output, and refresh first if the latest
+  download is more than a day old.
 
-- `workbooks/build_summary.json` — confirm the new period appears with plausible
-  row counts and the expected flags.
-- If openpyxl is installed, recalculate `ai_spend_output.xlsx` (Excel/LibreOffice
-  recalc on open) and require zero formula errors.
-- Confirm `artifacts/<period>_ai_spend.html` exists and, if any surface status
-  isn't `ok`, carries the right banner.
+## Setup
 
-### Step 4 — Deliver
+Talk to the operator one step at a time; they mostly confirm.
 
-- Present the artifact file and the Slack draft text **verbatim** to the operator.
-- **Never send the Slack message; never auto-send anything.** If a Slack tool is
-  connected, you may offer to stage a *draft* only. The operator sends it.
+1. **Folder.** Agree on a folder outside any git repo, such as `~/Desktop/AI-Spend`.
+   Then run `init --company "<name>"`.
+2. **Ramp.** Call `ramp_get_ai_token_spend_connections`. Each provider whose Admin key is
+   plugged into Ramp is listed there. If Anthropic or OpenAI is missing, the **Ramp admin**
+   adds the key in Ramp's AI spend settings. Offer a short message the operator can
+   forward, and carry on.
+3. **Seats.** For each vendor, ask for each seat type's monthly price and how many were
+   bought. Examples: Claude Team standard and premium, or ChatGPT Business. Write them to
+   `aicfo-spend.json` as `seats.<vendor>.<seat type> = {"price_usd": …, "bought": …}`, with
+   vendors `anthropic` and `openai`. Check the file with `settings`.
+4. **People file.** `people.csv` has one row per seat held: `email`, `vendor` and
+   `seat_type`. Fill `name` and `team` only for someone Ramp doesn't know. Build it from the
+   admin member lists the operator exports from claude.ai and ChatGPT. **Ask about anything
+   unclear; never guess a seat type or a team.** A wrong guess files someone's spend under
+   the wrong team.
+5. **Who sees what.** `visibility` is `"team"` by default: shared outputs show teams, and
+   teams under 3 people fold together. Set `"person"` only when the operator says the
+   company has decided everyone with the link may see each person's spend. Never change
+   it yourself.
+6. **Extra usage.** On Claude Team, each person's extra usage comes only from the claude.ai
+   spend export. There are two ways to get it:
+   - **By hand:** claude.ai → Settings → Analytics → Export spend report.
+   - **Daily on a Mac:** the fixed script `scripts/fetch_spend_export.py`. A claude.ai Owner
+     signs it in once with `--login`.
+   **The export only reaches back 90 days, so a month that isn't saved within 90 days is
+   lost.** Save last month whole and this month so far (step 2 of the refresh).
+7. **First refresh**, then **schedule it**. Run the Daily refresh. Then offer a Cowork
+   scheduled task: daily, working in `$FOLDER`, with the instruction "Run the
+   ai-spend-analysis daily refresh in this folder." Say plainly that it runs only while
+   this computer is on. Show the task's settings and get a yes before creating it.
+
+## Daily refresh
+
+Every source is a day behind, so a refresh covers **through yesterday**. The month to refresh
+is the one that contains yesterday, so the run on the 1st closes out the month just ended.
+Below, `<first>` is that month's 1st, `<yesterday>` is yesterday and `<today>` is today, all as
+`YYYY-MM-DD`.
+
+1. **Save Ramp's numbers.** Follow every page, and write each answer to a file exactly as
+   Ramp returned it, with the pages' lists joined into one. Change nothing else, because the
+   engine checks the files.
+   - People: call `ramp_list_users` (page size 100). Write `{"users": [ … ]}` to
+     `$FOLDER/inbox/ramp-people.json`, then run
+     `save ramp-people --start <today> --file "$FOLDER/inbox/ramp-people.json"`.
+   - API spend: call `ramp_api_key_spend` with `from_date` = `<first>` and `to_date` =
+     `<today>`. Ramp's `to_date` is exclusive, so this reaches through yesterday. Use page
+     size 100 and no status filter, because a locked key can still have spent this month.
+     Write `{"data": [ … ]}` to `$FOLDER/inbox/ramp-api-keys.json`, then run
+     `save ramp-api-keys --start <first> --end <yesterday> --file "$FOLDER/inbox/ramp-api-keys.json"`.
+   - Delete each inbox file once its save succeeds.
+2. **Save any new spend export.** If the Mac script ran, it has already saved its export.
+   If the operator dropped an export in `$FOLDER/inbox/`, ask which days it covers. Then run
+   `save claude-spend-export --start <its first day> --end <its last day> --file <it>`.
+   It must start on a month's 1st and stay within one month.
+3. **Run the numbers.** Run `report <month>`, `pace <month>` and `dashboard <month>`. On the
+   1st to the 3rd, also run `report` for the month before, since it has just closed.
+4. **Show the results.** Lead with the pace line, then the alerts, then the notes, and
+   finish with the team table from `report`. Present the alerts as drafts: **never send
+   anything**. If a scheduled task is running, write the same summary to
+   `$FOLDER/out/<month>/summary.txt` and stop.
+
+**When something fails, say so in the summary's first line.** That includes a Ramp call,
+a save, or a missing export. Never fill a gap with a guess. A save that refuses a file says
+why; fix the cause, don't edit files in `raw/`.
+
+**If API spend reads near $0 while people use the API every day,** Ramp's connection may
+point at a different Anthropic Console organization than the one in use. The Ramp admin
+re-adds the right organization's Admin key in Ramp.
 
 ## Hard rules
 
-- **Read-only on every financial surface.** Never modify seats, plans, billing,
-  or org settings; sessions/keys are used for GET-equivalent reads only.
-- **Secrets never leak — the operator places them, not the assistant.** API keys
-  live only in env vars or `$ROOT/.secrets/` (gitignored). The friendly path is the
-  `PASTE_ADMIN_KEY_HERE.txt` drop file → `secure_key.py` (file → file, never through
-  chat or a command). Never solicit a key in chat; if one appears there, refuse it
-  and tell the operator to rotate. Never write a key to config, workbook, artifact,
-  log, or chat.
-- **Three surfaces stay visually distinct** everywhere. Overage is usage-credit
-  spend beyond allotments; in-allotment usage is tokens-only by design (not a bug).
-- **Fail loud.** A missing surface produces a banner + first-line summary alert,
-  never a silent gap. Empty months never pollute flag lookbacks.
-- **Config, not workbooks.** New hires / seat changes go in the roster
-  (`config/roster.xlsx|csv`) — or edit `config/*.csv` directly; new API keys go in
-  `config/api_key_map.csv`. The workbooks and artifact fully regenerate every run.
-- **The shared dashboard follows `dashboard_visibility`.** `"department"` (the
-  default) means no name or email is uploaded; `"person"` only when the operator
-  says their organization has decided to share per-person spend. The filter
-  runs before upload, because anyone who can open the dashboard can download
-  its rows. Never change the setting on your own.
-- **Scheduled jobs are proposals until approved.** Show the full routine or
-  launchd configuration and get a yes before creating either. Keys never go to
-  a cloud job: the cloud routine reads API cost through Ramp's connector and
-  holds no secret; anything needing the Admin key or a claude.ai login runs on
-  the operator's Mac.
-- **No real org data, no other vendors.** This ships with synthetic fixtures only;
-  it covers Anthropic/Claude spend, not OpenAI/Gemini (on the roadmap).
+- **Read-only** on every financial system. Never change seats, plans, billing, keys or settings.
+- **The tool never handles a key.** Ramp holds the Admin keys. If a key is pasted in chat,
+  don't use or store it. Tell the operator to revoke it, because it's now exposed, and that
+  keys go into Ramp's AI spend settings instead.
+- **Claude never drives claude.ai.** The spend export comes from the export button or the
+  fixed script, which a claude.ai Owner signs in once. An unattended Claude session isn't
+  allowed to export per-person data from an Owner's session.
+- **Visibility is the operator's call**, as Setup step 5 says. Anyone who can open a shared
+  output can download its rows.
+- **Drafts only.** Alerts and summaries are written for a person to send.
+- **Company data stays in `$FOLDER`.** Never copy it into a repo or anywhere else.
+- **Run only the pinned engine**, through the launcher. Never edit files in `raw/` or `.engine/`.
 
 ## Files
 
 | File | Purpose |
-|---|---|
-| `scripts/run_pipeline.py` | Orchestrator (plan-tier aware). Runtime entrypoint |
-| `scripts/fetch_surface_c.py` | Admin API pull (env / `.secrets` key; graceful-missing) |
-| `scripts/fetch_surface_b_enterprise.py` | Enterprise Surface B via the Analytics API (built from docs, untested live — roadmap) |
-| `scripts/validate_surface_b.py` | Schema + sanity check → `surface_b_status.json` |
-| `scripts/build_workbooks.py` | Both `.xlsx` + `build_summary.json` (openpyxl optional); hosts `load()`/`compute_flags()` |
-| `scripts/build_artifact.py` | Self-contained interactive HTML dashboard |
-| `scripts/draft_slack.py` | Draft summary `.txt` (never sends) |
-| `scripts/scaffold.py` | Create a fresh workspace + seed config from templates |
-| `scripts/bootstrap_roster.py` | Seed a fill-in `config/roster.xlsx` (or `.csv`) from the first spend export |
-| `scripts/apply_roster.py` | Turn the roster into `config/org_chart.csv` + `config/seats.csv` (rates from `pipeline.json` `seat_rates`) |
-| `scripts/fetch_claude_code.py` | Admin API Claude Code usage report → `raw/<period>/claude_code_usage.csv` (per person or API key, per day, per model) |
-| `scripts/ingest_ramp.py` | Parse saved Ramp answers into `api_usage_cost.csv` (Surface C) and `card_charges.csv` |
-| `scripts/build_dashboard_datasets.py` | The Claude Dashboard's datasets (`dashboard/*.json` + manifest), filtered by `dashboard_visibility` |
-| `scripts/dashboard_page.html` | The Claude Dashboard's page (written once to the dashboard's `files/index.html`) |
-| `references/daily-refresh.md` | Daily refresh runbook: dashboard setup, publishing datasets, the cloud routine, the Mac job, the Chrome export step, failure handling |
-| `scripts/doctor.py` | Setup checks in order, each with its fix and who can do it; the next step; `--fix-config`; logs setup time |
-| `scripts/match_roster.py` | Fill the roster from an HR/payroll export (email or name matching; reports ambiguity, never guesses) |
-| `scripts/fetch_surface_b_browser.py` | Team-plan spend export by fixed script (`--login` once, `--check`, daily fetch with month-end catch-up) |
-| `scripts/install_mac_job.py` | Preview, then install, the daily launchd job (generated commands, nothing typed) |
-| `scripts/uninstall.py` | Remove the job, login, key or data — lists first, acts only with `--yes` |
-| `references/setup-pitfalls.md` | Every failure seen in real installs, mapped to the doctor check that catches it; the roles setup needs |
-| `references/security-overview.md` | One page for an IT/security reviewer: what data goes where, who can see it, what holds credentials |
-| `scripts/secure_key.py` | Move an Admin key from the `PASTE_ADMIN_KEY_HERE.txt` drop file into `.secrets/` (600), then delete the drop |
-| `scripts/artifact_template.html` | The dashboard template (config-driven; single file, no external calls) |
-| `config.example/` | Templated config (fake values) — the shape setup fills in |
-| `fixtures/` | Synthetic 3-month dataset + `make_fixtures.py` (seeded) for tests |
-| `references/dashboard-guide.md` | Three-surface framing, plan-tier matrix, security model, data traps, roadmap |
-| `USER_GUIDE.md` | Friendly end-user walkthrough (setup → export → roster → optional key → reading the dashboard) |
-
-## Maintenance notes
-
-- Seat prices in `seats.csv` are list-rate assumptions; update if actual invoices differ.
-- **Endpoint drift (Team automation):** if the in-page spend-report fetch 404s,
-  rediscover the endpoint via DevTools/network capture on the export modal and
-  update `pipeline.json`. The manual export is always the safe fallback.
-- **Model lines evolve:** update `config/models.json` patterns — no code change needed.
+| --- | --- |
+| `scripts/aicfo_spend.py` | The launcher: downloads the pinned engine once, checks its fingerprint, runs it |
+| `scripts/fetch_spend_export.py` | The claude.ai spend export on a Mac, by a fixed script (`--login` once, then daily) |
+| `scripts/__tests__/` | Offline tests for both scripts: `python3 -m unittest discover -s scripts/__tests__` |
+| `references/security-overview.md` | One page for an IT or security reviewer: what data goes where, and who can see it |

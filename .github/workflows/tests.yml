@@ -20,14 +20,8 @@ jobs:
         working-directory: plugins/ai-cfo-lab/skills/ai-spend-analysis
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - uses: astral-sh/setup-uv@v6
-      # openpyxl is optional for the skill; installing it here also exercises the
-      # Excel workbook and roster paths.
-      - run: uv pip install --system openpyxl
-      - run: node --test scripts/__tests__/*.test.js
+          # The skill's scripts must run on Cowork's local shell, which has Python 3.10.
+          python-version: "3.10"
+      - run: python -m unittest discover -s scripts/__tests__ -v

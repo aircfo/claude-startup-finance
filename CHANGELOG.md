@@ -150,6 +150,33 @@ forward.
 
 ## `ai-cfo-lab`
 
+### [0.4.0] — Unreleased
+
+#### Changed
+
+- `ai-spend-analysis` is now a thin layer over the open-source engine
+  [aircfo/aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis), built on
+  Ramp. Anthropic and OpenAI seats, extra usage and API spend go to people and teams, with
+  this month's pace, next month's forecast and spike alerts. A launcher downloads the pinned
+  engine release once into the company's folder, checks its fingerprint, and runs it. The
+  daily refresh is a Cowork scheduled task. The claude.ai spend export comes from the export
+  button or the fixed Mac script, now `fetch_spend_export.py`.
+- Ramp holds the Admin keys, and the skill never handles one.
+- Shared outputs default to teams, with teams under 3 people folded together.
+
+#### Removed
+
+- The v0.3.0 pipeline, which the engine replaces: the doctor, the roster matcher, the Excel
+  workbooks and HTML dashboard, the Admin API and Claude Code fetchers, invoice
+  reconciliation, the Mac job installer and uninstaller, the fixtures and the user guide.
+  Their history moved to the engine repo's `legacy/` folder.
+- The two evals for the removed doctor and roster matcher. The other five were rewritten
+  for the new flow.
+
+#### Notes
+
+- CI runs the skill's two scripts' offline tests with Python's `unittest`.
+
 ### [0.3.0] — Unreleased
 
 #### Added

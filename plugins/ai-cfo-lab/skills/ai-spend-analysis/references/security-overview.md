@@ -1,85 +1,51 @@
 # Security overview
 
-One page for whoever approves this tool: what data it reads, where that data
-goes, who can see it, and what holds credentials. Everything below is the
-daily-dashboard setup; the monthly workflow is the same minus the dashboard
-and the scheduled jobs.
+One page for whoever approves this tool. It covers what data the tool reads, where that data goes, who can see it, and what holds credentials.
 
 ## Data flow
 
 ```
- claude.ai spend export ──(fixed script, Owner's saved login)──┐
- Anthropic Admin API ─────(Admin key, read endpoints only)────┼──► Workspace on one Mac ──(filtered datasets)──► Claude Dashboard
- Ramp ────────────────────(the operator's Ramp connector)─────┘     (local files)                                 (claude.ai, private
-                                                                                                                  until shared)
- Optional cloud routine: Ramp ──► org-wide API cost only ──────────────────────────────────────────────────────► same dashboard
+ Ramp ──────────────────(the operator's Ramp connector)───────┐
+ claude.ai spend export ─(export button, or the fixed script)─┼──► The company's folder ──► summaries and a team dashboard
+ Seat holders ──────────(admin member lists, by hand)─────────┘    (local files)            (drafts; shared only by a person)
 ```
 
 ## What is read
 
 | Source | What it contains | How it's reached |
 |---|---|---|
-| claude.ai spend export | Per person: email, product, model, requests, tokens, overage dollars | One GET request through a dedicated browser profile signed in by a claude.ai Owner |
-| Anthropic Admin API | Console API usage and cost; Claude Code usage per person or API key | An Admin API key stored on the Mac |
-| Ramp | Anthropic card charges (cardholder name, amount, date); API cost per model | The operator's own claude.ai Ramp connector (OAuth); Claude saves the answers |
-| HR / payroll export (once, at setup) | Names, departments, active status | A file the operator provides |
+| Ramp: API key spend | Each API key's name, owner, department tag and estimated cost, for Anthropic and OpenAI | Ramp's connector, under the operator's own Ramp login. Ramp holds the Admin keys. |
+| Ramp: people list | Each person's name, email, department and active status | The same connector |
+| claude.ai spend export | Each person's email, product, model and extra-usage dollars | The export button, or one GET request by a fixed script through a browser profile a claude.ai Owner signed in |
+| Admin member lists | Who holds which seat type, from claude.ai and ChatGPT | Files the operator exports and provides |
 
-Nothing is written to any of these systems. The tool never changes seats,
-billing, settings, cards or transactions, and never sends a message.
+Nothing is written to any of these systems. The tool never changes seats, billing, settings, keys or cards, and it never sends a message.
 
 ## What is stored, and where
 
-Everything lands in **one workspace folder on the operator's Mac**, outside any
-git repository, with a `.gitignore` covering every sensitive path:
+Everything lands in **one folder on the operator's computer**, outside any git repository.
 
-- `raw/`, `workbooks/`, `artifacts/`, `dashboard/` — per-person spend history,
-  kept until `uninstall.py --purge-data`.
-- `config/` — the roster (names, emails, departments, seat types).
-- `.secrets/anthropic_admin_key` — the Admin key, file mode 600.
-- `.browser-profile/` — the **claude.ai Owner session** the export uses. Treat
-  it like a password: anyone who can read this macOS user's files can act as
-  that Owner on claude.ai until the session expires or is signed out. Keep
-  FileVault on, don't share the macOS account, and remove it with
-  `uninstall.py --remove-login` when the tool is retired or the operator
-  changes.
-- `logs/` — job output and setup check statuses; no keys, and no spend in the
-  setup log.
+- **`raw/`** holds every download, saved once and read-only.
+- **`out/`** holds the spend table, the forecast plan, the alert drafts and the dashboard data.
+- **`aicfo-spend.json` and `people.csv`** hold seat prices and who holds a seat.
+- **`.engine/`** holds the pinned release of the open-source engine, checked against its fingerprint before it's run.
+- **`.browser-profile/`** is created only if the Mac script is used. It holds a **claude.ai Owner session**, so treat it like a password. Anyone who can read this computer account's files can act as that Owner on claude.ai until the session expires or is signed out. Keep FileVault on, don't share the account, and delete the folder when the tool is retired or the operator changes.
 
-## What leaves the Mac
+## What leaves the folder
 
-- **To the Claude Dashboard** (hosted on claude.ai under the operator's
-  account): the datasets `manifest.json` lists. With `dashboard_visibility:
-  "department"` (the default) no name or email is uploaded — people are summed
-  into departments first. With `"person"`, per-person rows are uploaded.
-  **Anyone the dashboard is shared with can download every row** from its
-  Sources panel, so sharing is the access control. The dashboard is private
-  until its owner shares it. Each refresh replaces the previous upload and
-  deletes it.
-- **To Claude** (the model), during the scheduled run: Ramp's answers (card
-  charges with cardholder names) and the pipeline's summaries, under the
-  operator's Claude plan terms. The spend export itself is fetched and saved by
-  code, not read by the model.
+- **Shared outputs.** The dashboard data shows teams by default. Teams under 3 people fold together, and no name, email or API key name is included. A person opts into the person view, which shows each person's spend. **Anyone a shared output reaches can read every number in it**, so sharing is the access control.
+- **What Claude reads.** During a refresh, Claude reads Ramp's answers and the tool's summaries, under the operator's Claude plan terms. Ramp's answers include people's names. The spend export is saved by code; Claude doesn't need to read it.
 
 ## Credentials
 
-| Credential | Power | Held | Limit it by |
+| Credential | Power | Held by | Limit it by |
 |---|---|---|---|
-| Anthropic Admin API key | Admin keys can do more than read; the scripts call only read endpoints | `.secrets/` on the Mac | A dedicated key for this tool; revoke it in platform.claude.com when retiring |
-| claude.ai Owner session | Full Owner access to claude.ai | `.browser-profile/` on the Mac | Dedicated profile, FileVault, `--remove-login` on retirement; signing out of claude.ai everywhere ends it |
-| Ramp connector | What the operator's Ramp role allows (the tool uses read tools only) | claude.ai (OAuth) | The operator's Ramp permissions |
-
-No credential is stored in the cloud. The optional cloud routine uses only the
-Ramp connector, under the operator's claude.ai account.
+| Anthropic and OpenAI Admin keys | More than reading usage | **Ramp**, never this tool | Ramp's AI spend settings; revoke them at the vendor when retiring |
+| Ramp connector | Whatever the operator's Ramp role allows; the tool uses read tools only | claude.ai (OAuth) | The operator's Ramp permissions |
+| claude.ai Owner session (Mac script only) | Full Owner access to claude.ai | `.browser-profile/` in the folder | FileVault; delete it on retirement; signing out of claude.ai everywhere ends it |
 
 ## Known risks
 
-- **Undocumented endpoint.** The Team-plan export uses the request behind the
-  claude.ai Export button, which Anthropic doesn't document and can change. A
-  change shows on the dashboard as a failed export; the manual export is the
-  fallback.
-- **Automation of an Owner session.** Claude Code's safety checks refuse to let
-  an unattended Claude session do this, so the export is a fixed script that
-  can make only that one request. Review `scripts/fetch_surface_b_browser.py`
-  before approving; it is short on purpose.
-- **Per-person visibility.** Choosing `"person"` makes individual spend visible
-  to everyone the dashboard is shared with.
+- **The export endpoint is undocumented.** The Mac script uses the request behind claude.ai's Export button. Anthropic doesn't document that request and can change it. A change shows as a failed export, and the button is the fallback.
+- **An Owner session is automated.** An unattended Claude session isn't allowed to do this, so the export is a fixed script that makes only that one request. Review `scripts/fetch_spend_export.py` before approving; it is short on purpose.
+- **The engine is downloaded code.** The launcher runs only the release whose fingerprint is pinned in `scripts/aicfo_spend.py`. Changing the version means changing the fingerprint in a reviewed pull request.

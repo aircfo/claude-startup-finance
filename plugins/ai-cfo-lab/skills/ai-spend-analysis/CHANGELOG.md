@@ -1,5 +1,24 @@
 # Changelog — ai-spend-analysis
 
+## v0.4.0 — Unreleased
+
+The skill becomes a thin layer over the open-source engine,
+[aircfo/aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis). The math
+moved there; the skill gathers the inputs and shows the answers.
+
+- `scripts/aicfo_spend.py` is the launcher. The first run downloads the pinned engine
+  release into the company's folder and checks its SHA-256. Later runs use it offline.
+  Nothing is installed.
+- Built on Ramp. API spend for Anthropic and OpenAI, and the people list, come through the
+  Ramp connector. Ramp holds the Admin keys.
+- `scripts/fetch_spend_export.py` replaces `fetch_surface_b_browser.py`. It hands each
+  export to the engine's `save`, and finishes last month first when its newest export
+  stops short.
+- The daily refresh is a Cowork scheduled task working in the company's folder.
+- Removed the v0.3.0 pipeline: the doctor, the roster matcher, the workbooks, the HTML
+  dashboard, the Admin API fetchers, reconciliation, the Mac job installer and the fixtures.
+  Its history is in the engine repo's `legacy/` folder until the cut-over deletes it.
+
 ## v0.3.0 — Unreleased
 
 Setup a non-technical operator can finish alone, and an outside company can
