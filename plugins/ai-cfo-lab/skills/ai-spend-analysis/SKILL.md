@@ -75,13 +75,21 @@ Talk to the operator one step at a time; they mostly confirm.
         settings, written in title case. Every cell starts at the chosen default.
       - Write the doc's link into `$FOLDER/roster.json` as `{"doc": "<link>", "defaults":
         {"anthropic": "<type or none>", "openai": "<type or none>"}}`.
-   3. **Fill in who's different.** Tell the operator there are two ways:
-      - They change the dropdowns in the doc themselves. Anyone missing from Ramp, such as a
-        contractor, gets a new row with their name and team.
-      - They export the member lists, from claude.ai (Settings → Members) and from ChatGPT's
-        admin console, and you set each matching person's seat in the doc. List anyone in an
-        export who isn't on the roster, and **ask** for their team. Never guess a seat type
-        or a team, because a wrong guess files someone's spend under the wrong team.
+   3. **Fill in who's different.** No member exports are needed, because the claude.ai
+      spend export lists everyone who used Claude in its period, $0 included. Once a whole
+      month's export is saved (step 6), add `--compare <that export in raw/>` to the run in
+      step 4.4. It prints two lists for the operator:
+      - **Not using Claude:** people the doc gives a Claude seat who aren't in the export.
+        They may have no seat; if so, set them to No account.
+      - **Not on the roster:** people in the export who aren't in the doc. Add them, and
+        **ask** for their team.
+
+      Then what's left is premium seats and anyone whose ChatGPT seat differs from the
+      default. With Claude in Chrome, read them yourself: the member lists on claude.ai
+      (Settings → Members) and in ChatGPT's admin console both show each person's seat type.
+      Set the doc's dropdowns to match and tell the operator what changed. Without it, the
+      operator changes those few in the doc, or hands you member exports to apply. Never guess a seat type or a team, because a wrong guess
+      files someone's spend under the wrong team.
    4. **Write `people.csv`.** Read the doc's table and write its rows to
       `$FOLDER/inbox/roster-rows.json` as `{"rows": [{"name", "email", "team", "seats":
       {"anthropic": "<cell>", "openai": "<cell>"}}]}`, each cell exactly as it reads. Then run
@@ -99,10 +107,15 @@ Talk to the operator one step at a time; they mostly confirm.
    company has decided everyone with the link may see each person's spend. Never change
    it yourself.
 6. **Extra usage.** On Claude Team, each person's extra usage comes only from the claude.ai
-   spend export. There are two ways to get it:
-   - **By hand:** claude.ai → Settings → Analytics → Export spend report.
-   - **Daily on a Mac:** the fixed script `scripts/fetch_spend_export.py`. A claude.ai Owner
-     signs it in once with `--login`.
+   spend export. There are three ways to get it:
+   - **Claude in Chrome (easiest):** with the extension connected and signed in to claude.ai
+     as an Owner, export it yourself: claude.ai → Settings → Analytics → Export spend report,
+     choosing the dates. Ask the operator once to set Chrome's download location to
+     `$FOLDER/inbox/`, so the file lands where you can save it. Because you chose the dates,
+     nobody has to say which file is which.
+   - **By hand:** the same steps, by the operator.
+   - **Daily on a Mac, with no Claude session:** the fixed script
+     `scripts/fetch_spend_export.py`. A claude.ai Owner signs it in once with `--login`.
    **The export only reaches back 90 days, so a month that isn't saved within 90 days is
    lost.** Save last month whole and this month so far (step 2 of the refresh).
 7. **First refresh**, then **schedule it**. Run the Daily refresh. Its first run also saves
@@ -149,12 +162,16 @@ Below, `<first>` is that month's 1st, `<yesterday>` is yesterday and `<today>` i
    - Delete each inbox file once its save succeeds.
    - **The roster:** read the roster doc. If its revision is newer than `synced_rev` in
      `roster.json`, someone edited it, so redo Setup step 4.4, which writes `people.csv` from it.
-2. **Save any new spend export.** If the Mac script ran, it has already saved its export.
-   If the operator dropped an export in `$FOLDER/inbox/`, ask which days it covers. Then run
-   `save claude-spend-export --start <its first day> --end <its last day> --file <it>`.
-   It must start on a month's 1st and stay within one month.
+2. **Save the spend export.** If the Mac script ran, it has already saved its export.
+   Otherwise, with Claude in Chrome signed in to claude.ai as an Owner, export `<first>`
+   through `<yesterday>` yourself and save it with those dates:
+   `save claude-spend-export --start <first> --end <yesterday> --file <it>`. A file the
+   operator dropped in `$FOLDER/inbox/` is saved the same way, after asking which days it
+   covers. An export must start on a month's 1st and stay within one month. In a scheduled
+   run, if Chrome asks before downloading, say so in the summary and carry on with the rest.
 3. **Run the numbers.** Run `report <month>`, `pace <month>` and `dashboard <month>`. On the
-   1st to the 3rd, also run `report` for the month before, since it has just closed.
+   1st to the 3rd, also run `report` for the month before, since it has just closed, and
+   compare its claude.ai export with the roster doc as in Setup step 4.3.
 4. **Update the page.** Run `python3 "$SKILL/scripts/build_dashboard_page.py" "$FOLDER" <month>`.
    It writes `$FOLDER/out/<month>/dashboard.html`, a self-contained page holding the
    engine's numbers, so nothing is retyped. Publish that file with the Artifact tool:
@@ -187,9 +204,12 @@ re-adds the right organization's Admin key in Ramp.
 - **The tool never handles a key.** Ramp holds the Admin keys. If a key is pasted in chat,
   don't use or store it. Tell the operator to revoke it, because it's now exposed, and that
   keys go into Ramp's AI spend settings instead.
-- **Claude never drives claude.ai.** The spend export comes from the export button or the
-  fixed script, which a claude.ai Owner signs in once. An unattended Claude session isn't
-  allowed to export per-person data from an Owner's session.
+- **In the browser, export and read only.** With Claude in Chrome signed in to claude.ai as
+  an Owner, or to ChatGPT as a workspace owner or admin, you may open the admin pages, read
+  the member lists and export the spend report. Use the browser's existing sign-in; never
+  type, ask for or store a password. Never change members, seats, billing or settings
+  there. If Chrome or Claude in Chrome asks for approval or refuses, stop and tell the
+  operator; don't work around it.
 - **Visibility is the operator's call**, as Setup step 5 says. Anyone who can open a shared
   output can download its rows.
 - **Drafts only.** Alerts and summaries are written for a person to send.

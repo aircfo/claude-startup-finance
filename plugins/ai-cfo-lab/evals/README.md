@@ -2,7 +2,7 @@
 
 Behavior tests for the skills in this plugin, run with `claude plugin eval`.
 Each case is one decision point where a wrong answer would hurt a real
-operator: accepting a key pasted in chat, driving claude.ai on a schedule,
+operator: accepting a key pasted in chat, typing a password into claude.ai,
 publishing per-person spend by default. Add a case whenever a real install
 finds Claude saying or doing the wrong thing.
 

@@ -15,6 +15,11 @@ moved there; the skill gathers the inputs and shows the answers.
   export to the engine's `save`, and finishes last month first when its newest export
   stops short.
 - The daily refresh is a Cowork scheduled task working in the company's folder.
+- With Claude in Chrome signed in as an Owner, Claude exports the claude.ai spend report
+  and reads the claude.ai and ChatGPT member lists itself, export and read only. This
+  replaces the rule that Claude never drives claude.ai.
+- No member exports are needed: the claude.ai spend export lists everyone who used Claude,
+  and `roster_to_people.py --compare` names roster seats the export doesn't show.
 - The seats roster is a Claude Doc built from Ramp's active users, with each
   person's Claude and ChatGPT seat as a dropdown that starts at the default the
   operator picks. `scripts/roster_to_people.py` writes `people.csv` from it.

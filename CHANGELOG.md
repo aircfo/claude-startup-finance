@@ -159,8 +159,9 @@ forward.
   Ramp. Anthropic and OpenAI seats, extra usage and API spend go to people and teams, with
   this month's pace, next month's forecast and spike alerts. A launcher downloads the pinned
   engine release once into the company's folder, checks its fingerprint, and runs it. The
-  daily refresh is a Cowork scheduled task. The claude.ai spend export comes from the export
-  button or the fixed Mac script, now `fetch_spend_export.py`.
+  daily refresh is a Cowork scheduled task. The claude.ai spend export comes from Claude in
+  Chrome in the Owner's signed-in browser (export and read only), the export button, or the
+  fixed Mac script, now `fetch_spend_export.py`.
 - Ramp holds the Admin keys, and the skill never handles one.
 - Shared outputs default to teams, with teams under 3 people folded together.
 

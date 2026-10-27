@@ -2,7 +2,7 @@
 """Write the engine's people.csv from the seats roster people edit.
 
 Usage:
-  python3 roster_to_people.py <folder> <roster rows file>
+  python3 roster_to_people.py <folder> <roster rows file> [--compare <claude.ai spend export>]
 
 The roster is a Claude Doc with one row per person: name, email, team, and a seat column
 per vendor. Claude reads its table and writes the rows to a JSON file:
@@ -14,6 +14,10 @@ This writes <folder>/people.csv: one row per seat held. A seat type must be one 
 settings file prices. Name and team are written only where the engine can't get them from
 Ramp's newest people list: for someone Ramp doesn't know, or a team that differs from
 Ramp's. That way a team changed in Ramp still flows through for everyone else.
+
+With --compare, it also lists who the roster gives a Claude seat but the export doesn't
+show using Claude, and who the export shows but the roster lacks. The export lists everyone
+who used Claude in its period, $0 included, so no member list is needed.
 """
 from __future__ import annotations
 
@@ -92,6 +96,38 @@ def people_rows(
     return out, summary
 
 
+def compare_with_export(roster: object, export_emails: set[str]) -> list[str]:
+    """Lines naming roster people with a Claude seat the export doesn't show, and export people the roster lacks."""
+    rows = roster.get("rows") if isinstance(roster, dict) else None
+    with_seat: set[str] = set()
+    on_roster: set[str] = set()
+    for row in rows if isinstance(rows, list) else []:
+        if not isinstance(row, dict):
+            continue
+        email = str(row.get("email") or "").strip().lower()
+        on_roster.add(email)
+        seats = row.get("seats") if isinstance(row.get("seats"), dict) else {}
+        if str(seats.get("anthropic") or "").strip().lower() not in NO_SEAT:
+            with_seat.add(email)
+    lines = []
+    idle = sorted(with_seat - export_emails)
+    if idle:
+        lines.append(f"Claude seat on the roster, but not in the export: {', '.join(idle)}")
+    missing = sorted(export_emails - on_roster)
+    if missing:
+        lines.append(f"In the export, but not on the roster: {', '.join(missing)}")
+    return lines or ["The roster's Claude seats match the export."]
+
+
+def export_emails(path: Path) -> set[str]:
+    with path.open(encoding="utf-8-sig", newline="") as export:
+        return {
+            row["user_email"].strip().lower()
+            for row in csv.DictReader(export)
+            if (row.get("user_email") or "").strip()
+        }
+
+
 def priced_seats(folder: Path) -> dict[str, set[str]]:
     settings = json.loads((folder / "aicfo-spend.json").read_text(encoding="utf-8"))
     seats = settings.get("seats") if isinstance(settings, dict) else None
@@ -133,19 +169,21 @@ def write_people_csv(folder: Path, rows: list[dict[str, str]]) -> Path:
 
 
 def main(argv: Sequence[str]) -> int:
-    if len(argv) != 2:
+    if len(argv) not in (2, 4) or (len(argv) == 4 and argv[2] != "--compare"):
         raise SystemExit(__doc__)
     folder, roster_file = Path(argv[0]).expanduser(), Path(argv[1]).expanduser()
+    roster = json.loads(roster_file.read_text(encoding="utf-8"))
     try:
-        rows, summary = people_rows(
-            json.loads(roster_file.read_text(encoding="utf-8")), priced_seats(folder), newest_ramp_people(folder)
-        )
+        rows, summary = people_rows(roster, priced_seats(folder), newest_ramp_people(folder))
     except RosterError as error:
         raise SystemExit(f"roster_to_people: {error}") from None
     path = write_people_csv(folder, rows)
     print(f"Wrote {path} ({len(rows)} seats)")
     for line in summary:
         print(f"  {line}")
+    if len(argv) == 4:
+        for line in compare_with_export(roster, export_emails(Path(argv[3]).expanduser())):
+            print(f"  {line}")
     return 0
 
 

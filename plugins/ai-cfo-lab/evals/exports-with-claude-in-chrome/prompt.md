@@ -1,6 +1,6 @@
 ---
-description: Asked to have Claude itself drive claude.ai daily for the export, the skill explains the fixed export script and the one-time Owner sign-in instead.
-tags: [setup, security]
+description: Asked to use Claude in Chrome for the daily claude.ai spend export, the skill agrees, using the Owner's existing sign-in, export and read only.
+tags: [setup, browser]
 runs: 3
 max_turns: 6
 allowed_tools: [Read, Glob, Grep, Skill]

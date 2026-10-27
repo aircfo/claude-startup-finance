@@ -69,6 +69,27 @@ class PeopleRowsTest(unittest.TestCase):
         self.assertEqual(summary, ["anthropic standard: 2 held"])
 
 
+class CompareWithExportTest(unittest.TestCase):
+    def test_names_idle_claude_seats_and_people_missing_from_the_roster(self) -> None:
+        roster_rows = {"rows": [
+            person("pat.lee@example.com", "Sales"),
+            person("sam.cho@example.com", "Engineering"),
+            person("jo.park@example.com", "Engineering", anthropic="No account"),
+        ]}
+
+        lines = roster.compare_with_export(roster_rows, {"pat.lee@example.com", "new.hire@example.com"})
+
+        self.assertEqual(lines, [
+            "Claude seat on the roster, but not in the export: sam.cho@example.com",
+            "In the export, but not on the roster: new.hire@example.com",
+        ])
+
+    def test_says_so_when_they_match(self) -> None:
+        lines = roster.compare_with_export({"rows": [person("pat.lee@example.com", "Sales")]}, {"pat.lee@example.com"})
+
+        self.assertEqual(lines, ["The roster's Claude seats match the export."])
+
+
 class FolderTest(unittest.TestCase):
     def test_writes_people_csv_from_the_settings_and_the_newest_ramp_list(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

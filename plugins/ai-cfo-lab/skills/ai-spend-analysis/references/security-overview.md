@@ -6,7 +6,7 @@ One page for whoever approves this tool. It covers what data the tool reads, whe
 
 ```
  Ramp ──────────────────(the operator's Ramp connector)───────┐
- claude.ai spend export ─(export button, or the fixed script)─┼──► The company's folder ──► summaries and a team dashboard
+ claude.ai spend export ─(Claude in Chrome, the button, or the script)─┼──► The company's folder ──► summaries and a team dashboard
  Seat holders ──────────(admin member lists, by hand)─────────┘    (local files)            (drafts; shared only by a person)
 ```
 
@@ -17,7 +17,7 @@ One page for whoever approves this tool. It covers what data the tool reads, whe
 | Ramp: API key spend | Each API key's name, owner, department tag and estimated cost, for Anthropic and OpenAI | Ramp's connector, under the operator's own Ramp login. Ramp holds the Admin keys. |
 | Ramp: vendor totals | Ramp's total API cost for Anthropic and OpenAI, including spend no current key carries | The same connector |
 | Ramp: people list | Each person's name, email, department and active status | The same connector |
-| claude.ai spend export | Each person's email, product, model and extra-usage dollars | The export button, or one GET request by a fixed script through a browser profile a claude.ai Owner signed in |
+| claude.ai spend export | Each person's email, product, model and extra-usage dollars | Claude in Chrome clicking the export button in the Owner's own signed-in Chrome, the button by hand, or one GET request by a fixed script through a browser profile a claude.ai Owner signed in |
 | Admin member lists | Who holds which seat type, from claude.ai and ChatGPT | Files the operator exports and provides |
 
 Nothing is written to any of these systems. The tool never changes seats, billing, settings, keys or cards, and it never sends a message.
@@ -48,5 +48,5 @@ Everything lands in **one folder on the operator's computer**, outside any git r
 ## Known risks
 
 - **The export endpoint is undocumented.** The Mac script uses the request behind claude.ai's Export button. Anthropic doesn't document that request and can change it. A change shows as a failed export, and the button is the fallback.
-- **An Owner session is automated.** An unattended Claude session isn't allowed to do this, so the export is a fixed script that makes only that one request. Review `scripts/fetch_spend_export.py` before approving; it is short on purpose.
+- **An Owner session is automated.** Claude in Chrome acts inside the Owner's signed-in Chrome. The skill limits it to reading member lists and exporting the spend report, never changing anything, and Chrome asks before a download. The Mac script makes only the export's one request; review `scripts/fetch_spend_export.py` before approving, as it is short on purpose.
 - **The engine is downloaded code.** The launcher runs only the release whose fingerprint is pinned in `scripts/aicfo_spend.py`. Changing the version means changing the fingerprint in a reviewed pull request.

@@ -14,10 +14,9 @@ Usage:
 
 The org id is in the address of claude.ai's admin pages: .../organizations/<org id>/...
 
-Why a fixed script: Team plans have no spend API, and an unattended Claude session is
-(rightly) refused permission to drive an Owner's claude.ai session to export per-person
-data. This script makes one kind of request, the GET behind the Export spend report
-button, and saves the bytes as received. That endpoint is UNDOCUMENTED and can change;
+Why a fixed script: Team plans have no spend API, and this runs daily with no Claude
+session and nothing to approve. It makes one kind of request, the GET behind the Export
+spend report button, and saves the bytes as received. That endpoint is UNDOCUMENTED and can change;
 every failure says so plainly, and the export button is always the fallback.
 """
 from __future__ import annotations
