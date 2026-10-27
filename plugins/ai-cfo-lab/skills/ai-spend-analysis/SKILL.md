@@ -34,7 +34,8 @@ and stop; don't install anything else. Commands: `init`, `settings`, `save`, `re
 
 ## Which path
 
-- **There's no `aicfo-spend.json` in the folder:** run Setup.
+- **Setup isn't finished:** there's no `aicfo-spend.json`, `settings` shows no seats, or
+  there's no `roster.json`. Run Setup, starting at the first step that isn't done.
 - **Otherwise, a refresh was asked for or a scheduled task is running:** run the Daily refresh.
 - **Otherwise, a question about the numbers:** answer it from the latest
   `out/<month>/dashboard.json` and `report` output, and refresh first if the latest
