@@ -21,10 +21,10 @@ import urllib.request
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-ENGINE_VERSION = "0.1.0"
+ENGINE_VERSION = "0.2.0"
 WHEEL_NAME = f"aicfo_spend_analysis-{ENGINE_VERSION}-py3-none-any.whl"
 WHEEL_URL = f"https://github.com/aircfo/aicfo-spend-analysis/releases/download/v{ENGINE_VERSION}/{WHEEL_NAME}"
-WHEEL_SHA256 = "8c7fa94282c4ddf848b78c04f4787ab90d4193590e89626d2918568def23bbde"
+WHEEL_SHA256 = "3f8d310a1dc7eec8c459ec7449bfac8539827a31e970433ab09de017b1e0833b"
 ENGINE_FOLDER = ".engine"
 MIN_PYTHON = (3, 10)
 
