@@ -54,11 +54,45 @@ Talk to the operator one step at a time; they mostly confirm.
    bought. Examples: Claude Team standard and premium, or ChatGPT Business. Write them to
    `aicfo-spend.json` as `seats.<vendor>.<seat type> = {"price_usd": …, "bought": …}`, with
    vendors `anthropic` and `openai`. Check the file with `settings`.
-4. **People file.** `people.csv` has one row per seat held: `email`, `vendor` and
-   `seat_type`. Fill `name` and `team` only for someone Ramp doesn't know. Build it from the
-   admin member lists the operator exports from claude.ai and ChatGPT. **Ask about anything
-   unclear; never guess a seat type or a team.** A wrong guess files someone's spend under
-   the wrong team.
+4. **The seats roster.** This is the company's list of who holds which seat. People keep it
+   as a Claude Doc, and the engine reads `people.csv`, which is written from it.
+   1. **Defaults first.** Before building anything, ask two questions with your
+      multiple-choice question tool if you have one, otherwise in chat:
+      - "What seat does a typical employee have on Claude?" Offer each Anthropic seat type
+        from step 3, plus **No account**.
+      - "And on ChatGPT?" Offer each OpenAI seat type, plus **No account**.
+
+      Recommend nothing; the operator knows their company.
+   2. **Build the doc.**
+      - Save the people list (step 1 of the refresh, People).
+      - Then create a Claude Doc titled "<company> AI seats". Its lead sentence says the
+        defaults chosen, and that people edit the seat columns.
+      - Below the lead, one table, with one row per **active** Ramp user, sorted by team, then
+        name. The columns are Name, Email, Team (Ramp's department), Claude seat and ChatGPT
+        seat.
+      - Each seat column is a dropdown. Its options are No account and each seat type from
+        settings, written in title case. Every cell starts at the chosen default.
+      - Write the doc's link into `$FOLDER/roster.json` as `{"doc": "<link>", "defaults":
+        {"anthropic": "<type or none>", "openai": "<type or none>"}}`.
+   3. **Fill in who's different.** Tell the operator there are two ways:
+      - They change the dropdowns in the doc themselves. Anyone missing from Ramp, such as a
+        contractor, gets a new row with their name and team.
+      - They export the member lists, from claude.ai (Settings → Members) and from ChatGPT's
+        admin console, and you set each matching person's seat in the doc. List anyone in an
+        export who isn't on the roster, and **ask** for their team. Never guess a seat type
+        or a team, because a wrong guess files someone's spend under the wrong team.
+   4. **Write `people.csv`.** Read the doc's table and write its rows to
+      `$FOLDER/inbox/roster-rows.json` as `{"rows": [{"name", "email", "team", "seats":
+      {"anthropic": "<cell>", "openai": "<cell>"}}]}`, each cell exactly as it reads. Then run
+      `python3 "$SKILL/scripts/roster_to_people.py" "$FOLDER" "$FOLDER/inbox/roster-rows.json"`.
+      It checks every seat type against settings and refuses the file with a list of what to
+      fix. It prints seats held by type: compare those with the seats bought in settings, and
+      ask about any difference. Delete the rows file afterwards, and record the doc's
+      revision number from that read as `"synced_rev"` in `roster.json`.
+
+   No Claude Docs tools in this session? Keep the roster in `people.csv` by hand instead.
+   It has one row per seat held: `email`, `vendor` and `seat_type`, plus `name` and `team`
+   only for someone Ramp doesn't know.
 5. **Who sees what.** `visibility` is `"team"` by default: shared outputs show teams, and
    teams under 3 people fold together. Set `"person"` only when the operator says the
    company has decided everyone with the link may see each person's spend. Never change
@@ -109,7 +143,11 @@ Below, `<first>` is that month's 1st, `<yesterday>` is yesterday and `<today>` i
      `{"users": [ … ]}` with each user's `email`, `first_name`, `last_name`,
      `department_name` and `is_inactive` to `$FOLDER/inbox/ramp-people.json`, then run
      `save ramp-people --start <today> --file "$FOLDER/inbox/ramp-people.json"`.
+     Then add any new active Ramp user to the roster doc with the defaults in
+     `roster.json`, and name them in the summary so someone checks their seats.
    - Delete each inbox file once its save succeeds.
+   - **The roster:** read the roster doc. If its revision is newer than `synced_rev` in
+     `roster.json`, someone edited it, so redo Setup step 4.4, which writes `people.csv` from it.
 2. **Save any new spend export.** If the Mac script ran, it has already saved its export.
    If the operator dropped an export in `$FOLDER/inbox/`, ask which days it covers. Then run
    `save claude-spend-export --start <its first day> --end <its last day> --file <it>`.
@@ -163,6 +201,7 @@ re-adds the right organization's Admin key in Ramp.
 | --- | --- |
 | `scripts/aicfo_spend.py` | The launcher: downloads the pinned engine once, checks its fingerprint, runs it |
 | `scripts/fetch_spend_export.py` | The claude.ai spend export on a Mac, by a fixed script (`--login` once, then daily) |
+| `scripts/roster_to_people.py` | Writes the engine's `people.csv` from the seats roster doc's rows, checking every seat type against settings |
 | `scripts/build_dashboard_page.py` | Puts the engine's `dashboard.json` into `dashboard_page.html`, giving one self-contained page to publish |
 | `scripts/dashboard_page.html` | The page: the month's verdict, where the money went, Unassigned and how to place it, the change from last month, and next month |
 | `scripts/__tests__/` | Offline tests for the scripts: `python3 -m unittest discover -s scripts/__tests__` |

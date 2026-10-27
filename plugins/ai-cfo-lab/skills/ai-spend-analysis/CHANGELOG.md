@@ -15,6 +15,9 @@ moved there; the skill gathers the inputs and shows the answers.
   export to the engine's `save`, and finishes last month first when its newest export
   stops short.
 - The daily refresh is a Cowork scheduled task working in the company's folder.
+- The seats roster is a Claude Doc built from Ramp's active users, with each
+  person's Claude and ChatGPT seat as a dropdown that starts at the default the
+  operator picks. `scripts/roster_to_people.py` writes `people.csv` from it.
 - A shared page, `scripts/dashboard_page.html`, built from the engine's `dashboard.json` by
   `scripts/build_dashboard_page.py` and published to one link that stays the same. It shows
   teams only unless the person view is on.
