@@ -82,17 +82,30 @@ is the one that contains yesterday, so the run on the 1st closes out the month j
 Below, `<first>` is that month's 1st, `<yesterday>` is yesterday and `<today>` is today, all as
 `YYYY-MM-DD`.
 
-1. **Save Ramp's numbers.** Follow every page, and write each answer to a file exactly as
-   Ramp returned it, with the pages' lists joined into one. Change nothing else, because the
-   engine checks the files.
-   - People: call `ramp_list_users` (page size 100). Write `{"users": [ … ]}` to
-     `$FOLDER/inbox/ramp-people.json`, then run
-     `save ramp-people --start <today> --file "$FOLDER/inbox/ramp-people.json"`.
-   - API spend: call `ramp_api_key_spend` with `from_date` = `<first>` and `to_date` =
-     `<today>`. Ramp's `to_date` is exclusive, so this reaches through yesterday. Use page
-     size 100 and no status filter, because a locked key can still have spent this month.
-     Write `{"data": [ … ]}` to `$FOLDER/inbox/ramp-api-keys.json`, then run
+1. **Save Ramp's numbers.** Follow every page and join the pages' lists into one. Copy
+   values exactly as Ramp returned them: the engine checks the files, and Ramp's own totals
+   check your copy.
+   - **API spend by key:** call `ramp_api_key_spend` with `from_date` = `<first>` and
+     `to_date` = `<today>`. Ramp's `to_date` is exclusive, so this reaches through
+     yesterday. Use page size 100 and no status filter, because a locked key can still have
+     spent this month. Write only the keys whose `estimated_cost.value` is above 0, and only
+     the fields the engine reads: `name`, `provider`, `owner` (just its `email`), `tags`
+     (just the `Department` one) and `estimated_cost`. Write it as `{"data": [ … ]}` to
+     `$FOLDER/inbox/ramp-api-keys.json`, then run
      `save ramp-api-keys --start <first> --end <yesterday> --file "$FOLDER/inbox/ramp-api-keys.json"`.
+   - **Ramp's total for each vendor:** call `ramp_get_ai_token_spend_aggregates` with
+     `metric` = `cost`, `group_by` = `["provider"]`, `providers` = `["ANTHROPIC", "OPENAI"]`,
+     `rollup` = `all`, `start_at` = `<first>` and `end_at` = `<today>`. Write each row's
+     `provider` and `total_cost` as `{"cost": {"data": [ … ]}}` to
+     `$FOLDER/inbox/ramp-provider-totals.json`, then run
+     `save ramp-provider-totals --start <first> --end <yesterday> --file "$FOLDER/inbox/ramp-provider-totals.json"`.
+     Spend this total has beyond the keys shows as Unassigned, "API spend not tied to a
+     current key". The usual cause is a key deleted or rotated during the month.
+   - **People:** only on the 1st, on Mondays, and at setup, because teams change slowly and
+     the list is the longest answer. Call `ramp_list_users` (page size 100), write
+     `{"users": [ … ]}` with each user's `email`, `first_name`, `last_name`,
+     `department_name` and `is_inactive` to `$FOLDER/inbox/ramp-people.json`, then run
+     `save ramp-people --start <today> --file "$FOLDER/inbox/ramp-people.json"`.
    - Delete each inbox file once its save succeeds.
 2. **Save any new spend export.** If the Mac script ran, it has already saved its export.
    If the operator dropped an export in `$FOLDER/inbox/`, ask which days it covers. Then run
@@ -108,6 +121,10 @@ Below, `<first>` is that month's 1st, `<yesterday>` is yesterday and `<today>` i
 **When something fails, say so in the summary's first line.** That includes a Ramp call,
 a save, or a missing export. Never fill a gap with a guess. A save that refuses a file says
 why; fix the cause, don't edit files in `raw/`.
+
+**If `report` says a vendor's keys add up to more than Ramp's total,** the per-key copy has a
+mistake. Call `ramp_api_key_spend` again, write the file again, and save it again; the newer
+save counts.
 
 **If API spend reads near $0 while people use the API every day,** Ramp's connection may
 point at a different Anthropic Console organization than the one in use. The Ramp admin

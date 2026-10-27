@@ -15,6 +15,7 @@ One page for whoever approves this tool. It covers what data the tool reads, whe
 | Source | What it contains | How it's reached |
 |---|---|---|
 | Ramp: API key spend | Each API key's name, owner, department tag and estimated cost, for Anthropic and OpenAI | Ramp's connector, under the operator's own Ramp login. Ramp holds the Admin keys. |
+| Ramp: vendor totals | Ramp's total API cost for Anthropic and OpenAI, including spend no current key carries | The same connector |
 | Ramp: people list | Each person's name, email, department and active status | The same connector |
 | claude.ai spend export | Each person's email, product, model and extra-usage dollars | The export button, or one GET request by a fixed script through a browser profile a claude.ai Owner signed in |
 | Admin member lists | Who holds which seat type, from claude.ai and ChatGPT | Files the operator exports and provides |
