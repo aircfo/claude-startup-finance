@@ -70,10 +70,13 @@ Talk to the operator one step at a time; they mostly confirm.
      signs it in once with `--login`.
    **The export only reaches back 90 days, so a month that isn't saved within 90 days is
    lost.** Save last month whole and this month so far (step 2 of the refresh).
-7. **First refresh**, then **schedule it**. Run the Daily refresh. Then offer a Cowork
-   scheduled task: daily, working in `$FOLDER`, with the instruction "Run the
-   ai-spend-analysis daily refresh in this folder." Say plainly that it runs only while
-   this computer is on. Show the task's settings and get a yes before creating it.
+7. **First refresh**, then **schedule it**. Run the Daily refresh. Its first run also saves
+   last month whole: Ramp's per-key spend and vendor totals for last month's 1st to its last
+   day, so the forecast and the change from last month have something to stand on. The
+   first run also creates the page; tell the operator it's private until they share it.
+   Then offer a Cowork scheduled task: daily, working in `$FOLDER`, with the instruction
+   "Run the ai-spend-analysis daily refresh in this folder." Say plainly that it runs only
+   while this computer is on. Show the task's settings and get a yes before creating it.
 
 ## Daily refresh
 
@@ -113,10 +116,19 @@ Below, `<first>` is that month's 1st, `<yesterday>` is yesterday and `<today>` i
    It must start on a month's 1st and stay within one month.
 3. **Run the numbers.** Run `report <month>`, `pace <month>` and `dashboard <month>`. On the
    1st to the 3rd, also run `report` for the month before, since it has just closed.
-4. **Show the results.** Lead with the pace line, then the alerts, then the notes, and
-   finish with the team table from `report`. Present the alerts as drafts: **never send
-   anything**. If a scheduled task is running, write the same summary to
-   `$FOLDER/out/<month>/summary.txt` and stop.
+4. **Update the page.** Run `python3 "$SKILL/scripts/build_dashboard_page.py" "$FOLDER" <month>`.
+   It writes `$FOLDER/out/<month>/dashboard.html`, a self-contained page holding the
+   engine's numbers, so nothing is retyped. Publish that file with the Artifact tool:
+   - **No `$FOLDER/dashboard-url.txt` yet:** publish it as a new page with the icon `chart`,
+     and write the link the tool returns into `$FOLDER/dashboard-url.txt`.
+   - **Otherwise:** read the page at that link first, then publish the file to that link
+     (`url`), so the link stays the same every day.
+   The page is private until the operator shares it from its Share menu. Never share it
+   yourself. It shows exactly what the `visibility` setting allows.
+5. **Show the results.** Give the page's link, then lead with the pace line, then the
+   alerts, then the notes, and finish with the team table from `report`. Present the alerts
+   as drafts: **never send anything**. If a scheduled task is running, write the same
+   summary to `$FOLDER/out/<month>/summary.txt` and stop.
 
 **When something fails, say so in the summary's first line.** That includes a Ramp call,
 a save, or a missing export. Never fill a gap with a guess. A save that refuses a file says
@@ -151,5 +163,7 @@ re-adds the right organization's Admin key in Ramp.
 | --- | --- |
 | `scripts/aicfo_spend.py` | The launcher: downloads the pinned engine once, checks its fingerprint, runs it |
 | `scripts/fetch_spend_export.py` | The claude.ai spend export on a Mac, by a fixed script (`--login` once, then daily) |
-| `scripts/__tests__/` | Offline tests for both scripts: `python3 -m unittest discover -s scripts/__tests__` |
+| `scripts/build_dashboard_page.py` | Puts the engine's `dashboard.json` into `dashboard_page.html`, giving one self-contained page to publish |
+| `scripts/dashboard_page.html` | The page: the month's verdict, where the money went, Unassigned and how to place it, the change from last month, and next month |
+| `scripts/__tests__/` | Offline tests for the scripts: `python3 -m unittest discover -s scripts/__tests__` |
 | `references/security-overview.md` | One page for an IT or security reviewer: what data goes where, and who can see it |

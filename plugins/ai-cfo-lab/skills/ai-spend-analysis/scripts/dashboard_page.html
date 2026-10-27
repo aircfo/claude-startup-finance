@@ -1,0 +1,536 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column. The month's verdict first, then where the money went, then what changes it. */
+:root {
+  --page: #f5f6f3;
+  --surface: #fcfcfb;
+  --ink: #121412;
+  --ink-2: #4c524e;
+  --muted: #7d837f;
+  --line: #e0e3dd;
+  --axis: #c3c7c0;
+  --accent: #1d5c48;
+  --seats: #2a78d6;
+  --extra: #eb6834;
+  --api: #1baf7a;
+  --projected: #a9b4ae;
+  --critical: #d03b3b;
+  --critical-text: #b02e2e;
+  --good: #0ca30c;
+  --good-text: #006300;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0e0f0e;
+    --surface: #1a1b1a;
+    --ink: #eff0ec;
+    --ink-2: #c4c7c0;
+    --muted: #8c918c;
+    --line: #2c2e2c;
+    --axis: #3a3d3a;
+    --accent: #7cc4a8;
+    --seats: #3987e5;
+    --extra: #d95926;
+    --api: #199e70;
+    --projected: #4d5650;
+    --critical: #e66767;
+    --critical-text: #f08a8a;
+    --good: #0ca30c;
+    --good-text: #3fc93f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0e0f0e;
+  --surface: #1a1b1a;
+  --ink: #eff0ec;
+  --ink-2: #c4c7c0;
+  --muted: #8c918c;
+  --line: #2c2e2c;
+  --axis: #3a3d3a;
+  --accent: #7cc4a8;
+  --seats: #3987e5;
+  --extra: #d95926;
+  --api: #199e70;
+  --projected: #4d5650;
+  --critical: #e66767;
+  --critical-text: #f08a8a;
+  --good: #0ca30c;
+  --good-text: #3fc93f;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.spend { max-width: 1040px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+h2 { font-size: 16px; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.masthead { display: flex; flex-direction: column; gap: 4px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.meta { color: var(--ink-2); font-size: 14px; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.panel-note { color: var(--muted); font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+/* The verdict */
+.verdict { gap: 18px; }
+.verdict-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.hero-label { color: var(--ink-2); font-size: 14px; }
+.hero { font-size: 52px; font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.chip.over { color: var(--critical-text); }
+.chip.under { color: var(--good-text); }
+.chip.none { color: var(--muted); }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; }
+.figure-label { color: var(--muted); font-size: 13px; }
+.figure-value { font-size: 20px; font-weight: 600; }
+.figure-sub { color: var(--ink-2); font-size: 13px; }
+
+.bullet { position: relative; height: 22px; background: color-mix(in srgb, var(--line) 55%, transparent); border-radius: 4px; }
+.bullet-so-far, .bullet-projected { position: absolute; top: 0; bottom: 0; left: 0; }
+.bullet-projected { background: var(--projected); border-radius: 0 4px 4px 0; }
+.bullet-so-far { background: var(--ink-2); border-radius: 0 4px 4px 0; }
+.bullet-plan { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--ink); }
+.bullet-key { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.swatch.tick { width: 2px; height: 14px; border-radius: 0; background: var(--ink); }
+
+/* Alerts */
+.alerts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.alert { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: start; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--line); border-left: 3px solid var(--critical); }
+.alert-kind { font-family: var(--font-data); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--critical-text); padding-top: 2px; }
+.draft-tag { font-size: 12px; color: var(--muted); }
+.empty { color: var(--ink-2); }
+
+/* Where it went */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
+.bars { display: flex; flex-direction: column; gap: 10px; position: relative; }
+.bar-row { display: grid; grid-template-columns: minmax(120px, 190px) 1fr minmax(84px, auto); align-items: center; gap: 12px; }
+.bar-name { font-size: 14px; overflow-wrap: anywhere; }
+.bar-name.unassigned { color: var(--ink-2); font-style: italic; }
+.bar-track { display: flex; gap: 2px; height: 18px; min-width: 0; }
+.seg { height: 100%; min-width: 2px; cursor: default; }
+.seg:last-child { border-radius: 0 4px 4px 0; }
+.seg.seats { background: var(--seats); }
+.seg.extra { background: var(--extra); }
+.seg.api { background: var(--api); }
+.seg:hover, .seg:focus-visible { filter: brightness(1.12); }
+.bar-total { font-family: var(--font-data); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tooltip { position: absolute; pointer-events: none; z-index: 5; background: var(--ink); color: var(--surface); border-radius: 6px; padding: 6px 10px; font-size: 13px; line-height: 1.35; max-width: 240px; }
+.tooltip strong { display: block; font-size: 14px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; white-space: normal; padding-left: 0; }
+th { font-weight: 500; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+td { font-variant-numeric: tabular-nums; }
+td.num { font-family: var(--font-data); font-size: 13px; }
+tr.total td { font-weight: 600; border-bottom: none; }
+tr.unassigned td:first-child { font-style: italic; color: var(--ink-2); }
+details > summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+details[open] > summary { margin-bottom: 10px; }
+
+.reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.reason { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
+.reason-amount { font-family: var(--font-data); font-size: 13px; text-align: right; }
+.reason-fix { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+
+.notes { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--ink-2); font-size: 14px; }
+.footer { color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+
+@media (max-width: 560px) {
+  .hero { font-size: 44px; }
+  .bar-row { grid-template-columns: 1fr auto; gap: 4px 12px; }
+  .bar-track { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .seg { transition: filter 120ms ease; }
+}
+</style>
+
+<main class="spend" aria-live="polite">
+  <header class="masthead">
+    <p class="eyebrow" id="eyebrow">AI spend</p>
+    <h1 id="title">AI spend</h1>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <section class="panel verdict" aria-labelledby="verdict-heading">
+    <h2 id="verdict-heading" hidden>Where this month is heading</h2>
+    <div class="verdict-top">
+      <div>
+        <p class="hero-label">On pace for</p>
+        <p class="hero" id="on-pace">—</p>
+      </div>
+      <span class="chip none" id="pace-chip">No plan yet</span>
+    </div>
+    <div class="bullet" id="bullet" role="img" aria-label="Spend so far and projected month end, against the plan">
+      <div class="bullet-projected" id="bullet-projected"></div>
+      <div class="bullet-so-far" id="bullet-so-far"></div>
+      <div class="bullet-plan" id="bullet-plan" hidden></div>
+    </div>
+    <div class="bullet-key">
+      <span class="key"><span class="swatch" style="background: var(--ink-2)"></span>So far</span>
+      <span class="key"><span class="swatch" style="background: var(--projected)"></span>Rest of the month, projected</span>
+      <span class="key" id="plan-key" hidden><span class="swatch tick"></span>Plan</span>
+    </div>
+    <div class="figures">
+      <div><p class="figure-label">So far</p><p class="figure-value" id="so-far">—</p><p class="figure-sub" id="through"></p></div>
+      <div><p class="figure-label">Plan</p><p class="figure-value" id="plan">—</p><p class="figure-sub" id="plan-sub"></p></div>
+      <div><p class="figure-label">Next month, forecast</p><p class="figure-value" id="forecast">—</p><p class="figure-sub" id="forecast-sub"></p></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="alerts-heading">
+    <div class="panel-head">
+      <h2 id="alerts-heading">Alerts</h2>
+      <p class="panel-note">Drafts for a person to send. Nothing here was sent.</p>
+    </div>
+    <ul class="alerts" id="alerts"></ul>
+  </section>
+
+  <section class="panel" aria-labelledby="teams-heading">
+    <div class="panel-head">
+      <h2 id="teams-heading">Where it went, by team</h2>
+      <p class="panel-note" id="teams-note"></p>
+    </div>
+    <div class="legend" aria-hidden="true">
+      <span class="key"><span class="swatch" style="background: var(--seats)"></span>Seats</span>
+      <span class="key"><span class="swatch" style="background: var(--extra)"></span>Extra usage</span>
+      <span class="key"><span class="swatch" style="background: var(--api)"></span>API</span>
+    </div>
+    <div class="bars" id="bars"></div>
+    <details>
+      <summary>Show as a table</summary>
+      <div class="table-wrap"><table id="teams-table"></table></div>
+    </details>
+  </section>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="unassigned-heading">
+      <div class="panel-head"><h2 id="unassigned-heading">Unassigned, and how to place it</h2></div>
+      <ul class="reasons" id="reasons"></ul>
+    </section>
+    <section class="panel" aria-labelledby="vendors-heading">
+      <div class="panel-head"><h2 id="vendors-heading">By vendor</h2></div>
+      <div class="table-wrap"><table id="vendors-table"></table></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="change-heading">
+    <div class="panel-head">
+      <h2 id="change-heading">Change from last month</h2>
+      <p class="panel-note" id="change-note"></p>
+    </div>
+    <div class="table-wrap"><table id="change-table"></table></div>
+    <div id="models" hidden>
+      <h3 class="figure-label">Extra usage by model, biggest moves first</h3>
+      <div class="table-wrap"><table id="models-table"></table></div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="pace-heading">
+      <div class="panel-head"><h2 id="pace-heading">This month by team</h2></div>
+      <div class="table-wrap"><table id="pace-table"></table></div>
+    </section>
+    <section class="panel" aria-labelledby="forecast-heading">
+      <div class="panel-head">
+        <h2 id="forecast-heading">Next month by team</h2>
+        <p class="panel-note" id="forecast-note"></p>
+      </div>
+      <div class="table-wrap"><table id="forecast-table"></table></div>
+    </section>
+  </div>
+
+  <section class="panel" id="people-panel" aria-labelledby="people-heading" hidden>
+    <div class="panel-head">
+      <h2 id="people-heading">By person</h2>
+      <p class="panel-note">Shown because this company turned on the person view.</p>
+    </div>
+    <div class="table-wrap"><table id="people-table"></table></div>
+    <h3 class="figure-label">API keys</h3>
+    <div class="table-wrap"><table id="keys-table"></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="notes-heading">
+    <div class="panel-head"><h2 id="notes-heading">Notes on the data</h2></div>
+    <ul class="notes" id="notes"></ul>
+  </section>
+
+  <footer class="footer">
+    <p id="made-with"></p>
+    <p>Read-only: nothing here changes seats, billing or keys, and nothing is sent.</p>
+  </footer>
+</main>
+
+<script type="application/json" id="spend-data">__DASHBOARD_JSON__</script>
+<script>
+(function () {
+  "use strict";
+  const data = JSON.parse(document.getElementById("spend-data").textContent);
+  const PRODUCTS = [
+    { field: "seats_cents", name: "Seats", cls: "seats" },
+    { field: "extra_usage_cents", name: "Extra usage", cls: "extra" },
+    { field: "api_cents", name: "API", cls: "api" },
+  ];
+  const REASON_FIXES = {
+    "no team on the people list": "Give these people a team in people.csv, or add them to Ramp with a department.",
+    "key with no team": "Tag these API keys with a department in Ramp, or give them an owner.",
+    "empty seat": "Paid seats nobody holds: reclaim them, or correct the seats bought in settings.",
+    "API spend not tied to a current key": "Spend Ramp counts but no current key carries, usually a key deleted or rotated this month.",
+  };
+  const UNASSIGNED = "Unassigned";
+
+  const byId = (id) => document.getElementById(id);
+  const text = (el, value) => { el.textContent = value; return el; };
+  const make = (tag, cls, value) => {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (value !== undefined) el.textContent = value;
+    return el;
+  };
+  const money = (cents) => (cents < 0 ? "-" : "") + "$" + (Math.abs(cents) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const wholeMoney = (cents) => "$" + Math.round(cents / 100).toLocaleString("en-US");
+  const monthName = (label) => {
+    const [year, month] = label.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, 1)).toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  };
+  const dayName = (iso) => {
+    const [year, month, day] = iso.slice(0, 10).split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day)).toLocaleString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  };
+  const change = (before, after) => {
+    const difference = after - before;
+    if (Math.abs(difference) < 1) return "no change";
+    const sign = difference > 0 ? "+" : "-";
+    if (before === 0) return sign + money(Math.abs(difference)) + " (new)";
+    return sign + money(Math.abs(difference)) + " (" + sign + Math.round(Math.abs(difference) / before * 100) + "%)";
+  };
+
+  function table(el, headings, rows, options) {
+    const opts = options || {};
+    el.replaceChildren();
+    const head = el.createTHead().insertRow();
+    headings.forEach((heading) => head.appendChild(make("th", "", heading)));
+    const body = el.createTBody();
+    rows.forEach((cells) => {
+      const row = body.insertRow();
+      if (opts.rowClass) row.className = opts.rowClass(cells) || "";
+      cells.forEach((cell, index) => row.appendChild(make("td", index === 0 ? "" : "num", cell)));
+    });
+    if (opts.total) {
+      const row = body.insertRow();
+      row.className = "total";
+      opts.total.forEach((cell, index) => row.appendChild(make("td", index === 0 ? "" : "num", cell)));
+    }
+  }
+
+  const about = data.about;
+  const spend = data.spend;
+  const pace = data.pace;
+  const forecast = data.forecast;
+  const company = about.company || "Your company";
+
+  // Masthead
+  text(byId("eyebrow"), monthName(about.month));
+  text(byId("title"), company + " AI spend");
+  const through = pace.through || Object.values(spend.through || {}).sort()[0];
+  const metaParts = [];
+  if (through) metaParts.push("Data through " + dayName(through));
+  metaParts.push("refreshed " + dayName(about.made_on));
+  metaParts.push(about.view === "person" ? "person view" : "teams only, small teams folded together");
+  text(byId("meta"), metaParts.join(" · "));
+
+  // The verdict
+  text(byId("on-pace"), wholeMoney(pace.on_pace_for_cents));
+  text(byId("so-far"), wholeMoney(pace.so_far_cents));
+  text(byId("through"), through ? "through " + dayName(through) : "");
+  const chip = byId("pace-chip");
+  if (pace.plan) {
+    const plan = pace.plan.total_cents;
+    text(byId("plan"), wholeMoney(plan));
+    text(byId("plan-sub"), "the forecast made as of " + dayName(pace.plan.made_as_of));
+    const percent = plan > 0 ? Math.round((pace.on_pace_for_cents - plan) / plan * 100) : 0;
+    if (percent > 0) {
+      chip.className = "chip over";
+      text(chip, "▲ " + percent + "% over plan");
+    } else {
+      chip.className = "chip under";
+      text(chip, percent === 0 ? "On plan" : "▼ " + Math.abs(percent) + "% under plan");
+    }
+  } else {
+    text(byId("plan-sub"), "Saved once a month has full history behind it");
+  }
+  text(byId("forecast"), wholeMoney(forecast.total_cents));
+  text(byId("forecast-sub"), monthName(forecast.month));
+
+  const scale = Math.max(pace.on_pace_for_cents, pace.plan ? pace.plan.total_cents : 0, 1) * 1.04;
+  byId("bullet-so-far").style.width = (pace.so_far_cents / scale * 100) + "%";
+  byId("bullet-projected").style.width = (pace.on_pace_for_cents / scale * 100) + "%";
+  if (pace.plan) {
+    const tick = byId("bullet-plan");
+    tick.style.left = "calc(" + (pace.plan.total_cents / scale * 100) + "% - 1px)";
+    tick.hidden = false;
+    byId("plan-key").hidden = false;
+  }
+  byId("bullet").setAttribute("aria-label",
+    "So far " + wholeMoney(pace.so_far_cents) + ", on pace for " + wholeMoney(pace.on_pace_for_cents) +
+    (pace.plan ? ", against a plan of " + wholeMoney(pace.plan.total_cents) : ""));
+
+  // Alerts
+  const alerts = byId("alerts");
+  if (data.alerts.length === 0) {
+    alerts.appendChild(make("li", "empty", "No alerts this month."));
+  }
+  data.alerts.forEach((alert) => {
+    const item = make("li", "alert");
+    const [kind, ...rest] = alert.split(": ");
+    item.appendChild(make("span", "alert-kind", rest.length ? kind : "Alert"));
+    const body = make("div");
+    body.appendChild(make("p", "", rest.length ? rest.join(": ") : alert));
+    body.appendChild(make("p", "draft-tag", "Draft, not sent"));
+    item.appendChild(body);
+    alerts.appendChild(item);
+  });
+
+  // Where it went, by team
+  const teams = spend.by_team;
+  const largest = Math.max(1, ...teams.map((team) => team.total_cents));
+  const bars = byId("bars");
+  const tooltip = make("div", "tooltip");
+  tooltip.hidden = true;
+  bars.appendChild(tooltip);
+  const showTip = (segment, title, value) => {
+    tooltip.replaceChildren(make("strong", "", value), document.createTextNode(title));
+    tooltip.hidden = false;
+    const box = bars.getBoundingClientRect();
+    const mark = segment.getBoundingClientRect();
+    const left = Math.min(Math.max(mark.left - box.left + mark.width / 2 - tooltip.offsetWidth / 2, 0), box.width - tooltip.offsetWidth);
+    tooltip.style.left = left + "px";
+    tooltip.style.top = (mark.top - box.top - tooltip.offsetHeight - 6) + "px";
+  };
+  const hideTip = () => { tooltip.hidden = true; };
+  teams.forEach((team) => {
+    const row = make("div", "bar-row");
+    row.appendChild(make("span", "bar-name" + (team.team === UNASSIGNED ? " unassigned" : ""), team.team));
+    const track = make("div", "bar-track");
+    track.style.width = (team.total_cents / largest * 100) + "%";
+    PRODUCTS.forEach((product) => {
+      const cents = team[product.field];
+      if (cents <= 0) return;
+      const segment = make("span", "seg " + product.cls);
+      segment.style.flex = cents + " 1 0";
+      segment.tabIndex = 0;
+      const label = team.team + " · " + product.name;
+      segment.setAttribute("aria-label", label + ": " + money(cents));
+      segment.addEventListener("pointerenter", () => showTip(segment, label, money(cents)));
+      segment.addEventListener("focus", () => showTip(segment, label, money(cents)));
+      segment.addEventListener("pointerleave", hideTip);
+      segment.addEventListener("blur", hideTip);
+      track.appendChild(segment);
+    });
+    const holder = make("div");
+    holder.style.minWidth = "0";
+    holder.appendChild(track);
+    row.appendChild(holder);
+    row.appendChild(make("span", "bar-total", money(team.total_cents)));
+    bars.appendChild(row);
+  });
+  const columnTotals = PRODUCTS.map((product) => teams.reduce((sum, team) => sum + team[product.field], 0));
+  table(byId("teams-table"), ["Team", "Seats", "Extra usage", "API", "Total"],
+    teams.map((team) => [team.team, ...PRODUCTS.map((product) => money(team[product.field])), money(team.total_cents)]),
+    { total: ["Total", ...columnTotals.map(money), money(spend.total_cents)],
+      rowClass: (cells) => cells[0] === UNASSIGNED ? "unassigned" : "" });
+  text(byId("teams-note"), money(spend.total_cents) + " this month" + (through ? ", through " + dayName(through) : ""));
+
+  // Unassigned
+  const reasons = byId("reasons");
+  if (spend.unassigned_by_reason.length === 0) {
+    reasons.appendChild(make("li", "empty", "Every dollar is on a team."));
+  }
+  spend.unassigned_by_reason.forEach((reason) => {
+    const item = make("li", "reason");
+    item.appendChild(make("span", "", reason.reason.charAt(0).toUpperCase() + reason.reason.slice(1)));
+    item.appendChild(make("span", "reason-amount", money(reason.total_cents)));
+    if (REASON_FIXES[reason.reason]) item.appendChild(make("span", "reason-fix", REASON_FIXES[reason.reason]));
+    reasons.appendChild(item);
+  });
+
+  // By vendor
+  const vendorName = (vendor) => ({ anthropic: "Anthropic", openai: "OpenAI" }[vendor] || vendor);
+  table(byId("vendors-table"), ["Vendor", "Seats", "Extra usage", "API", "Total"],
+    spend.by_vendor.map((vendor) => [vendorName(vendor.vendor), ...PRODUCTS.map((product) => money(vendor[product.field])), money(vendor.total_cents)]));
+
+  // Change from last month
+  const changes = data.change_from_last_month;
+  if (changes) {
+    text(byId("change-note"), "Against " + monthName(changes.previous_month));
+    table(byId("change-table"), ["Team", monthName(changes.previous_month), monthName(about.month), "Change"],
+      changes.by_team.map((row) => [row.team, money(row.previous_cents), money(row.current_cents), change(row.previous_cents, row.current_cents)]),
+      { rowClass: (cells) => cells[0] === UNASSIGNED ? "unassigned" : "" });
+    if (changes.by_model.length) {
+      byId("models").hidden = false;
+      table(byId("models-table"), ["Model", "Last month", "This month", "Change"],
+        changes.by_model.slice(0, 8).map((row) => [row.model, money(row.previous_cents), money(row.current_cents), change(row.previous_cents, row.current_cents)]));
+    }
+  } else {
+    byId("change-table").replaceWith(make("p", "empty", "No usage is saved for last month, so there's nothing to compare."));
+  }
+
+  // This month and next, by team
+  table(byId("pace-table"), ["Team", "So far", "On pace for"],
+    pace.by_team.map((row) => [row.team, money(row.so_far_cents), money(row.on_pace_for_cents)]),
+    { total: ["Total", money(pace.so_far_cents), money(pace.on_pace_for_cents)],
+      rowClass: (cells) => cells[0] === UNASSIGNED ? "unassigned" : "" });
+  table(byId("forecast-table"), ["Team", "Forecast"],
+    forecast.by_team.map((row) => [row.team, money(row.total_cents)]),
+    { total: ["Total", money(forecast.total_cents)],
+      rowClass: (cells) => cells[0] === UNASSIGNED ? "unassigned" : "" });
+  const spans = Object.entries(forecast.averaged_over || {})
+    .filter(([, months]) => months.length)
+    .map(([product, months]) => ({ "extra usage": "extra usage", api: "API" }[product] || product) +
+      " averaged over " + months.length + (months.length === 1 ? " month" : " months"));
+  text(byId("forecast-note"), monthName(forecast.month) + (spans.length ? "; " + spans.join(", ") : ""));
+
+  // The person view
+  if (spend.by_person) {
+    byId("people-panel").hidden = false;
+    table(byId("people-table"), ["Person", "Seats", "Extra usage", "API", "Total"],
+      spend.by_person.map((person) => [person.person, ...PRODUCTS.map((product) => money(person[product.field])), money(person.total_cents)]));
+    table(byId("keys-table"), ["Key", "Vendor", "Owner", "Team", "Spend"],
+      (spend.api_keys || []).map((key) => [key.api_key, vendorName(key.vendor), key.owner || "no owner", key.team, money(key.total_cents)]));
+  }
+
+  // Notes and footer
+  const notes = byId("notes");
+  const allNotes = data.notes.concat(changes ? changes.notes : []);
+  if (allNotes.length === 0) notes.appendChild(make("li", "", "Nothing missing or partial."));
+  [...new Set(allNotes)].forEach((note) => notes.appendChild(make("li", "", note.charAt(0).toUpperCase() + note.slice(1))));
+  text(byId("made-with"), "Made with " + about.tool + ", open-source AI spend analysis built on Ramp.");
+})();
+</script>

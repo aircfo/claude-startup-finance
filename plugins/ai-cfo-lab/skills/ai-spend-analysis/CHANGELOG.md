@@ -15,6 +15,9 @@ moved there; the skill gathers the inputs and shows the answers.
   export to the engine's `save`, and finishes last month first when its newest export
   stops short.
 - The daily refresh is a Cowork scheduled task working in the company's folder.
+- A shared page, `scripts/dashboard_page.html`, built from the engine's `dashboard.json` by
+  `scripts/build_dashboard_page.py` and published to one link that stays the same. It shows
+  teams only unless the person view is on.
 - Removed the v0.3.0 pipeline: the doctor, the roster matcher, the workbooks, the HTML
   dashboard, the Admin API fetchers, reconciliation, the Mac job installer and the fixtures.
   Its history is in the engine repo's `legacy/` folder until the cut-over deletes it.
