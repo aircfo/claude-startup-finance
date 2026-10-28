@@ -9,6 +9,8 @@ Generate a new finance workflow skill for the user to save into their own worksp
 
 The hard part of authoring a skill isn't the markdown — it's pinning down the tacit steps a finance person runs on autopilot. This skill does that extraction for them, then bakes in the non-negotiables so they never have to know those rules exist.
 
+**Working in a Finance Brain folder?** If the session's folder has a `CLAUDE.md` plus `handbook/` and `skills/` (the airCFO Finance Brain Starter Kit), use that folder's `new-skill` skill instead: it saves the new skill into the folder's `skills/`, proves it against last month's result in `testing/`, and adds it to the `CLAUDE.md` skills table, so the whole team gets it. Use this builder outside a Finance Brain.
+
 ## What this produces
 A complete, house-style `SKILL.md`, **presented in the chat** for the finance pro to take — they can download it or drop it into their own skills folder. Don't write it to their disk for them; hand over the finished file and tell them exactly where it goes:
 - **`~/.claude/skills/<name>/SKILL.md`** — available in every project (the usual home for a personal workflow).

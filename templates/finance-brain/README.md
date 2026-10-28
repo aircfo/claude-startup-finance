@@ -47,9 +47,10 @@ part of the kit that gets you to the next one.
 example `~/Documents/Finance Brain/`), and add it to Cowork with **Work in a folder**. Cowork
 reads `CLAUDE.md` automatically every time you work there.
 
-**Claude Code:** open the folder as your project and copy the folders in `skills/` into
-`.claude/skills/`. Each skill then runs when a request matches it, or directly as a slash
-command such as `/build-handbook`.
+**Claude Code:** open the folder as your project and link the skills folder so Claude Code
+uses the same files you edit: `mkdir -p .claude && ln -s ../skills .claude/skills`. Each skill
+then runs when a request matches it, or directly as a slash command such as `/build-handbook`.
+(Copying the folders also works, but then copy them again after every change.)
 
 ### 2. Pick a path
 

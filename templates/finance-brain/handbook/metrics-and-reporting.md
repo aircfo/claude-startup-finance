@@ -6,8 +6,8 @@ definitions instead of a textbook one.
 
 **Last reviewed:** [PLACEHOLDER: YYYY-MM-DD, by whom]
 
-> Definitions are conventions, not data. No system can fill this page on its own; the person
-> who owns the numbers decides. Which accounts feed each metric lives in
+> Definitions are conventions, not data. Systems can show what the numbers are; the person who
+> owns them decides what they mean. Which accounts feed each metric lives in
 > `handbook/chart-of-accounts.md` (Reporting rollups), and which accounts count as cash lives
 > in `handbook/cash.md`.
 

@@ -59,7 +59,7 @@ forward.
   **Get Started** and *Use Cases* to **Prompts**, and the homepage no longer frames the
   plugins as early access.
 - **`all-systems-go` is the declared home of the shared Stripe, Ramp, and Mercury
-  connectors**, as `finance-contextos` is for QuickBooks. New plugins declare the systems
+  connectors**. New plugins declare the systems
   they read instead of bundling another copy; `docs/_data/connectors.yml` records which
   plugin provides each one, and every tool page derives its install order from it.
 - Root README leads with the library and a theme table; the "What's in this repo" table

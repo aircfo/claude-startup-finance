@@ -38,9 +38,9 @@ not to use it. If Claude ever proposes a write action, stop and review before pr
 
 ## What Gets Written
 
-- **The kit** writes only inside its own folder: handbook pages, workpapers in `testing/` or
-  your close folder, and the changelog in `CLAUDE.md`. It never deletes or moves files you put
-  there.
+- **The kit** writes handbook pages, drafts in `testing/`, and the changelog in `CLAUDE.md`
+  inside its own folder. Final workpapers go to the close folder you name in `CLAUDE.md` (for
+  example a shared drive). It never deletes or moves files you put there.
 - **The tools** write nothing by default. Their outputs appear in your conversation unless you
   ask Claude to save them.
 

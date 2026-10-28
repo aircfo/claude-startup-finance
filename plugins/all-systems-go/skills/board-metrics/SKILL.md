@@ -25,7 +25,7 @@ Find it in this order:
 
 ## Metrics to assemble (confirm the reporting month with the user first)
 1. **Revenue (Stripe)**: MRR and ARR, new vs. churned MRR if available, month-over-month growth %.
-2. **Cash (Mercury)**: total cash across operating and treasury accounts, as of period end.
+2. **Cash (Mercury)**: total cash across the accounts `handbook/cash.md` counts as cash, as of period end.
 3. **Burn & runway (Mercury + Ramp)**: net monthly burn and months of runway — reuse the `runway-and-burn` logic.
 4. **AR aging (QuickBooks)**: total receivables and amount past due (current / 30 / 60 / 90+).
 5. **AP aging (QuickBooks)**: total payables and amount past due.

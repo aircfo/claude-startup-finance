@@ -145,7 +145,7 @@ Expected output:
 
 ## 6. Explain A Burn Change
 
-*Ad-hoc — no dedicated workflow yet; Claude runs this using your profile.*
+*Ad-hoc — no dedicated workflow yet; Claude runs this using your handbook.*
 
 Prompt:
 
@@ -168,7 +168,7 @@ Expected output:
 
 ## 7. Find Recurring Vendor Themes
 
-*Ad-hoc — no dedicated workflow yet; Claude runs this using your profile.*
+*Ad-hoc — no dedicated workflow yet; Claude runs this using your handbook.*
 
 Prompt:
 

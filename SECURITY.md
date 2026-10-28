@@ -38,20 +38,22 @@ then email us — rotating comes before cleaning up the history.
 
 ## How this project is designed to limit risk
 
-- **Read-only wherever it touches money.** The connectors ship without write tools, so the
-  skills here can read your books and change nothing.
+- **Read-only wherever it touches money.** Every skill and kit instruction tells Claude to read
+  only, never to post, pay, transfer, or edit. Some vendors' connectors do offer write access,
+  so grant read-only access where the vendor lets you, and review before anything is posted.
 - **Per-user OAuth.** You authenticate into your own accounts in your own browser. This
   repository contains no keys or tokens, and airCFO never holds a shared credential to your
   systems.
 - **No airCFO server in the path.** Every connector is the vendor's own (Stripe, Ramp,
   Mercury, and a QuickBooks connector you add in Claude's connector settings). airCFO never
   receives or stores your financial data.
-- **Local files stay where you put them.** The Finance Brain kit is a folder on your machine
-  and writes only inside it. The tools write nothing unless you ask Claude to save an output.
+- **Files stay where you put them.** The Finance Brain kit is a folder on your machine. It
+  writes inside that folder and, once a skill has passed review, to the close folder you name
+  in its `CLAUDE.md`. The tools write nothing unless you ask Claude to save an output.
 - **Evaluate with a sandbox.** Not ready to authorize production data? Connect a sandbox or
   test company first.
 
-Full detail, including exactly what each connector can read:
+Full detail on where data lives and what gets written:
 [docs/data-handling-security.md](docs/data-handling-security.md).
 
 ## Scope

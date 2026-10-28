@@ -10,9 +10,12 @@ way your team does it. Anyone on the team can run it and get the same workpaper.
 
 > "Use the `prepaid-amortization` skill for September 2026."
 
-**Claude Code:** copy the folders in `skills/` into `.claude/skills/`. Claude then uses each
-skill when a request matches its description, and you can run one directly as a slash command
-named after its folder, for example `/prepaid-amortization 2026-09`.
+**Claude Code:** link this folder as `.claude/skills` (`mkdir -p .claude && ln -s ../skills
+.claude/skills` from the kit's top folder), so Claude Code runs the same files the team
+improves. Claude then uses each skill when a request matches its description, and you can run
+one directly as a slash command named after its folder, for example
+`/prepaid-amortization 2026-09`. If you copy the folders instead, copy them again after every
+change.
 
 Every skill asks for what it needs (a period, an account) if you don't say.
 

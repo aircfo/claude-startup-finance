@@ -5,7 +5,7 @@ title: Tool Library
 <div class="hero" markdown="0">
   <p class="eyebrow">From The AI CFO newsletter · by airCFO</p>
   <h1>Build an AI-powered finance function.</h1>
-  <p class="lede">Free, read-only Claude tools for startup finance and accounting, organized by the job they do. Start with the <strong>Finance Brain Starter Kit</strong>: a folder that gives Claude your handbook, your recurring commands, and a review step, so it works the way your team does.</p>
+  <p class="lede">Free, read-only Claude tools for startup finance and accounting, organized by the job they do. Start with the <strong>Finance Brain Starter Kit</strong>: a folder that gives Claude your handbook, your recurring skills, and a review step, so it works the way your team does.</p>
   <div class="hero-ctas">
     <a class="btn btn-primary" href="{{ '/finance-brain.html' | relative_url }}">Get the starter kit</a>
     <a class="btn btn-secondary" href="#tools">Browse the tools</a>

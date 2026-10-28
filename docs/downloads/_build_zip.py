@@ -13,7 +13,9 @@ OUT = HERE / "finance-brain-starter-kit.zip"
 
 with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
     for path in sorted(KIT.rglob("*")):
-        if path.is_file() and path.name != ".DS_Store":
+        # Skip hidden files (.DS_Store) and Office lock files (~$name.xlsx) so stray local
+        # files never ship in the public download.
+        if path.is_file() and not path.name.startswith((".", "~$")):
             z.write(path, pathlib.Path("finance-brain") / path.relative_to(KIT))
 
 print(f"Wrote {OUT} ({OUT.stat().st_size // 1024} KB)")

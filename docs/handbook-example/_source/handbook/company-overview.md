@@ -14,7 +14,7 @@ ARR is annual prepaid.
 
 - **Stage and last raise:** Series A, $12M, closed December 15, 2025.
 - **Headcount:** 38. Roster of record is the payroll provider.
-- **Finance team:** Head of Finance (owns the close and signs off). Outsourced accounting firm (categorization, recs, first-pass JEs). CEO approves anything over $25,000.
+- **Finance team:** Head of Finance (owns the close and signs off). Outsourced accounting firm (categorization, recs, first-pass JEs). CEO also approves journal entries over $25,000 and bills over $10,000.
 
 ## Entities
 

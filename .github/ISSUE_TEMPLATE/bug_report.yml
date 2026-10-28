@@ -30,7 +30,7 @@ body:
     id: skill
     attributes:
       label: Which skill or command?
-      placeholder: "commands/setup/build-handbook.md, /runway-and-burn, or the phrase you typed"
+      placeholder: "the build-handbook skill, /runway-and-burn, or the phrase you typed"
 
   - type: textarea
     id: what-happened
@@ -46,7 +46,7 @@ body:
       label: Steps to reproduce
       description: What you said to Claude, in order, and where it went wrong.
       placeholder: |
-        1. Opened the Finance Brain folder in Cowork, said "Run commands/setup/build-handbook.md"
+        1. Opened the Finance Brain folder in Cowork, said "Use the build-handbook skill"
         2. Connected QuickBooks
         3. At the report card step, …
     validations:

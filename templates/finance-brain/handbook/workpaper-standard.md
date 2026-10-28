@@ -89,7 +89,8 @@ account tied to a schedule.
 **Checks before handoff:**
 
 1. **Unreconciled difference is zero.**
-2. **GL balance matches the trial balance** for the account at the period end.
+2. **GL balance matches the trial balance** for the account at the statement date (the month
+   end for most bank accounts; cards often close mid-month).
 3. **Statement ending balance matches the statement** (not a running total Claude computed).
 4. **Last month's items are accounted for:** every prior open item is cleared or carried forward
    with its age.

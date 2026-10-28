@@ -1,6 +1,6 @@
 ---
 name: build-handbook
-description: "Build or refresh the company's finance handbook. Reads the documents you share and any connected finance systems, drafts every page in handbook/ and the at-a-glance section of CLAUDE.md, then asks only the questions they couldn't answer. Use on first setup, when CLAUDE.md or a handbook page still has [PLACEHOLDER, or when someone says \"set up the handbook,\" \"build my finance brain,\" \"refresh the handbook,\" or \"add this to the handbook.\""
+description: "Build or refresh the company's finance handbook. Reads the documents you share and any connected finance systems, drafts every page in handbook/ and the at-a-glance section of CLAUDE.md, then asks only the questions they couldn't answer. Use on first setup (when the Company at a glance section of CLAUDE.md is still placeholders), or when someone says \"set up the handbook,\" \"build my finance brain,\" \"refresh the handbook,\" or \"add this to the handbook.\""
 ---
 
 # Build the finance handbook

@@ -4,9 +4,10 @@ This folder is the finance team's shared brain. It holds how the company does it
 (`handbook/`) and the recurring tasks Claude runs (`skills/`). Read this file first, then the
 handbook pages a task needs, before doing any finance work here.
 
-> **First time here?** If this file or any page in `handbook/` still contains
-> `[PLACEHOLDER`, the handbook isn't set up yet. Offer to run
-> the `build-handbook` skill before anything else.
+> **First time here?** If the Company at a glance section below is still mostly
+> `[PLACEHOLDER` lines, the handbook isn't set up yet. Offer to run the `build-handbook` skill
+> before anything else. A few open placeholders elsewhere are normal after setup; they're
+> listed under Open questions.
 
 ## Company at a glance
 

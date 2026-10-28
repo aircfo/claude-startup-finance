@@ -23,14 +23,14 @@ Find it in this order:
 **Do not guess** the operating-vs-treasury split or the internal-transfer exclusions. Without the Finance Brain, or where a page you need still says `[PLACEHOLDER`, treat that definition as unknown: either stop, or label every number that depends on it as an assumption the user must confirm, and list it as an open question.
 
 ## Data to gather
-1. **Current cash** — from **Mercury**: sum the available balance across the accounts `handbook/cash.md` counts as runway cash. This is the numerator for runway.
-2. **Cash outflows** — from **Mercury**: every debit out of the operating accounts over the trailing window (the lookback window in `handbook/metrics-and-reporting.md`; default: the last 3 full calendar months), excluding the internal transfers `handbook/cash.md` defines. The bank sees *all* cash out — payroll, taxes, card settlements, wires — so this is the only complete measure of gross burn. **Never use Ramp as the outflow total:** payroll and other non-card spend never touch Ramp, so a card-only number understates burn, often badly.
-3. **Cash inflows (revenue)** — from **Stripe** (collected payments) and/or **Mercury** deposits over the same window, again excluding internal transfers. Use this to compute *net* burn.
+1. **Current cash**, from **Mercury**: sum the available balance across the accounts `handbook/cash.md` counts as runway cash. This is the numerator for runway.
+2. **Cash outflows**, from **Mercury**: every debit out of the operating accounts over the lookback window (see Calculation), excluding the internal transfers `handbook/cash.md` defines and any one-time items `handbook/metrics-and-reporting.md` leaves out of run-rate burn (list each exclusion you apply). The bank sees *all* cash out (payroll, taxes, card settlements, wires), so this is the only complete measure of gross burn. **Never use Ramp as the outflow total:** payroll and other non-card spend never touch Ramp, so a card-only number understates burn, often badly.
+3. **Cash inflows (operating)**, from **Stripe** (collected payments) and/or **Mercury** deposits over the same window, excluding internal transfers and **financing inflows** (equity and debt proceeds, per the Financing inflows rule in `handbook/metrics-and-reporting.md`). If that rule is still a placeholder, exclude any deposit that looks like a raise or loan and say so as an assumption. A fundraise counted as an inflow makes net burn look negative. Use this to compute *net* burn.
    - If the company is pre-revenue, inflows are ~0 and net burn ≈ gross spend.
 4. **Spend drivers** — from **Ramp**: top vendors and categories over the window. This is what Ramp is authoritative for — explaining *what's inside* the burn (the biggest drivers, what changed) — not totaling it.
 
 ## Calculation
-- Use the lookback window in `handbook/metrics-and-reporting.md`, or **3 full calendar months** if it isn't set, unless the user asks for a different window.
+- Use the lookback window in `handbook/metrics-and-reporting.md`, unless the user asks for a different one. If it isn't set, use **3 full calendar months** and label it as an assumption.
 - **Gross monthly burn** = total outflows over the window ÷ number of months.
 - **Net monthly burn** = (total outflows − total inflows) over the window ÷ number of months.
 - **Runway (months)** = current cash ÷ net monthly burn.

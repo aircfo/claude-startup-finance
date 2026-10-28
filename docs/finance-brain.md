@@ -57,7 +57,7 @@ The kit follows the five-rung ladder for AI in finance. Find your rung and start
    - *An afternoon:* "Use the `build-handbook` skill." Claude drafts every handbook page from your docs and any connected systems, then asks you only what they couldn't answer.
    - *This month:* run the worked examples on your own books, add your recurring tasks, and publish the handbook as an internal website with the `build-handbook-site` skill.
 
-Using Claude Code instead? Open the folder as a project and copy the folders in `skills/` into `.claude/skills/`. The full instructions are in the kit's [README](https://github.com/aircfo/claude-startup-finance/tree/main/templates/finance-brain).
+Using Claude Code instead? Open the folder as a project and link `skills/` as `.claude/skills` so Claude Code runs the same files you edit. The full instructions are in the kit's [README](https://github.com/aircfo/claude-startup-finance/tree/main/templates/finance-brain).
 
 ## Ground rules baked in
 

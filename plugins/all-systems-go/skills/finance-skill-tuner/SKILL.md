@@ -8,7 +8,7 @@ description: Diagnose and fix a finance skill that isn't behaving — one that w
 Finance workflows get refined over time. This skill takes a skill the user already authored (usually with `finance-skill-builder`) and fixes why it's misbehaving — in plain language, because the cause is almost always one of a handful of known ones.
 
 ## 1 · Find the skill
-Look in `.claude/skills/` (this project) and `~/.claude/skills/` (personal). If the name is ambiguous, list the candidates and let the user pick. Read its `SKILL.md` end to end before changing anything.
+Look in `.claude/skills/` (this project), `~/.claude/skills/` (personal), and, when the session is working in a Finance Brain folder (a `CLAUDE.md` plus `handbook/` and `skills/`), that folder's `skills/`. A fix to a Finance Brain skill is made in its own `SKILL.md`, rerun into `testing/`, and logged in the folder's `CLAUDE.md` changelog. If the name is ambiguous, list the candidates and let the user pick. Read its `SKILL.md` end to end before changing anything.
 
 ## 2 · Diagnose against the common failure modes
 Match the symptom the user describes to its usual cause:
