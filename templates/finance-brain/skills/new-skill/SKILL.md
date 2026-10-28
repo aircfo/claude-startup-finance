@@ -88,7 +88,7 @@ from `testing/` to the real close folder.
 Once it has passed review and saves time or catches mistakes, add a line to Wins under
 "Level-up progress" in `CLAUDE.md`, for example "2026-11: software accrual skill, 90 minutes to
 15 minutes." Keep the five most recent. If the folder is a GitHub repository, make every change
-in this step on a branch and open a pull request, so someone other than you approves it.
+from step 5 on (the new skill, its table rows, and this Wins line) on a branch and open a pull request, so someone other than you approves it.
 
 ## Never
 

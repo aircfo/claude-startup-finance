@@ -100,7 +100,9 @@ Update the "Level-up progress" section of `CLAUDE.md`:
 
 Add a Changelog line too. If the folder is a GitHub repository, make these updates on a
 branch and open a pull request (or add them to the pull request for the change you just made),
-so the team's copy stays the one source of truth. Then tell them how to come back: "Say 'help me level up' any time,
+so the team's copy stays the one source of truth. During `github-setup.md` itself, leave
+progress edits uncommitted until step 12's practice pull request, which carries them. Then
+tell them how to come back: "Say 'help me level up' any time,
 and I'll pick up from here."
 
 ## Never

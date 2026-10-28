@@ -191,8 +191,10 @@ install the one from Anthropic, to use Claude Code in a panel beside your files.
   account for the company, so the repository doesn't belong to one person who might leave. On
   github.com: your profile picture, **Your organizations**, **New organization**, the free plan.
 - **The company already has a GitHub organization.** Ask its owner to create an **empty,
-  Private** repository named `finance-brain` (no README or other files) and give you **Write**
-  access. You'll use path B in step 9.
+  Private** repository named `finance-brain` (no README or other files) and give you the
+  **Admin** role on that one repository. Admin is what lets you invite a reviewer (step 10),
+  turn on review (step 11), and fix visibility if needed. If they'd rather keep Admin, they do
+  steps 10, 11, and 14 for you. You'll use path B in step 9.
 - **Working solo.** Use your own GitHub username wherever this guide says `your-org`.
 
 ## Step 7: Make a working copy outside any synced folder
@@ -202,7 +204,15 @@ Dropbox, iCloud) are known to corrupt it. So the repository lives in a plain fol
 computer, not on a shared drive, and not in a Documents or Desktop folder that syncs. GitHub
 becomes the shared copy instead.
 
-**Copy the Finance Brain folder into your home folder.** Type the first part, then drag the
+**First, freeze the old folder.** Tell the team: no edits to the shared-drive Finance Brain
+until we're on GitHub. If anyone changes it before step 9, copy those changes over by hand.
+
+**If `finance-brain` already exists in your home folder** (from an earlier try), skip the copy
+and go to the check below.
+
+**Copy the Finance Brain folder into your home folder.** In the commands below, `~` (Mac) and
+`$HOME` (Windows) mean your home folder: on a Mac, Finder's **Go**, **Home**; on Windows,
+`C:\Users\YourName`. Type the first part, then drag the
 Finance Brain folder from Finder or File Explorer into the terminal window, then type the end
 and press Enter.
 
@@ -230,11 +240,14 @@ It should say "not a git repository." If it says anything else, stop here and wo
 Claude what's already set up before going on. Then list the folder (`ls` on a Mac, `dir` on
 Windows): you should see `CLAUDE.md`, `handbook`, and `skills`.
 
-**Coaching in Cowork?** Cowork can only see folders you've given it. Add `~/finance-brain`
-with **Work in a folder** now, and keep coaching from there.
+**Coaching in Cowork?** Cowork can only see folders you've given it. Add the new
+`finance-brain` folder in your home folder with **Work in a folder** now, and keep coaching
+from there. Record "GitHub setup: step 7 done" in that folder's `CLAUDE.md`, not the old one.
 
-From now on everyone works in their own copy of the repository. After step 9, rename the old
-shared-drive folder to "Finance Brain (old, now on GitHub)" so nobody keeps editing it.
+From now on everyone works in their own copy of the repository. Keep the old shared-drive
+folder frozen (read-only if you can) until every teammate has their own copy ("Add a
+teammate"), then rename it "Finance Brain (old, now on GitHub)". Its workpapers and exports
+stay on the shared drive, in the working-files folder from step 8.
 
 ## Step 8: Keep financial data out
 
@@ -245,44 +258,52 @@ replacing it. Files whose names start with a dot are hidden in Finder and File E
 tell the user it's there even though they can't see it.
 
 ```text
-# Allowlist: only the handbook pages, skills, and kit files are uploaded to GitHub.
-# Everything else (workpapers, exports, statements, PDFs) stays on this computer
-# unless the company has approved storing financial data in GitHub.
+# Allowlist: only handbook pages, skills, and kit files are uploaded to GitHub.
+# Everything else (workpapers, exports, statements, PDFs, screenshots) stays off
+# GitHub unless the company has approved storing financial data there.
 /*
 !/CLAUDE.md
 !/README.md
 !/.gitignore
 !/.github/
-!/skills/
-!/examples/
+/.github/*
+!/.github/CODEOWNERS
 !/handbook/
 /handbook/*
 !/handbook/*.md
+!/skills/
+/skills/**
+!/skills/**/
+!/skills/**/*.md
+!/skills/setup-finance-brain/site-template/*.html
+!/skills/setup-finance-brain/site-template/*.css
+!/examples/
+/examples/*
+!/examples/README.md
+!/examples/workpapers/
+/examples/workpapers/*
+!/examples/workpapers/2101 - Accrued Expenses - Usage Accrual 2026.09.xlsx
 !/testing/
 /testing/*
 !/testing/README.md
 
-# Never upload data files or these, wherever they are (even inside skills/).
-*.pdf
-*.xls
-*.xlsx
-*.xlsm
-*.csv
-*.json
-*.zip
+# Never upload these, wherever they are.
 .DS_Store
 Thumbs.db
 desktop.ini
 ~$*
-.claude/skills
-
-# The kit's one synthetic example workpaper is the exception.
-!/examples/workpapers/*.xlsx
 ```
 
 This is an allowlist: it blocks everything, then lets through only `CLAUDE.md`, the READMEs,
-the handbook's `.md` pages, the skills, and the kit's synthetic example. Spreadsheets, PDFs,
-and exports are blocked everywhere, even inside an allowed folder. A new folder or file
+the handbook's `.md` pages, the skills' `.md` files and site template, and the kit's one
+synthetic example workpaper. Any other file, in any folder, stays off GitHub unless the team
+deliberately adds it here. The one thing no ignore file can catch is data typed into a `.md`
+page, so the check in step 9 covers that.
+
+**Files that stay off GitHub still need a home the team can reach.** Drafts waiting for review
+(`testing/`), source exports (`handbook/sources/`), and finished workpapers should live in a
+shared-drive folder such as "Finance Brain working files," not only on one laptop. Claude:
+ask where that folder is and write it into "Where outputs go" in `CLAUDE.md`. A new folder or file
 type someone adds later stays off GitHub unless the team deliberately adds it here.
 
 ## Step 9: Save the first version and upload it
@@ -293,11 +314,14 @@ git add .
 git status
 ```
 
-These start tracking the folder and stage the files to upload. **Paste what `git status`
-printed.** Claude: check every file under "Changes to be committed." It should only be
-`.gitignore`, `CLAUDE.md`, `README.md`, `.md` files in `handbook/`, `skills/`, and `testing/`,
-the site template in `skills/setup-finance-brain/site-template/`, and the example in
-`examples/`. If anything else is listed, stop and fix `.gitignore` before going on.
+These start tracking the folder and stage the files to upload. On Windows, warnings about
+"LF will be replaced by CRLF" are harmless. **Paste what `git status` printed.** Claude: check
+every file under "Changes to be committed." It should only be `.gitignore`, `CLAUDE.md`,
+`README.md`, `.md` files in `handbook/`, `skills/`, `examples/`, and `testing/`, the site
+template in `skills/setup-finance-brain/site-template/`, and the example workpaper in
+`examples/workpapers/`. Open any `.md` that isn't one of the kit's own pages and check it holds
+no account balances, transactions, or other data. If anything else is listed, stop and fix it
+before going on.
 
 Then save the first version:
 
@@ -312,12 +336,23 @@ username if you're solo):
 gh repo create your-org/finance-brain --private --source=. --remote=origin --push
 ```
 
-**Path B, an empty repository someone created for you:**
+**Path B, an empty repository someone created for you.** First confirm it's private:
+
+```bash
+gh repo view your-org/finance-brain --json visibility -q .visibility
+```
+
+It must print `PRIVATE`. If it prints anything else, stop: ask the owner to make it private (or
+do it yourself under **Settings**, **Danger Zone**, **Change visibility**) before uploading
+anything. Then:
 
 ```bash
 git remote add origin https://github.com/your-org/finance-brain.git
 git push -u origin main
 ```
+
+If the path B upload is rejected because the repository isn't empty (someone added a README),
+ask the owner to delete and recreate it empty rather than trying to combine the two.
 
 **Check it worked and is private,** whichever path you took:
 
@@ -354,8 +389,8 @@ branch ruleset**.
 - Save.
 
 **Check for a banner** saying the rules won't be enforced until you upgrade. Enforcing rules on
-a private repository needs a paid GitHub plan (GitHub Team for organizations, which has a
-per-user monthly cost). Without it, GitHub saves the ruleset but doesn't enforce it. Until you
+a private repository needs a paid GitHub plan (GitHub Team for an organization, GitHub Pro
+for a personal account; both have a monthly cost). Without it, GitHub saves the ruleset but doesn't enforce it. Until you
 upgrade, agree as a team that nobody merges their own pull request, and check at the monthly
 skills review. Step 12 includes a test.
 
@@ -430,15 +465,17 @@ A founder without a second person can still use most of this:
   and an off-computer backup of the handbook and skills.
 - Skip steps 10, 11, 12's approval, and 14. A required review you can't satisfy would block
   every change.
-- If you have an outside accountant or bookkeeper, consider making them your reviewer with
-  Write access. That restores "the author is never the approver."
+- You're done with this rung when the private repo exists and your changes go through a pull
+  request that you merge yourself after a day's pause (a cheap second look).
+- If you later gain an outside accountant or bookkeeper, make them your reviewer with Write
+  access and do steps 10 to 12. That restores "the author is never the approver."
 
 ## Add a teammate
 
 The champion pairs with each teammate the first time (in person or on a screen share).
 
 1. **The champion invites them** as in step 10. They accept the email invitation.
-2. **The teammate does steps 1 to 5 and step 13** on their own computer.
+2. **The teammate does steps 1 to 5** on their own computer.
 3. **They get the team's copy** in their home folder (not a synced folder):
 
    ```bash
@@ -449,6 +486,7 @@ The champion pairs with each teammate the first time (in person or on a screen s
    ```
 
    On Windows, use `cd $HOME` for the first line. The last line opens the folder in VS Code.
+   Then they do step 13 (connectors) from inside this folder.
 4. **They start Claude Code in that folder** (`claude`). It reads `CLAUDE.md`, and naming a
    skill works right away, for example "use the bank-reconciliation skill for September."
 5. **Optional:** for slash commands such as `/usage-accrual`, link the skills folder once.
@@ -500,6 +538,7 @@ happens in the browser.
 ## When this rung is done
 
 The repository is private, review is on (or agreed, until the plan is upgraded), the first pull
-request was approved by someone other than its author, the old shared-drive copy is retired,
-and each teammate can get the latest and open a pull request. Record the team as on rung 4 in
+request was approved by someone other than its author, each teammate can get the latest and
+open a pull request, and the old shared-drive copy is retired. (Working solo, see "Working
+solo" for your version of done.) Record the team as on rung 4 in
 "Level-up progress" in `CLAUDE.md`.
