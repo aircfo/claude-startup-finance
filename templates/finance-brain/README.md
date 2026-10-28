@@ -33,7 +33,7 @@ part of the kit that gets you to the next one.
 | **0 · Chat** | Asking Claude questions one at a time. | the `new-skill` skill |
 | **1 · Skills** | A monthly task Claude can repeat on demand. | the `new-skill` skill |
 | **2 · Clean, connected data** | Claude reads your systems, and the inputs look the same every month. | `handbook/systems-and-data.md` |
-| **3 · Shared context & workflows** | One place your policies and processes live, so the whole team works from the same playbook. | `CLAUDE.md`, `handbook/`, the `build-handbook` skill |
+| **3 · Shared context & workflows** | One place your policies and processes live, so the whole team works from the same playbook. | `CLAUDE.md`, `handbook/`, the `setup-finance-brain` skill |
 | **4 · Finance engineering** | Version control, review before anything hits the books. | `testing/` and `handbook/workpaper-standard.md` |
 | **5 · The frontier** | New work finance couldn't do before. | Everything above, running. |
 
@@ -49,7 +49,7 @@ reads `CLAUDE.md` automatically every time you work there.
 
 **Claude Code:** open the folder as your project and link the skills folder so Claude Code
 uses the same files you edit: `mkdir -p .claude && ln -s ../skills .claude/skills`. Each skill
-then runs when a request matches it, or directly as a slash command such as `/build-handbook`.
+then runs when a request matches it, or directly as a slash command such as `/setup-finance-brain`.
 (Copying the folders also works, but then copy them again after every change.)
 
 ### 2. Pick a path
@@ -64,17 +64,17 @@ month.
 
 **An afternoon: your handbook.** Say:
 
-> "Use the `build-handbook` skill."
+> "Use the `setup-finance-brain` skill."
 
 Claude reads whatever you share (a close checklist, a policy doc, last month's reporting
 package) and any finance systems you've connected, drafts every page in `handbook/`, then
 interviews you only on the things no document or system could tell it. Gaps stay marked as
-`[PLACEHOLDER: ...]`, never guessed. Then use the `follow-up-interview` skill with
-whoever owns the numbers to define your metrics, burn, and runway.
+`[PLACEHOLDER: ...]`, never guessed. Then the same skill runs a follow-up with whoever owns
+the numbers to define your metrics, burn, and runway.
 
 **This month: make it the team's.** Run the worked examples (`prepaid-amortization`,
 `usage-accrual`, `bank-reconciliation`) on your own books, add your recurring tasks, and publish the handbook as a
-website your whole team can browse (the `build-handbook-site` skill).
+website your whole team can browse (say "publish the handbook").
 
 ### 3. Keep it current
 
@@ -99,13 +99,11 @@ finance-brain/
 │   └── workpaper-standard.md  What every JE and rec workpaper looks like, and its checks
 ├── skills/                   One folder per recurring task, each with a SKILL.md
 │   ├── README.md             How skills work, grouped by workflow, and how to add one
-│   ├── build-handbook/       Setup: draft the handbook, then ask only what's left
-│   ├── follow-up-interview/  Setup: metrics, plan, reporting, people
+│   ├── setup-finance-brain/  Setup: interview, follow-up, publish (+ site-template/)
 │   ├── new-skill/            Setup: turn a task you know cold into a skill (+ templates/)
 │   ├── prepaid-amortization/ JE: monthly prepaid amortization
 │   ├── usage-accrual/        JE: month-end usage accrual
-│   ├── bank-reconciliation/  Rec: bank or card account to statement
-│   └── build-handbook-site/  Publish: the handbook as a website (+ site-template/)
+│   └── bank-reconciliation/  Rec: bank or card account to statement
 ├── testing/                  Where drafts live until a skill is trusted
 └── examples/                 A sample Claude-prepared JE workpaper (synthetic data)
 ```
@@ -125,7 +123,7 @@ finance-brain/
 
 The [example handbook](https://aircfo.github.io/claude-startup-finance/handbook-example/) shows
 this kit filled in for a fictional Series A company, Honestly Just Spreadsheets, Inc., published
-with the `build-handbook-site` skill.
+with the kit's own website step.
 
 ---
 

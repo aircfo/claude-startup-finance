@@ -49,13 +49,11 @@ When the user asks for one of these tasks, or names a skill, read its `SKILL.md`
 
 | Skill | What it does |
 | --- | --- |
-| `skills/build-handbook/` | Drafts the handbook from docs and systems, then interviews on the gaps |
-| `skills/follow-up-interview/` | 30 minutes with whoever owns the numbers: metrics, plan, reporting, people |
+| `skills/setup-finance-brain/` | Sets up and refreshes this handbook: interview, follow-up with whoever owns the numbers, publishing it as a website |
 | `skills/new-skill/` | Turns one task you know cold into a reusable skill |
 | `skills/prepaid-amortization/` | Monthly prepaid amortization JE from the prepaid schedule |
 | `skills/usage-accrual/` | Month-end accrual for Stratus Cloud and Lattice Inference usage |
 | `skills/bank-reconciliation/` | Mercury operating, Mercury treasury, and Ramp card recs |
-| `skills/build-handbook-site/` | Publishes this handbook as a website |
 
 ## Where outputs go
 
@@ -73,4 +71,4 @@ When the user asks for one of these tasks, or names a skill, read its `SKILL.md`
 - 2026-10-15: Metrics and reporting page filled in from a follow-up interview with the CEO and Head of Finance.
 - 2026-10-15: usage-accrual skill graduated from `testing/` after two clean months (approved by Head of Finance).
 - 2026-09-30: Added Lattice Inference to the usage accrual. Product launched AI features in September.
-- 2026-09-02: Handbook built with the `build-handbook` skill. 9 placeholders open.
+- 2026-09-02: Handbook built with the `setup-finance-brain` skill. 9 placeholders open.

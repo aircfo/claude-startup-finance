@@ -1,9 +1,4 @@
----
-name: build-handbook
-description: "Build or refresh the company's finance handbook. Reads the documents you share and any connected finance systems, drafts every page in handbook/ and the at-a-glance section of CLAUDE.md, then asks only the questions they couldn't answer. Use on first setup (when the Company at a glance section of CLAUDE.md is still placeholders), or when someone says \"set up the handbook,\" \"build my finance brain,\" \"refresh the handbook,\" or \"add this to the handbook.\""
----
-
-# Build the finance handbook
+# Stage 1: Interview (build the handbook)
 
 **Purpose:** fill in `CLAUDE.md` and every page in `handbook/` so Claude knows how this company
 does its accounting. Systems and documents fill the "what." The person running this fills the
@@ -81,7 +76,7 @@ dated reports, and page through large lists.
 | `cash.md` | Every bank, card, and treasury account on the balance sheet, with the last four digits if they appear in the name. Statement timing for cards if it's visible. |
 | `systems-and-data.md` | The connector status table from step 2. Data issues you noticed while reading (duplicates, clearing accounts that don't clear, uncategorized balances). Vendors or customers that appear under different names in different systems. |
 | `workpaper-standard.md` | Nothing to pull: the standard ships ready to use. If the user shared finished workpapers in step 3, note where their conventions differ (tab names, file naming) and ask which to keep. The aging threshold for reconciling items stays a placeholder for step 6. |
-| `metrics-and-reporting.md` | Only what the books show: revenue mix, gross margin, and average monthly cash out over the last three closed months, each computed in a calculation step. Definitions and targets stay placeholders; the user or the `follow-up-interview` skill fills them. |
+| `metrics-and-reporting.md` | Only what the books show: revenue mix, gross margin, and average monthly cash out over the last three closed months, each computed in a calculation step. Definitions and targets stay placeholders; the user or the follow-up (stage 2, `follow-up-questions.md`) fills them. |
 
 Write a first draft of each page and the "Company at a glance" section of `CLAUDE.md`. Fill
 what you can support, cite it, and placeholder the rest.
@@ -115,8 +110,7 @@ ask the most valuable first, and keep each one answerable in under a minute. Typ
 
 Write each answer into the right page immediately. Offer to stop after the first 15 minutes and
 keep the rest as open questions with owners. Questions about metric definitions, the plan, and
-reporting can wait for the `follow-up-interview` skill, which is built for whoever owns
-the numbers.
+reporting can wait for the follow-up (stage 2), which is built for whoever owns the numbers.
 
 ### 7. Check the handbook against the books
 
@@ -138,9 +132,8 @@ the handbook doing its job, so say so.
 - Update the "Last reviewed" line on every page you touched.
 - Update `CLAUDE.md`: the at-a-glance section, open questions, and a Changelog line saying what
   was built and what's still open.
-- Suggest next steps: "If `handbook/metrics-and-reporting.md` is mostly placeholders, run
-  the `follow-up-interview` skill with whoever owns the numbers. Then pick one task you
-  know cold and use the `new-skill` skill."
+- Offer the next stage, as `SKILL.md` describes: the follow-up (stage 2) if
+  `handbook/metrics-and-reporting.md` is mostly placeholders.
 
 ## Refreshing later
 

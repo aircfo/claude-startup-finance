@@ -1,7 +1,7 @@
 """Rebuild the example handbook site from docs/handbook-example/_source/.
 
-This mirrors what the kit's build-handbook-site skill
-(templates/finance-brain/skills/build-handbook-site/SKILL.md) asks Claude to do, so the
+This mirrors what the publish stage of the kit's setup-finance-brain skill
+(templates/finance-brain/skills/setup-finance-brain/publish-site.md) asks Claude to do, so the
 published example matches what a user's own build produces. Maintainers only; users never need it.
 
     uv run --with markdown --with pyyaml python3 docs/handbook-example/_build.py
@@ -22,7 +22,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 SOURCE = HERE / "_source"
 KIT = REPO / "templates" / "finance-brain"
-SITE_TEMPLATE = KIT / "skills" / "build-handbook-site" / "site-template"
+SITE_TEMPLATE = KIT / "skills" / "setup-finance-brain" / "site-template"
 TEMPLATE = (SITE_TEMPLATE / "page.html").read_text()
 
 HANDBOOK_PAGES = [
@@ -38,10 +38,9 @@ HANDBOOK_PAGES = [
 
 # The skills page groups skills by workflow, in this order, as the kit's skills/README.md does.
 SKILL_WORKFLOWS = [
-    ("Setup", ["build-handbook", "follow-up-interview", "new-skill"]),
+    ("Setup", ["setup-finance-brain", "new-skill"]),
     ("Journal entries", ["prepaid-amortization", "usage-accrual"]),
     ("Reconciliations", ["bank-reconciliation"]),
-    ("Publish", ["build-handbook-site"]),
 ]
 
 

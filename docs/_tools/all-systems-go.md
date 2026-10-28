@@ -39,6 +39,6 @@ Authorize the systems you use and decline the rest. Declining never blocks anyth
 ## Fill in your Finance Brain
 
 Working from a [Finance Brain]({{ '/finance-brain.html' | relative_url }})? After you
-authorize, use the kit's `build-handbook` skill again. The refresh reads your bank, card,
+authorize, use the kit's `setup-finance-brain` skill again. The refresh reads your bank, card,
 and billing accounts and fills in the cash, systems, and metrics pages your books alone
 can't.

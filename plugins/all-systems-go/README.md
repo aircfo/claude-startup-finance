@@ -26,7 +26,7 @@ your own login. Without one, those workflows ask for the specific QuickBooks exp
 need instead.
 
 Connected these systems after building your Finance Brain? Re-run the kit's
-`build-handbook` skill and it folds each bank account, card, and payout stream
+`setup-finance-brain` skill and it folds each bank account, card, and payout stream
 into `handbook/cash.md` and `handbook/systems-and-data.md`.
 
 ## Skills

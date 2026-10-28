@@ -5,7 +5,7 @@ This folder is the finance team's shared brain. It holds how the company does it
 handbook pages a task needs, before doing any finance work here.
 
 > **First time here?** If the Company at a glance section below is still mostly
-> `[PLACEHOLDER` lines, the handbook isn't set up yet. Offer to run the `build-handbook` skill
+> `[PLACEHOLDER` lines, the handbook isn't set up yet. Offer to run the `setup-finance-brain` skill
 > before anything else. A few open placeholders elsewhere are normal after setup; they're
 > listed under Open questions.
 
@@ -67,13 +67,11 @@ When the user asks for one of these tasks, or names a skill, read its `SKILL.md`
 
 | Skill | What it does |
 | --- | --- |
-| `skills/build-handbook/` | Drafts the handbook from your docs and systems, then interviews you on the gaps |
-| `skills/follow-up-interview/` | 30 minutes with whoever owns the numbers: metrics, plan, reporting, people |
+| `skills/setup-finance-brain/` | Sets up and refreshes the handbook: interview, follow-up with whoever owns the numbers, and publishing it as a website |
 | `skills/new-skill/` | Turns one task you know cold into a reusable skill |
 | `skills/prepaid-amortization/` | Monthly prepaid amortization JE from the prepaid schedule |
 | `skills/usage-accrual/` | Month-end accrual for usage-billed vendors not yet invoiced |
 | `skills/bank-reconciliation/` | Bank rec: GL to statement, reconciling items, sign-off |
-| `skills/build-handbook-site/` | Publishes `handbook/` as a browsable website |
 
 Add a row whenever a new skill is created.
 

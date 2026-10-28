@@ -21,12 +21,13 @@ forward.
 
 - **The Finance Brain Starter Kit** (`templates/finance-brain/`): a copy-ready folder, no
   plugin install, that gives Claude a finance handbook it reads every session (`CLAUDE.md` +
-  eight `handbook/` pages, including a JE and reconciliation workpaper standard), seven Claude
-  skills in `skills/<name>/SKILL.md` folders (setup, JEs, recs, publish), a `testing/`
-  convention for new skills, and a synthetic usage-accrual workpaper. The `build-handbook`
-  skill drafts the handbook from your docs and books and asks only what they can't answer;
-  `follow-up-interview` is a 30-minute session with whoever owns the numbers; `new-skill`
-  turns a task you know cold into a new skill. The kit's `metrics-and-reporting.md` page
+  eight `handbook/` pages, including a JE and reconciliation workpaper standard), five Claude
+  skills in `skills/<name>/SKILL.md` folders, a `testing/` convention for new skills, and a
+  synthetic usage-accrual workpaper. The `setup-finance-brain` skill runs the whole setup flow
+  in three stages: an interview that drafts the handbook from your docs and books and asks
+  only what they can't answer, a 30-minute follow-up with whoever owns the numbers, and an
+  optional internal website. `new-skill` turns a task you know cold into a new skill, and
+  three worked examples cover prepaid amortization, a usage accrual, and a bank rec. The kit's `metrics-and-reporting.md` page
   (metric definitions, burn and runway, people, plan, audiences) and the Reporting rollups in
   `chart-of-accounts.md` carry over what the ContextOS finance profile held.
 - `docs/finance-brain.md`: the kit's guide page, first in the docs nav.
@@ -37,6 +38,13 @@ forward.
 
 ### Changed
 
+- **The kit's setup flow is one skill.** `build-handbook`, `follow-up-interview`, and
+  `build-handbook-site` became the stages of `setup-finance-brain` (stage files `interview.md`,
+  `follow-up-questions.md`, `publish-site.md`, plus `site-template/`), taking the kit from seven
+  skills to five. Copies downloaded before this change have the three separate skills; the
+  steps inside them are the same.
+- **`all-systems-go` 0.10.1** points readers without a Finance Brain to the kit's
+  `setup-finance-brain` skill (copy only).
 - **`all-systems-go` 0.10.0 reads the Finance Brain instead of the ContextOS.** Every
   workflow's first step reads the named handbook pages from the Finance Brain folder (or asks
   where it is) instead of `finance-profile.md`. QuickBooks now comes from a QuickBooks
