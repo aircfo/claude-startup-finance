@@ -31,9 +31,14 @@ a skill deserves its own plugin versus joining an existing one.
 6. **Register the plugin** in `.claude-plugin/marketplace.json`, including the `skills`
    array. A skill that isn't listed there is invisible to the `skills` CLI.
 
-7. **Delete this file** (`HOW-TO-USE.md`) from your copy.
+7. **Add the tool's library page** at `docs/_tools/<skill-name>.md`: pick a theme, list the
+   systems it reads, and write the reader-facing summary. That page is the link the
+   newsletter uses. The front matter is spelled out under "Adding a tool to the library" in
+   the authoring conventions.
 
-8. **Verify** before opening a pull request:
+8. **Delete this file** (`HOW-TO-USE.md`) from your copy.
+
+9. **Verify** before opening a pull request:
 
    ```bash
    jq . .claude-plugin/marketplace.json
@@ -46,7 +51,12 @@ a skill deserves its own plugin versus joining an existing one.
 
 ## If the plugin bundles a connector
 
-Add a `.mcp.json` alongside `.claude-plugin/`, following
+First check that no plugin already provides it: QuickBooks ships with `finance-contextos`,
+and Stripe, Ramp, and Mercury with `all-systems-go`. If one does, don't bundle it. List the
+system in your tool page's `reads` instead, and the page will tell readers which plugin to
+install. See "Shared connectors" in the authoring conventions.
+
+Otherwise, add a `.mcp.json` alongside `.claude-plugin/`, following
 `plugins/finance-contextos/.mcp.json`. Connectors must be **read-only** wherever they touch
 money or accounting records, and must authenticate as the user (their own OAuth login) —
 never a shared airCFO credential.

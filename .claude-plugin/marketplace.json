@@ -4,7 +4,7 @@
     "name": "airCFO",
     "email": "alex@aircfo.com"
   },
-  "description": "Unofficial Claude connectors and finance workflows for the startup back-office stack. Start with finance-contextos to build your ContextOS, add all-systems-go for the rest of your stack. Not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
+  "description": "Read-only Claude tools for startup finance from The AI CFO newsletter, organized by theme at aircfo.github.io/claude-startup-finance. Start with finance-contextos to build your ContextOS; all-systems-go connects Stripe, Ramp, and Mercury and adds the workflows that use them. Not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
   "plugins": [
     {
       "name": "finance-contextos",

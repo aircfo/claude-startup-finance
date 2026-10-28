@@ -1,5 +1,10 @@
 title: airCFO · Claude for Startup Finance
-description: Build your ContextOS — airCFO plugins for Claude Cowork that teach Claude what your numbers mean, starting from QuickBooks and proven against your live books.
+description: Read-only Claude tools for the startup finance function, from The AI CFO newsletter — organized by the job they do, all built on a ContextOS that teaches Claude what your numbers mean.
+
+# Every tool's install steps point readers here. Tools hosted in other repos are still listed
+# in this marketplace (see docs/authoring-conventions.md), so readers only ever add this one.
+marketplace_url: "https://github.com/aircfo/claude-startup-finance"
+newsletter_url: "https://www.aircfo.com/the-ai-cfo"
 
 # The site is served at https://aircfo.github.io/claude-startup-finance/ (a GitHub
 # Pages project site). These two keys make asset paths and internal links resolve
@@ -14,6 +19,18 @@ defaults:
       path: ""
     values:
       layout: default
+  - scope:
+      path: ""
+      type: tools
+    values:
+      layout: tool
+
+# The tool library: one file per tool in docs/_tools/, each published at /tools/<file-name>/.
+# The homepage groups them by the themes in docs/_data/themes.yml.
+collections:
+  tools:
+    output: true
+    permalink: /tools/:name/
 
 # Let [text](other-page.md) links between docs resolve to their published URLs.
 plugins:

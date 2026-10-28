@@ -192,4 +192,4 @@ If an output feels wrong:
 
 ## Next Step
 
-Try the prompts in [Use Cases](use-cases.md).
+Try the prompts in [Prompts to try](use-cases.md), or browse the [tool library](index.md#tools).

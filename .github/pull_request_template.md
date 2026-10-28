@@ -47,6 +47,9 @@ figure" is worth more than a green checkmark.
       version change needed because behavior didn't change).
 - [ ] `CHANGELOG.md` entry added under `[Unreleased]`.
 - [ ] Docs updated — root README table, plugin README, and the docs site where affected.
+- [ ] A new reader-facing tool has its library page in `docs/_tools/` (theme, `reads`,
+      summary), and the site builds locally.
+- [ ] No connector bundled that another plugin already provides — see `docs/_data/connectors.yml`.
 - [ ] Every touched README keeps its Unofficial / not-affiliated disclaimer and its read-only
       language.
 - [ ] All new relative links resolve on GitHub **and** on the published Pages site.

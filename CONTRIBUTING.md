@@ -31,6 +31,8 @@ claude-startup-finance/
 │   └── README.md
 ├── templates/skill-plugin/           # copy-ready scaffold for a new skill plugin
 ├── docs/                             # the published docs site (GitHub Pages, Jekyll)
+│   ├── _tools/                       # one page per tool in the library
+│   └── _data/                        # library themes + which plugin provides each connector
 ├── CHANGELOG.md
 └── SECURITY.md
 ```
@@ -39,6 +41,10 @@ MCP servers and webapps live in their **own repositories** (for example
 [`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp)) and are indexed in the root README's
 "What's in this repo" table. The marketplace pulls this entire repo on install, so nothing
 that doesn't need to ship to users belongs in it.
+
+Every reader-facing tool also gets a page in the docs site's tool library, one file in
+`docs/_tools/` — see "Adding a tool to the library" in
+[docs/authoring-conventions.md](docs/authoring-conventions.md).
 
 ## Non-negotiables
 

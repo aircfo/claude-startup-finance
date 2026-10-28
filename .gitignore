@@ -10,5 +10,8 @@
 __pycache__/
 *.pyc
 
+# Local docs-site builds (GitHub Pages builds the published site itself)
+_site/
+
 # claude plugin eval run output (reports, transcripts)
 plugins/*/evals/results/

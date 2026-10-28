@@ -1,0 +1,86 @@
+---
+layout: default
+---
+{%- comment -%}
+  One page per tool in docs/_tools/. Front matter drives everything above and below the body:
+  theme, summary, plugin, skill, ask, reads, needs_contextos, time, and an optional issue.
+  The install order is derived, not written by hand: finance-contextos first when the tool
+  reads the ContextOS, then the plugin that provides each connector it reads
+  (docs/_data/connectors.yml), then the tool's own plugin.
+{%- endcomment -%}
+{%- assign theme = site.data.themes | where: "key", page.theme | first -%}
+{%- capture install_csv -%}
+  {%- if page.needs_contextos -%}finance-contextos,{%- endif -%}
+  {%- for system in page.reads -%}{{ site.data.connectors[system].plugin }},{%- endfor -%}
+  {{- page.plugin -}}
+{%- endcapture -%}
+{%- assign install_plugins = install_csv | split: "," | uniq -%}
+
+<article class="tool-page">
+  <p class="eyebrow"><a href="{{ '/' | relative_url }}#{{ theme.key }}">{{ theme.name }}</a></p>
+  <h1>{{ page.title }}</h1>
+  <p class="lede">{{ page.summary }}</p>
+
+  <dl class="glance">
+    <div>
+      <dt>Install</dt>
+      <dd>
+        {%- for plugin_name in install_plugins -%}
+          {%- assign plugin_home = site.tools | where: "plugin", plugin_name | where: "plugin_home", true | first -%}
+          {%- if plugin_home and plugin_home.url != page.url -%}
+            <a href="{{ plugin_home.url | relative_url }}"><code>{{ plugin_name }}</code></a>
+          {%- else -%}
+            <code>{{ plugin_name }}</code>
+          {%- endif -%}
+          {%- unless forloop.last %} then {% endunless -%}
+        {%- endfor -%}
+      </dd>
+    </div>
+    {%- if page.ask %}
+    <div>
+      <dt>Ask</dt>
+      <dd>“{{ page.ask }}”{% if page.skill %} or <code>/{{ page.skill }}</code>{% endif %}</dd>
+    </div>
+    {%- endif %}
+    {%- if page.reads.size > 0 %}
+    <div>
+      <dt>Reads</dt>
+      <dd>{{ page.reads | join: ", " }} <span class="glance-note">— read-only, with your own login</span></dd>
+    </div>
+    {%- endif %}
+    {%- if page.needs_contextos %}
+    <div>
+      <dt>Before you start</dt>
+      <dd>A built <a href="{{ '/tools/contextos/' | relative_url }}">ContextOS</a> — this tool reads your definitions first</dd>
+    </div>
+    {%- endif %}
+    {%- if page.time %}
+    <div>
+      <dt>Time</dt>
+      <dd>{{ page.time }}</dd>
+    </div>
+    {%- endif %}
+    {%- if page.issue %}
+    <div>
+      <dt>Featured in</dt>
+      <dd><a href="{{ page.issue.url }}">{{ page.issue.title }}</a> — The AI CFO</dd>
+    </div>
+    {%- endif %}
+  </dl>
+
+  {{ content }}
+
+  {% include install-steps.html plugins=install_plugins ask=page.ask needs_contextos=page.needs_contextos %}
+
+  {%- assign theme_tools = site.tools | where: "theme", page.theme | sort: "order" %}
+  {%- if theme_tools.size > 1 %}
+  <h2>More in {{ theme.name }}</h2>
+  <div class="card-grid">
+    {%- for tool in theme_tools %}
+      {%- unless tool.url == page.url %}{% include tool-card.html tool=tool %}{% endunless %}
+    {%- endfor %}
+  </div>
+  {%- endif %}
+
+  <p class="back-link"><a href="{{ '/' | relative_url }}#tools">← All tools</a></p>
+</article>
