@@ -19,7 +19,7 @@ Read the company's Finance Brain first: the folder from the airCFO Finance Brain
 Find it in this order:
 1. The current workspace, if it holds a `CLAUDE.md` and a `handbook/` folder. In Cowork the user usually works in that folder, so `CLAUDE.md` is already loaded.
 2. Otherwise, ask the user where their Finance Brain folder is. Don't search the disk at random.
-3. If there's no Finance Brain, say so and point the user to the free kit (https://aircfo.github.io/claude-startup-finance/finance-brain.html), where its `build-handbook` skill builds one.
+3. If there's no Finance Brain, say so and point the user to the free kit (https://aircfo.github.io/claude-startup-finance/finance-brain.html), where its `setup-finance-brain` skill builds one.
 
 **Do not guess** the revenue mappings or recognition method. Without the Finance Brain, or where a page you need still says `[PLACEHOLDER`, treat that definition as unknown: either stop, or label every number that depends on it as an assumption the user must confirm, and list it as an open question.
 

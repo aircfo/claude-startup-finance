@@ -98,7 +98,7 @@ your own connector configuration for Stripe, Ramp, Mercury, or QuickBooks.
 **1. Build your Finance Brain.** Download the kit, unzip it somewhere permanent, and add the
 folder in Claude Cowork with **Work in a folder**. Then say:
 
-> "Use the `build-handbook` skill."
+> "Use the `setup-finance-brain` skill."
 
 Claude drafts every handbook page from the documents you share and any systems you've
 connected, then asks you only what they can't answer. Gaps stay marked as placeholders, never

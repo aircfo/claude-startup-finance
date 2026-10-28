@@ -25,13 +25,11 @@ Each skill is its own folder, named for what it does. Grouped by workflow:
 
 | Workflow | Skill | What it does |
 | --- | --- | --- |
-| Setup | `build-handbook/` | Drafts the handbook from your docs and systems, then asks only what they can't answer |
-| Setup | `follow-up-interview/` | 30 minutes with whoever owns the numbers: metrics, plan, reporting, people |
+| Setup | `setup-finance-brain/` | Builds and refreshes the handbook in three stages: interview, follow-up with whoever owns the numbers, publish as a website. Holds the site template |
 | Setup | `new-skill/` | Turns a task you know cold into a new skill. Holds the JE and rec skill templates |
 | Journal entries | `prepaid-amortization/` | Monthly prepaid amortization JE |
 | Journal entries | `usage-accrual/` | Month-end accrual for usage-billed vendors |
 | Reconciliations | `bank-reconciliation/` | Bank or card account to its statement |
-| Publish | `build-handbook-site/` | Publishes the handbook as an internal website. Holds the site template |
 
 When you add a skill, add its row here and in `CLAUDE.md`.
 

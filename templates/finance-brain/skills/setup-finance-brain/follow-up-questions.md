@@ -1,15 +1,12 @@
----
-name: follow-up-interview
-description: "A 30-minute follow-up with whoever owns the numbers (founder, CEO, or controller) that fills the metric definitions, plan, reporting, and people sections the books can't answer. Use after build-handbook, when handbook/metrics-and-reporting.md is mostly placeholders, or when someone says \"define our metrics,\" \"interview our CEO,\" or \"finish the handbook questions.\""
----
-
-# Follow-up interview
+# Stage 2: Follow-up interview
 
 **Purpose:** fill the parts of the handbook that live in someone's head: what the metrics mean,
 what the plan is, how reporting should work, and how people get paid. Run it after
-the `build-handbook` skill, with whoever owns the numbers (founder, CEO, controller).
-The person running the session can also take the questions to that person and bring answers
-back.
+the interview (stage 1), with whoever owns the numbers (founder, CEO, controller).
+**If that person isn't in the room,** write the questions that are still open (after the
+filtering below), each with its bracketed target, to
+`handbook/sources/follow-up-questions-YYYY-MM-DD.md` for the user to take to them. When the
+answers come back, fold each one into its page as below.
 
 ## Before asking anything
 
@@ -36,35 +33,47 @@ is a fine answer: record who does know as an open question in `CLAUDE.md` and mo
 5. "Gross margin came out at [computed from the books]%. Is that what you expect?" Compute it in
    a calculation step first. [metrics-and-reporting: target or benchmark]
 
+## Burn and runway (about 6 minutes)
+
+6. "What counts as burn here: all cash out of the operating accounts, or something narrower?
+   And is net burn that less what customers pay?" [metrics-and-reporting: Burn and runway]
+7. "When you raise money or take on debt, do those deposits stay out of net burn? Are there
+   one-time costs you leave out of run-rate burn, like a legal bill or an offsite?"
+   [metrics-and-reporting: Burn and runway]
+8. "Which accounts count as runway cash? Does a treasury or savings account count, or is it a
+   reserve you don't touch?" Skip if `handbook/cash.md` already says. [cash: Rules]
+9. "How do you calculate runway: runway cash divided by average net burn over how many closed
+   months?" [metrics-and-reporting: Burn and runway]
+
 ## Plan and what's coming (about 6 minutes)
 
-6. "Is there a budget or forecast? Where does it live, and is it the version to measure
+10. "Is there a budget or forecast? Where does it live, and is it the version to measure
    against?" [metrics-and-reporting: Plan and forecast]
-7. "What's the hiring plan for the rest of the year?" [metrics-and-reporting: Plan and forecast]
-8. "Any one-time costs or step changes coming: a price change, a big customer starting or
+11. "What's the hiring plan for the rest of the year?" [metrics-and-reporting: Plan and forecast]
+12. "Any one-time costs or step changes coming: a price change, a big customer starting or
    ending, a migration?" [metrics-and-reporting: Known changes coming]
-9. "Anything seasonal I should expect, and roughly how big is the swing?" [metrics-and-reporting:
+13. "Anything seasonal I should expect, and roughly how big is the swing?" [metrics-and-reporting:
    Seasonality]
 
 ## How reporting works (about 6 minutes)
 
-10. "Who reads the monthly numbers, in what format, and what do they always ask about?"
+14. "Who reads the monthly numbers, in what format, and what do they always ask about?"
     [metrics-and-reporting: Who reads the numbers]
-11. "Can you share the last monthly package or board deck you liked?" Save it to
+15. "Can you share the last monthly package or board deck you liked?" Save it to
     `handbook/sources/`. [metrics-and-reporting: Preferred format]
-12. "What size of month-over-month change deserves a sentence of explanation?" Skip if
+16. "What size of month-over-month change deserves a sentence of explanation?" Skip if
     `handbook/close-process.md` already has a flux threshold. [close-process: Flux review]
 
 ## People (about 5 minutes)
 
-13. "How do bonuses and commissions work, and when do they pay out?" [metrics-and-reporting:
+17. "How do bonuses and commissions work, and when do they pay out?" [metrics-and-reporting:
     People and payroll]
-14. "How are contractors and any international team engaged and paid?" [metrics-and-reporting:
+18. "How are contractors and any international team engaged and paid?" [metrics-and-reporting:
     People and payroll]
 
 ## The last question, always
 
-15. "What do you know about this business that the books would never tell me?"
+19. "What do you know about this business that the books would never tell me?"
     [company-overview: Things the books won't tell you]
 
 ## Finish
@@ -73,9 +82,12 @@ is a fine answer: record who does know as an open question in `CLAUDE.md` and mo
 - Add a Changelog line to `CLAUDE.md`: who was interviewed, which pages changed, and how many
   questions are still open.
 - Show the user what's still a placeholder, grouped by owner.
+- During first setup, add "Setup stage 2 (follow-up) done. Next: publish (optional)." to the
+  Changelog and offer the next stage as `SKILL.md` describes.
 
 ## Never
 
-- Never fill a definition or target with a "typical" value. If they don't answer, it stays a
-  placeholder.
+- Never write to a connected system. Read the books only to check an answer or compute a number.
+- Never guess. A definition or target the user doesn't give stays `[PLACEHOLDER: ...]`, listed
+  under Open questions with an owner. Never fill one with a "typical" value.
 - Never ask for tax or legal advice, or offer it. Record facts only.

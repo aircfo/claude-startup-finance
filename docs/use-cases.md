@@ -129,7 +129,7 @@ Try sharing:
 Prompt:
 
 ```text
-Use the follow-up-interview skill with me.
+Run the follow-up stage of the setup-finance-brain skill with me.
 ```
 
 Best with:

@@ -26,7 +26,7 @@ description: A free starter kit for building a finance brain that turns Claude i
   <div class="card">
     <span class="step-no">2</span>
     <h3>Skills</h3>
-    <p>One Claude skill per recurring task, each in its own folder. Setup skills that build your handbook, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
+    <p>One Claude skill per recurring task, each in its own folder. A setup skill that builds your handbook, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
   </div>
   <div class="card">
     <span class="step-no">3</span>
@@ -44,7 +44,7 @@ The kit follows the five-rung ladder for AI in finance. Find your rung and start
 | **0 · Chat** | Asking Claude questions one at a time | `new-skill` skill |
 | **1 · Skills** | A monthly task Claude can repeat on demand | `new-skill` skill |
 | **2 · Clean, connected data** | Claude reads your systems, and the inputs look the same every month | `handbook/systems-and-data.md` |
-| **3 · Shared context & workflows** | One place your policies and processes live | `build-handbook` skill |
+| **3 · Shared context & workflows** | One place your policies and processes live | `setup-finance-brain` skill |
 | **4 · Finance engineering** | Version control and review before anything hits the books | `testing/` and `handbook/workpaper-standard.md` |
 | **5 · The frontier** | New work finance couldn't do before | Everything above, running |
 
@@ -54,8 +54,8 @@ The kit follows the five-rung ladder for AI in finance. Find your rung and start
 2. **Add the folder** in Cowork with **Work in a folder**. Cowork reads `CLAUDE.md` automatically.
 3. **Pick a path:**
    - *30 minutes:* "Use the `new-skill` skill. I want to automate [one rec or JE you know cold]." Claude rebuilds last month's version, compares it to the real one until it matches, and saves the method as a new skill.
-   - *An afternoon:* "Use the `build-handbook` skill." Claude drafts every handbook page from your docs and any connected systems, then asks you only what they couldn't answer.
-   - *This month:* run the worked examples on your own books, add your recurring tasks, and publish the handbook as an internal website with the `build-handbook-site` skill.
+   - *An afternoon:* "Use the `setup-finance-brain` skill." Claude drafts every handbook page from your docs and any connected systems, asks you only what they couldn't answer, then runs a short follow-up with whoever owns the numbers.
+   - *This month:* run the worked examples on your own books, add your recurring tasks, and publish the handbook as an internal website (say "publish the handbook").
 
 Using Claude Code instead? Open the folder as a project and link `skills/` as `.claude/skills` so Claude Code runs the same files you edit. The full instructions are in the kit's [README](https://github.com/aircfo/claude-startup-finance/tree/main/templates/finance-brain).
 
@@ -68,7 +68,7 @@ Using Claude Code instead? Open the folder as a project and link `skills/` as `.
 
 ## See it finished
 
-The [example handbook](handbook-example/) is this kit filled in for Honestly Just Spreadsheets, Inc., a fictional Series A company, and published with the kit's own website skill. The kit also includes a finished, synthetic usage-accrual workpaper in `examples/workpapers/`.
+The [example handbook](handbook-example/) is this kit filled in for Honestly Just Spreadsheets, Inc., a fictional Series A company, and published with the kit's own publish step. The kit also includes a finished, synthetic usage-accrual workpaper in `examples/workpapers/`.
 
 ---
 

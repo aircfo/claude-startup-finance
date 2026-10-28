@@ -1,9 +1,4 @@
----
-name: build-handbook
-description: "Build or refresh the company's finance handbook. Reads the documents you share and any connected finance systems, drafts every page in handbook/ and the at-a-glance section of CLAUDE.md, then asks only the questions they couldn't answer. Use on first setup (when the Company at a glance section of CLAUDE.md is still placeholders), or when someone says \"set up the handbook,\" \"build my finance brain,\" \"refresh the handbook,\" or \"add this to the handbook.\""
----
-
-# Build the finance handbook
+# Stage 1: Interview (build the handbook)
 
 **Purpose:** fill in `CLAUDE.md` and every page in `handbook/` so Claude knows how this company
 does its accounting. Systems and documents fill the "what." The person running this fills the
@@ -37,7 +32,9 @@ prompts make sense:
 > time. The path: (1) confirm I can save to this folder, (2) check which finance systems I can
 > read, (3) you share any docs you have handy (optional), (4) I read your books and draft every
 > page, (5) I show you what I could fill on my own, (6) I ask you only the questions I couldn't
-> answer, (7) I run a few checks to make sure the handbook matches your books. Ready?"
+> answer, (7) I run a few checks to make sure the handbook matches your books. After that
+> there's a short follow-up with whoever owns the numbers, and an optional internal website.
+> Ready?"
 
 Give a one-line status update at each step.
 
@@ -55,7 +52,12 @@ the right company: for the accounting system, read the company name and show it 
 
 Show a short table: system, status (connected, partial, not connected), and what that means for
 the handbook. A missing system is never a blocker. Its sections stay as placeholders, or you
-ask for a specific export later.
+work from exports instead.
+
+**No accounting system connected?** Ask for these exports, each with its date range, and save
+them in `handbook/sources/`: the account list (chart of accounts), a trial balance and balance
+sheet at the last month end, and a monthly P&L for the last three closed months. Use them in
+step 4 and step 7 wherever these steps say "the books" or "the account list."
 
 ### 3. Invite documents (lightly)
 
@@ -81,7 +83,7 @@ dated reports, and page through large lists.
 | `cash.md` | Every bank, card, and treasury account on the balance sheet, with the last four digits if they appear in the name. Statement timing for cards if it's visible. |
 | `systems-and-data.md` | The connector status table from step 2. Data issues you noticed while reading (duplicates, clearing accounts that don't clear, uncategorized balances). Vendors or customers that appear under different names in different systems. |
 | `workpaper-standard.md` | Nothing to pull: the standard ships ready to use. If the user shared finished workpapers in step 3, note where their conventions differ (tab names, file naming) and ask which to keep. The aging threshold for reconciling items stays a placeholder for step 6. |
-| `metrics-and-reporting.md` | Only what the books show: revenue mix, gross margin, and average monthly cash out over the last three closed months, each computed in a calculation step. Definitions and targets stay placeholders; the user or the `follow-up-interview` skill fills them. |
+| `metrics-and-reporting.md` | Only what the books show: revenue mix, gross margin, and average monthly cash out over the last three closed months, each computed in a calculation step. Definitions and targets stay placeholders; the user or the follow-up (stage 2, `follow-up-questions.md`) fills them. |
 
 Write a first draft of each page and the "Company at a glance" section of `CLAUDE.md`. Fill
 what you can support, cite it, and placeholder the rest.
@@ -110,13 +112,14 @@ ask the most valuable first, and keep each one answerable in under a minute. Typ
 - **Materiality:** "What size of month-over-month change deserves a sentence of explanation?"
 - **Burn:** "What do you leave out when you talk about burn: transfers, fundraising, one-time
   costs?"
+- **Rec aging:** "How old can a reconciling item get before it's flagged?" Answer goes in
+  `workpaper-standard.md`.
 - **The last question, always:** "What do you know about this business that the books would never
   tell me?" Answers go in "Things the books won't tell you" in `company-overview.md`.
 
 Write each answer into the right page immediately. Offer to stop after the first 15 minutes and
 keep the rest as open questions with owners. Questions about metric definitions, the plan, and
-reporting can wait for the `follow-up-interview` skill, which is built for whoever owns
-the numbers.
+reporting can wait for the follow-up (stage 2), which is built for whoever owns the numbers.
 
 ### 7. Check the handbook against the books
 
@@ -130,6 +133,8 @@ calculation step for any arithmetic; never eyeball it.
   (Report it; don't fix it.)
 - Count of placeholders remaining, by page.
 
+If you had neither a connected system nor exports, say which checks were skipped and why.
+
 Anything that doesn't match becomes an open question in `CLAUDE.md`. A mismatch you find here is
 the handbook doing its job, so say so.
 
@@ -138,15 +143,17 @@ the handbook doing its job, so say so.
 - Update the "Last reviewed" line on every page you touched.
 - Update `CLAUDE.md`: the at-a-glance section, open questions, and a Changelog line saying what
   was built and what's still open.
-- Suggest next steps: "If `handbook/metrics-and-reporting.md` is mostly placeholders, run
-  the `follow-up-interview` skill with whoever owns the numbers. Then pick one task you
-  know cold and use the `new-skill` skill."
+- During first setup, add "Setup stage 1 (interview) done. Next: follow-up." to the Changelog
+  and offer the next stage as `SKILL.md` describes.
 
 ## Refreshing later
 
-Run this again any time. Re-read the systems, update what changed, and never overwrite something
-the user wrote or confirmed without asking. If the user says "add this to the handbook," fold it
-into the right page and log it in the Changelog.
+Run this again any time. A refresh skips the orientation message (step 0), logs "handbook
+refresh started" instead of "setup started" in step 1, reruns steps 2, 4, 5, and 7, and in step 6
+asks only questions that are new since the last run. Never overwrite something the user wrote or
+confirmed without asking. If the user says "add this to the handbook," save the document in
+`handbook/sources/`, fold what it says into the right pages, log it in the Changelog, and stop
+there. A refresh doesn't lead into the other stages.
 
 ## Never
 

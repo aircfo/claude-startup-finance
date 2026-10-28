@@ -28,7 +28,7 @@ end; reverses on the first day of the next month so the real invoice books clean
 | --- | --- | --- |
 | Usage for the period, by vendor | The vendor's usage dashboard or billing export, or a connected system | Units and dates for the full calendar month |
 | Contract rates | `handbook/accounting-policies.md`, or the contract | Rate per unit, tiers, minimums, committed spend |
-| Invoices already received | Accounting system, bills for the period | Anything already billed is not accrued |
+| Invoices already received | Accounting system, bills for the period (or an export of bills or AP detail for the period) | Anything already billed is not accrued |
 | Last month's accrual and the invoice that replaced it | Close folder and accounting system | For the true-up check |
 
 ## Steps

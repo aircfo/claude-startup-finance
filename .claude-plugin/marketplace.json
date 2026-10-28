@@ -10,7 +10,7 @@
       "name": "all-systems-go",
       "source": "./plugins/all-systems-go",
       "description": "Cross-system finance workflows, named for airCFO's All Systems Go series on the startup back-office stack. Adds Stripe, Ramp, and Mercury connectors plus workflows that read your Finance Brain first (runway & burn, revenue reconciliation, board metrics) and meta-skills to author your own. Pairs with the free Finance Brain Starter Kit.",
-      "version": "0.10.0",
+      "version": "0.10.1",
       "category": "finance",
       "keywords": [
         "finance",
