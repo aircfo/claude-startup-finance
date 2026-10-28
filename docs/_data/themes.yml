@@ -1,0 +1,31 @@
+# The tool library's themes, in the order the homepage shows them. Each tool in docs/_tools/
+# names one theme by its key. A theme with no published tool is hidden automatically, so a
+# theme can be defined here before its first tool ships.
+
+- key: foundation
+  name: Foundation
+  summary: Teach Claude your company's finance definitions once. Every other tool reads them first.
+
+- key: connected-stack
+  name: Connected stack
+  summary: Connect Stripe, Ramp, and Mercury once, read-only, with your own logins. Every tool that needs them shares these connectors.
+
+- key: cash-and-runway
+  name: Cash & runway
+  summary: How much cash you have, how fast it's going, and how long it lasts.
+
+- key: revenue-and-close
+  name: Revenue & close
+  summary: Tie revenue across systems and explain every gap before the books close.
+
+- key: reporting
+  name: Reporting
+  summary: Board- and investor-ready numbers, built from your own definitions.
+
+- key: ai-spend
+  name: AI spend & governance
+  summary: Where your company's AI money goes, and whether it's on plan.
+
+- key: build-your-own
+  name: Build your own
+  summary: Turn the workflows your team already runs into skills of your own.

@@ -17,6 +17,34 @@ forward.
 
 ## [Unreleased]
 
+### Changed
+
+- **The docs site is now a tool library organized by theme.** The homepage groups every
+  tool by the job it does (Foundation, Connected stack, Cash & runway, Revenue & close,
+  Reporting, Build your own), with ContextOS still the place to start. Each tool has its
+  own page at `/tools/<name>/` saying what it does, what it reads, and exactly which plugins
+  to install, in order. That page is the link a newsletter issue points at. Themes live in
+  `docs/_data/themes.yml` and tools in `docs/_tools/`, so new themes and tools are added
+  without touching layout code. The site navigation adds **Tools**, renames *First Session* to
+  **Get Started** and *Use Cases* to **Prompts**, and the homepage no longer frames the
+  plugins as early access.
+- **`all-systems-go` is the declared home of the shared Stripe, Ramp, and Mercury
+  connectors**, as `finance-contextos` is for QuickBooks. New plugins declare the systems
+  they read instead of bundling another copy; `docs/_data/connectors.yml` records which
+  plugin provides each one, and every tool page derives its install order from it.
+- Root README leads with the library and a theme table; the "What's in this repo" table
+  gains a Theme column and links each plugin's tool page.
+- `finance-contextos` and `all-systems-go` list their tool pages as `homepage`, and the
+  marketplace description points to the library. Metadata only; no version bump.
+
+### Added
+
+- `docs/authoring-conventions.md`: *Packaging versus navigation* (plugins are frozen once
+  published; the library can be regrouped freely), *Shared connectors*, *Plugins hosted in
+  another repository* (listed in this marketplace with a pinned `github` source once
+  public), and *Adding a tool to the library*. The skill-plugin scaffold, `CONTRIBUTING.md`,
+  and the pull-request checklist point to them.
+
 ### Removed
 
 - **`ai-cfo-lab` and its `ai-spend-analysis` skill (v0.3.0).** The skill moved into its

@@ -10,6 +10,8 @@ Each use case lists the connectors that make the workflow strongest. If a connec
 
 Some of these map to a dedicated workflow that ships with the plugin — runway and burn, board metrics, revenue reconciliation, and the account-map review. Others, like explaining a burn change or finding recurring vendors, are ad-hoc analyses Claude runs using your finance profile and connected systems. Either way you just ask; the ad-hoc ones are marked below.
 
+Each dedicated workflow also has its own page in the [tool library]({{ '/' | relative_url }}#tools), with what it reads and exactly what to install.
+
 ## 1. Runway And Burn
 
 Prompt:

@@ -19,21 +19,35 @@ numbers.**
      and embed it here with descriptive alt text. Intentionally left as a comment rather
      than a broken image reference. -->
 
-A Claude Cowork plugin marketplace for the startup back office, built around one idea:
-before AI touches your numbers, it should load **your ContextOS** — your company's finance
-context: what your metrics mean, how your accounts map into reporting, and the judgment
-calls your team carries in its head.
+The home of the Claude tools that ship with **[The AI CFO](https://www.aircfo.com/the-ai-cfo)**
+newsletter: a library for building an AI-powered startup finance function, built around one
+idea. Before AI touches your numbers, it should load **your ContextOS**, your company's
+finance context: what your metrics mean, how your accounts map into reporting, and the
+judgment calls your team carries in its head.
 
-Two plugins, in order:
+**→ [Browse the tool library](https://aircfo.github.io/claude-startup-finance/#tools)**:
+every tool, grouped by the job it does, each with its own page saying exactly what to
+install.
 
-1. **`finance-contextos`** — *start here.* Build your ContextOS from QuickBooks: a guided
+| Theme | Tools |
+| --- | --- |
+| **Foundation** | [Build your ContextOS](https://aircfo.github.io/claude-startup-finance/tools/contextos/), *start here* |
+| **Connected stack** | [All Systems Go](https://aircfo.github.io/claude-startup-finance/tools/all-systems-go/): the Stripe, Ramp, and Mercury connectors every other tool shares |
+| **Cash & runway** | [Runway & burn](https://aircfo.github.io/claude-startup-finance/tools/runway-and-burn/) |
+| **Revenue & close** | [Revenue reconciliation](https://aircfo.github.io/claude-startup-finance/tools/revenue-reconciliation/) |
+| **Reporting** | [Board metrics](https://aircfo.github.io/claude-startup-finance/tools/board-metrics/) |
+| **Build your own** | [Finance skill builder](https://aircfo.github.io/claude-startup-finance/tools/finance-skill-builder/) · [Finance skill tuner](https://aircfo.github.io/claude-startup-finance/tools/finance-skill-tuner/) |
+
+Two plugins deliver all of it, installed in order:
+
+1. **`finance-contextos`**, *start here.* Build your ContextOS from QuickBooks: a guided
    session drafts your account map, captures your definitions into a durable finance
    profile, and **proves the result ties to your live books**. One connector, one review,
    files you own.
-2. **`all-systems-go`** — the enrichment pack, named for airCFO's *All Systems Go* series
-   on the startup back-office stack. Adds Stripe, Ramp, and Mercury connectors plus
-   cross-system workflows (runway & burn, revenue reconciliation, board metrics) and
-   meta-skills to author your own — all reading your ContextOS first.
+2. **`all-systems-go`**, the connected stack, named for airCFO's *All Systems Go* series on
+   the startup back-office stack. It holds the Stripe, Ramp, and Mercury connectors that
+   every tool shares, plus the cross-system workflows above and the meta-skills to author
+   your own, all reading your ContextOS first.
 
 > **Unofficial.** Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury,
 > Intuit (QuickBooks), or Anthropic. All trademarks belong to their respective owners.
@@ -54,15 +68,16 @@ Two plugins, in order:
 
 ## What's in this repo
 
-| Type | Name | What it does | Install method | Docs |
-| --- | --- | --- | --- | --- |
-| Plugin | **`finance-contextos`** | Builds your ContextOS from QuickBooks — account map, finance profile, tie-out. Start here. | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/finance-contextos/README.md) · [ContextOS explainer](https://aircfo.github.io/claude-startup-finance/finance-profile-explainer.html) |
-| Plugin | **`all-systems-go`** | Adds Stripe, Ramp, and Mercury connectors plus cross-system workflows: runway & burn, revenue reconciliation, board metrics. | Cowork marketplace ([below](#install)) | [Plugin README](./plugins/all-systems-go/README.md) · [Use cases](https://aircfo.github.io/claude-startup-finance/use-cases.html) |
-| MCP server | **`qbo-mcp`** | The read-only QuickBooks MCP server behind `finance-contextos`. Runs on airCFO infrastructure by default; self-host it if you'd rather your books never touch ours. | Separate repo — [`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp) | [Self-hosting guide](https://aircfo.github.io/claude-startup-finance/self-hosting.html) |
+| Type | Name | Theme | What it does | Install method | Docs |
+| --- | --- | --- | --- | --- | --- |
+| Plugin | **`finance-contextos`** | Foundation | Builds your ContextOS from QuickBooks — account map, finance profile, tie-out. Start here. | Cowork marketplace ([below](#install)) | [Tool page](https://aircfo.github.io/claude-startup-finance/tools/contextos/) · [Plugin README](./plugins/finance-contextos/README.md) |
+| Plugin | **`all-systems-go`** | Connected stack, plus the workflows that use it | Provides the shared Stripe, Ramp, and Mercury connectors, plus cross-system workflows: runway & burn, revenue reconciliation, board metrics, and the skill builder and tuner. | Cowork marketplace ([below](#install)) | [Tool page](https://aircfo.github.io/claude-startup-finance/tools/all-systems-go/) · [Plugin README](./plugins/all-systems-go/README.md) |
+| MCP server | **`qbo-mcp`** | Foundation | The read-only QuickBooks MCP server behind `finance-contextos`. Runs on airCFO infrastructure by default; self-host it if you'd rather your books never touch ours. | Separate repo — [`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp) | [Self-hosting guide](https://aircfo.github.io/claude-startup-finance/self-hosting.html) |
 
 Anything airCFO publishes publicly for Claude — plugins, MCP servers, standalone skills —
-is indexed in this table, even when the code lives in its own repository. Start there
-rather than browsing directories.
+is indexed in this table, even when the code lives in its own repository. This table is the
+index for the repo; the [tool library](https://aircfo.github.io/claude-startup-finance/#tools)
+is the index for readers, with one page per tool.
 
 ### Not using Claude Cowork?
 
@@ -198,6 +213,8 @@ claude-startup-finance/
 │   │   └── README.md
 ├── templates/skill-plugin/           # copy-ready scaffold for a new skill plugin
 └── docs/                             # the published docs site (GitHub Pages)
+    ├── _tools/                       # one page per tool in the library
+    └── _data/                        # library themes + which plugin provides each connector
 ```
 
 ## Contributing

@@ -1,0 +1,5 @@
+<a class="card tool-card" href="{{ include.tool.url | relative_url }}">
+  <h3>{{ include.tool.title }}</h3>
+  <p>{{ include.tool.summary }}</p>
+  <p class="tool-meta">{% if include.tool.skill %}<code>/{{ include.tool.skill }}</code>{% else %}Plugin{% endif %}{% if include.tool.reads.size > 0 %} · {{ include.tool.reads | join: ", " }}{% endif %}</p>
+</a>

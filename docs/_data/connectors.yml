@@ -1,0 +1,13 @@
+# Which plugin provides each shared connector. A tool lists the systems it reads, and its page
+# tells readers to install the plugin that provides each one. A connector lives in exactly one
+# plugin: a new plugin declares the systems it reads instead of bundling its own copy (see
+# docs/authoring-conventions.md).
+
+QuickBooks:
+  plugin: finance-contextos
+Stripe:
+  plugin: all-systems-go
+Ramp:
+  plugin: all-systems-go
+Mercury:
+  plugin: all-systems-go
