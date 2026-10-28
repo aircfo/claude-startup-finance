@@ -58,6 +58,11 @@ When the user asks for one of these tasks, or names a skill, read its `SKILL.md`
 
 ## Level-up progress
 
+Where the team is on the ladder for AI in finance. The `level-up` skill reads and updates this
+section.
+
+- **Team:** Head of Finance plus a two-person outsourced accounting firm. Macs, Cowork today.
+  Biggest time sink: month-end accruals and recs.
 - **Rung:** 3, shared context and workflows. One handbook and one set of skills for the team.
 - **Last step:** 2026-10-15, follow-up interview done with the CEO and Head of Finance.
 - **Next step:** Head of Finance (champion) runs the GitHub and Claude Code setup in the

@@ -83,10 +83,12 @@ Where the team is on the ladder for AI in finance. The `level-up` skill reads an
 section. When someone asks what to do next, or how to get the team using Claude, use that
 skill and start from here.
 
+- **Team:** not recorded yet
 - **Rung:** not assessed yet. Say "help me level up" to start.
 - **Last step:** none yet
 - **Next step:** say "help me level up"
-- **Wins:** (the five most recent, for example "2026-10: usage accrual skill, 2 hours to 20 minutes")
+- **Wins:** none yet. Add one line per win, newest first, for example "2026-10: usage accrual
+  skill, 2 hours to 20 minutes." Keep the five most recent.
 
 ## Where outputs go
 

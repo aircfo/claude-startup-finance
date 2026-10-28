@@ -49,7 +49,8 @@ example `~/Documents/Finance Brain/`), and add it to Cowork with **Work in a fol
 reads `CLAUDE.md` automatically every time you work there.
 
 **Claude Code:** open the folder as your project and link the skills folder so Claude Code
-uses the same files you edit: `mkdir -p .claude && ln -s ../skills .claude/skills`. Each skill
+uses the same files you edit: `mkdir -p .claude && ln -s ../skills .claude/skills` on a Mac (on
+Windows, see "Add a teammate" in `skills/level-up/github-setup.md`). Each skill
 then runs when a request matches it, or directly as a slash command such as `/setup-finance-brain`.
 (Copying the folders also works, but then copy them again after every change.)
 

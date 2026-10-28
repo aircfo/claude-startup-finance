@@ -26,7 +26,7 @@ description: A free starter kit for building a finance brain that turns Claude i
   <div class="card">
     <span class="step-no">2</span>
     <h3>Skills</h3>
-    <p>One Claude skill per recurring task, each in its own folder. A setup skill that builds your handbook, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
+    <p>One Claude skill per recurring task, each in its own folder. A setup skill that builds your handbook, a level-up coach that brings your team along, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
   </div>
   <div class="card">
     <span class="step-no">3</span>

@@ -85,9 +85,10 @@ the person who ran it reviews it.
 When it has passed review (we suggest two clean months), change the skill's output location
 from `testing/` to the real close folder.
 
-If the new skill saves time or catches mistakes, add a line to Wins under "Level-up progress"
-in `CLAUDE.md`, for example "2026-11: software accrual skill, 90 minutes to 15 minutes." Keep
-the five most recent.
+Once it has passed review and saves time or catches mistakes, add a line to Wins under
+"Level-up progress" in `CLAUDE.md`, for example "2026-11: software accrual skill, 90 minutes to
+15 minutes." Keep the five most recent. If the folder is a GitHub repository, make every change
+in this step on a branch and open a pull request, so someone other than you approves it.
 
 ## Never
 

@@ -1,8 +1,9 @@
 # The ladder, for a team
 
-Six rungs, from asking Claude one question at a time to work finance couldn't do before.
+Rungs 0 to 5, from asking Claude one question at a time to work finance couldn't do before.
 Each rung lists what "done" looks like for a team, the moves to the next rung, and what
-usually gets in the way. A solo founder can follow the same ladder and skip the team moves.
+usually gets in the way. A solo founder can follow the same ladder, skip the team moves, and
+use "Working solo" in `github-setup.md` for rung 4.
 
 ## Rung 0: Chat
 
@@ -44,8 +45,9 @@ the same place and shape every time.
   who owns the close, then the follow-up with whoever owns the numbers.
 - **Give every handbook page an owner** (write it in the page's "Last reviewed" line). The
   owner keeps that page current.
-- **Put the folder where the whole team works from it:** a shared drive folder is fine for
-  now. Everyone opens the same folder in Cowork.
+- **Put the folder where the whole team works from it:** a shared drive folder is fine until
+  rung 4, when each person moves to their own copy of a GitHub repository. Everyone opens the
+  same folder in Cowork.
 - **Move personal skills into the shared `skills/` folder** and retire the duplicates.
 
 **Blockers:** nobody has time for the interview. Book 60 minutes after a close, and use the

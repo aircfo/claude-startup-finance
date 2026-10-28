@@ -5,23 +5,27 @@ counts, the author never approves their own change, and there's a full history o
 what and why. It's the same control the workpapers already have, applied to the method.
 
 **Who does it first:** one champion (usually the controller or a senior accountant), then each
-teammate with "Add a teammate" at the end. Budget 60 to 90 minutes for the champion.
+teammate with "Add a teammate" at the end, paired with the champion. Budget 60 to 90 minutes
+for the champion. **Working solo?** See "Working solo" near the end before you start.
 
 **Coach it one step at a time.** Give one step, have them run it, ask them to paste back what
-it printed, and check it before the next step. Every command below is typed into the
-computer's terminal, not into Claude:
+it printed, and check it before the next step. Record "GitHub setup: step N done" as the Last
+step in "Level-up progress" after each step, so a later session can pick up there. Every
+command below is typed into the computer's terminal, not into Claude:
 
 - **Mac:** press Cmd + Space, type "Terminal", press Enter.
 - **Windows:** open the Start menu, type "PowerShell", open "Windows PowerShell" (not as
   administrator unless a step says so).
 
 **Before you start, confirm:**
-- a Claude plan that includes Claude Code (Pro, Max, Team, or Enterprise);
+- a Claude plan that includes Claude Code (Pro, Max, Team, or Enterprise). On Team and
+  Enterprise plans, an admin may need to turn Claude Code on first;
 - a GitHub account for each person (free is fine to start);
 - permission to install software on the computer;
-- the company's answer to "may we store financial data in GitHub?" Until someone with the
-  authority says yes, the repository holds the handbook and skills only, and workpapers and
-  exports stay out (step 7 sets that up).
+- the company's answer to "may we store financial data in GitHub?" Note that the handbook
+  itself goes to GitHub: bank names with last four digits, policies, and thresholds. Confirm
+  that's fine. Until someone with the authority says yes to more, the repository holds the handbook and skills only. Step 8 makes that the
+  default, so workpapers, exports, and statements never upload.
 
 ## The big picture
 
@@ -48,8 +52,17 @@ before it becomes part of the shared copy. That's the heart of rung 4.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-It asks for the Mac's login password (nothing shows while typing; that's normal). At the end
-it may print "Next steps" with two or three lines to run. Run those lines exactly as printed.
+It asks for the Mac's login password (nothing shows while you type; that's normal), then asks
+you to press Return to continue. It may also download Apple's Command Line Tools, which can take
+10 minutes or more. At the end it prints "Next steps." On newer Macs (Apple silicon), those are
+these three lines; run them even if you closed the window:
+
+```bash
+echo >> ~/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
 Then check:
 
 ```bash
@@ -93,13 +106,18 @@ node --version
 code --version
 ```
 
-Python: on a Mac, `python3 --version`. On Windows, `python --version` (if that opens the
-Microsoft Store instead, use `py --version`).
+Python: on a Mac, `python3 --version`. On Windows, `python --version`; if that says Python
+wasn't found or opens the Microsoft Store, use `py --version` instead, and tell Claude Code
+later that this computer uses `py`.
 
 If a check says "command not found" or "not recognized," open a new terminal window and try
-again. On a Mac, rerun the "Next steps" lines from step 1. If it still fails, install that one
-tool from its website (git-scm.com, cli.github.com, nodejs.org, python.org,
+again. On a Mac, rerun the three "Next steps" lines from step 1. If it still fails, install that
+one tool from its website (git-scm.com, cli.github.com, nodejs.org, python.org,
 code.visualstudio.com) and check again.
+
+Nothing else to install for Python now. The first time Claude Code builds a workpaper, ask it
+to "set up Python for workpapers in this folder." It creates a private environment inside the
+folder and installs what it needs there.
 
 ## Step 3: Tell Git who you are
 
@@ -123,8 +141,10 @@ git config --global --list
 gh auth login
 ```
 
-Choose **GitHub.com**, then **HTTPS**, then **Login with a web browser**. It shows a one-time
-code; copy it, press Enter, paste the code in the browser, and approve. Check:
+Choose **GitHub.com**, then **HTTPS**. When it asks whether to authenticate Git with your
+GitHub credentials, choose **Yes** (the upload in step 9 depends on it). Then choose **Login
+with a web browser**: it shows a one-time code; copy it, press Enter, paste the code in the
+browser, and approve. Check:
 
 ```bash
 gh auth status
@@ -146,8 +166,9 @@ curl -fsSL https://claude.ai/install.sh | bash
 irm https://claude.ai/install.ps1 | iex
 ```
 
-It shows no progress while it downloads; wait for it to finish. Open a new terminal window,
-then check:
+It shows no progress while it downloads; wait for it to finish. If it prints a note about
+adding a folder to your PATH, follow the lines it prints. Open a new terminal window, then
+check:
 
 ```bash
 claude --version
@@ -157,108 +178,214 @@ claude doctor
 `claude doctor` checks the install and suggests fixes. If the install fails, the Claude Code
 setup guide (code.claude.com/docs/en/setup) matches each error to a fix.
 
-**Sign in:** type `claude` and press Enter. It opens the browser to sign in with your Claude
-account. Type `/exit` to leave when you're done.
+**Sign in:** type `claude` and press Enter. Choose the option for your Claude subscription
+account; it opens the browser to sign in. When it asks whether you trust the folder you're in,
+say yes only for your own folders. Type `/exit` to leave when you're done.
 
 **Optional:** in VS Code, open Extensions (the four-squares icon), search "Claude Code," and
 install the one from Anthropic, to use Claude Code in a panel beside your files.
 
-## Step 6: Create a GitHub organization for the team
+## Step 6: Decide where the repository lives
 
-An organization is a shared GitHub account for the company, so the repository doesn't belong
-to one person who might leave. On github.com: your profile picture, **Your organizations**,
-**New organization**, the free plan. Invite teammates later.
+- **A GitHub organization (recommended for a team).** An organization is a shared GitHub
+  account for the company, so the repository doesn't belong to one person who might leave. On
+  github.com: your profile picture, **Your organizations**, **New organization**, the free plan.
+- **The company already has a GitHub organization.** Ask its owner to create an **empty,
+  Private** repository named `finance-brain` (no README or other files) and give you **Write**
+  access. You'll use path B in step 9.
+- **Working solo.** Use your own GitHub username wherever this guide says `your-org`.
 
-Skip this if the company already has a GitHub organization; ask its owner to create the
-repository for you or give you permission.
+## Step 7: Make a working copy outside any synced folder
 
-## Step 7: Put the Finance Brain in a private repository
+Git keeps its history in a hidden folder, and file-syncing services (Google Drive, OneDrive,
+Dropbox, iCloud) are known to corrupt it. So the repository lives in a plain folder on your
+computer, not on a shared drive, and not in a Documents or Desktop folder that syncs. GitHub
+becomes the shared copy instead.
 
-**First, keep financial data out.** Ask Claude to create a file called `.gitignore` in the
-Finance Brain folder with these lines. It tells Git which files never to upload:
+**Copy the Finance Brain folder into your home folder.** Type the first part, then drag the
+Finance Brain folder from Finder or File Explorer into the terminal window, then type the end
+and press Enter.
 
-```text
-# Financial data stays out unless the company has approved storing it in GitHub.
-handbook/sources/
-testing/*
-!testing/README.md
-site/
-*.xlsx
-*.csv
-!examples/workpapers/*.xlsx
-.claude/skills
-.DS_Store
-~$*
-```
-
-**Then go to the folder in the terminal.** Type `cd`, a space, drag the Finance Brain folder
-from Finder or File Explorer into the terminal window, and press Enter. Check you're in the
-right place:
+**Mac:** type `cp -R `, drag the folder in, then type ` ~/finance-brain`:
 
 ```bash
-ls
+cp -R /path/to/Finance\ Brain ~/finance-brain
+cd ~/finance-brain
 ```
 
-(On Windows, `dir`.) You should see `CLAUDE.md`, `handbook`, and `skills`.
+**Windows:** type `Copy-Item -Recurse `, drag the folder in, then type ` $HOME\finance-brain`:
 
-**Save the first version and upload it** (replace `your-org` with the organization's name):
+```powershell
+Copy-Item -Recurse "C:\path\to\Finance Brain" $HOME\finance-brain
+cd $HOME\finance-brain
+```
+
+Check you're in the right place, and that it isn't already a Git repository:
+
+```bash
+git status
+```
+
+It should say "not a git repository." If it says anything else, stop here and work out with
+Claude what's already set up before going on. Then list the folder (`ls` on a Mac, `dir` on
+Windows): you should see `CLAUDE.md`, `handbook`, and `skills`.
+
+**Coaching in Cowork?** Cowork can only see folders you've given it. Add `~/finance-brain`
+with **Work in a folder** now, and keep coaching from there.
+
+From now on everyone works in their own copy of the repository. After step 9, rename the old
+shared-drive folder to "Finance Brain (old, now on GitHub)" so nobody keeps editing it.
+
+## Step 8: Keep financial data out
+
+Claude: first list every file in `~/finance-brain` that isn't a `.md` file (workpapers,
+statements, exports, PDFs) and show the user. Then create a file called `.gitignore` in that
+folder with exactly these lines. If one already exists, add these lines to it instead of
+replacing it. Files whose names start with a dot are hidden in Finder and File Explorer, so
+tell the user it's there even though they can't see it.
+
+```text
+# Allowlist: only the handbook pages, skills, and kit files are uploaded to GitHub.
+# Everything else (workpapers, exports, statements, PDFs) stays on this computer
+# unless the company has approved storing financial data in GitHub.
+/*
+!/CLAUDE.md
+!/README.md
+!/.gitignore
+!/.github/
+!/skills/
+!/examples/
+!/handbook/
+/handbook/*
+!/handbook/*.md
+!/testing/
+/testing/*
+!/testing/README.md
+
+# Never upload data files or these, wherever they are (even inside skills/).
+*.pdf
+*.xls
+*.xlsx
+*.xlsm
+*.csv
+*.json
+*.zip
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+.claude/skills
+
+# The kit's one synthetic example workpaper is the exception.
+!/examples/workpapers/*.xlsx
+```
+
+This is an allowlist: it blocks everything, then lets through only `CLAUDE.md`, the READMEs,
+the handbook's `.md` pages, the skills, and the kit's synthetic example. Spreadsheets, PDFs,
+and exports are blocked everywhere, even inside an allowed folder. A new folder or file
+type someone adds later stays off GitHub unless the team deliberately adds it here.
+
+## Step 9: Save the first version and upload it
 
 ```bash
 git init
 git add .
+git status
+```
+
+These start tracking the folder and stage the files to upload. **Paste what `git status`
+printed.** Claude: check every file under "Changes to be committed." It should only be
+`.gitignore`, `CLAUDE.md`, `README.md`, `.md` files in `handbook/`, `skills/`, and `testing/`,
+the site template in `skills/setup-finance-brain/site-template/`, and the example in
+`examples/`. If anything else is listed, stop and fix `.gitignore` before going on.
+
+Then save the first version:
+
+```bash
 git commit -m "Start our Finance Brain"
+```
+
+**Path A, a new repository** (replace `your-org` with the organization's name, or your
+username if you're solo):
+
+```bash
 gh repo create your-org/finance-brain --private --source=. --remote=origin --push
 ```
 
-In order, these: start tracking the folder, stage every file (except what `.gitignore`
-excludes), save the first version with a note, and create the private repo on GitHub and
-upload to it. Check it worked and is private:
+**Path B, an empty repository someone created for you:**
+
+```bash
+git remote add origin https://github.com/your-org/finance-brain.git
+git push -u origin main
+```
+
+**Check it worked and is private,** whichever path you took:
 
 ```bash
 gh repo view --web
 ```
 
-The browser opens the repo. Confirm it says **Private** next to the name, and that no
-workpapers or exports are in it.
+The browser opens the repo. Confirm it says **Private** next to the name, and that the files
+match the list you checked above. If it says Public, go to **Settings**, scroll to **Danger
+Zone**, and **Change visibility** to Private before anything else.
 
-## Step 8: Turn on review
+## Step 10: Invite a reviewer
+
+Review needs someone other than you. On the repo's GitHub page: **Settings**, **Collaborators
+and teams** (or **Collaborators** for a personal repo), **Add people**, and give one teammate
+the **Write** role. Only reviewers with Write access count toward a required approval. They
+must accept the email invitation before they can review or download the repo.
+
+## Step 11: Turn on review
 
 This is what makes "the author is never the approver" automatic. GitHub never lets someone
-approve their own pull request; this step makes approval required.
+approve their own pull request; this step makes an approval required before any change counts.
 
 On the repo's GitHub page: **Settings**, **Rules**, **Rulesets**, **New ruleset**, **New
 branch ruleset**.
 
 - Name it "Review required" and set **Enforcement status** to **Active**.
 - Under **Target branches**, add the **default branch**.
-- Turn on **Require a pull request before merging**, with **1** required approval.
-- Turn on **Block force pushes**.
+- Turn on **Require a pull request before merging**, with **1** required approval. Under it,
+  also turn on **Dismiss stale pull request approvals when new commits are pushed** and
+  **Require approval of the most recent reviewable push**. Without these, someone could add
+  changes after the approval and merge them unreviewed.
+- Make sure **Block force pushes** is on (it usually is by default).
 - Save.
 
-**If GitHub says this needs an upgrade:** enforcing rules on private repositories needs a paid
-GitHub plan (GitHub Team for organizations). Until then, agree as a team that nobody merges
-their own pull request, and check at the monthly skills review.
+**Check for a banner** saying the rules won't be enforced until you upgrade. Enforcing rules on
+a private repository needs a paid GitHub plan (GitHub Team for organizations, which has a
+per-user monthly cost). Without it, GitHub saves the ruleset but doesn't enforce it. Until you
+upgrade, agree as a team that nobody merges their own pull request, and check at the monthly
+skills review. Step 12 includes a test.
 
-**Optional, recommended: code owners.** Ask Claude to create `.github/CODEOWNERS` so the
-controller must approve changes to policies and skills (use their GitHub username), then turn
-on **Require review from Code Owners** in the ruleset:
+## Step 12: Your first pull request
 
-```text
-# The controller approves every change to policies and skills.
-/handbook/ @controller-username
-/skills/ @controller-username
-/CLAUDE.md @controller-username
-```
+Practice on something harmless. In `~/finance-brain`, start `claude` and say:
 
-Make this change through a pull request (step 10 shows how). It's good practice.
+> "Make a new branch, set the Last reviewed line in handbook/cash.md to today with my name,
+> commit it, and open a pull request."
 
-## Step 9: Connect your systems in Claude Code
+Claude runs the Git and GitHub commands, explaining each one, and gives you a link. Any
+progress notes recorded since step 9 can ride along in this same pull request.
 
-Connectors stay read-only, and each person signs in with their own login.
+**Test the rule:** on GitHub, try to merge your own pull request before anyone approves it. If
+review is enforced, GitHub blocks it. Then send the link to your reviewer. They open it, click
+**Files changed**, check the change, and click **Review changes**, choose **Approve**, then **Submit review**.
+Now merge it.
+
+That's the loop for every change from now on: a branch, a pull request, someone else approves,
+merge.
+
+## Step 13: Connect your systems in Claude Code
+
+Each person signs in with their own login. Some connectors offer write access; the kit's
+rules tell Claude never to use it, and it only reads.
 
 - **Connectors you've added on claude.ai** (for example QuickBooks) are available in Claude
   Code when you're signed in with the same Claude account. Inside Claude Code, type `/mcp` to
-  see them.
+  see them. On Team and Enterprise plans, an admin adds connectors on claude.ai for the
+  organization.
 - **Billing, spend, and banking connectors** for several common systems come in airCFO's free
   `all-systems-go` plugin, which also adds runway, revenue reconciliation, and board metrics
   workflows:
@@ -270,51 +397,78 @@ Connectors stay read-only, and each person signs in with their own login.
 
   Then start `claude`, type `/mcp`, and sign in to the ones you use.
 
-Check: in the Finance Brain folder, start `claude` and ask "Which finance systems can you read
-right now?"
+Check: in `~/finance-brain`, start `claude` and ask "Which finance systems can you read right
+now?"
 
-## Step 10: Your first pull request
+## Step 14 (optional): Code owners
 
-Practice on something harmless. In the Finance Brain folder, start `claude` and say:
+A code owners file makes specific people approve changes to policies and skills. Name **two**
+owners (for example the controller and a senior accountant): GitHub never lets the author
+approve their own change, so a single owner could never change their own pages. Owners need
+Write access (step 10).
 
-> "Make a new branch, set the Last reviewed line in handbook/cash.md to today with my name,
-> commit it, and open a pull request."
+Make this change through a pull request, the step 12 way. Ask Claude Code to create
+`.github/CODEOWNERS` with:
 
-Claude runs the Git and GitHub commands, explaining each one, and gives you a link. Send it to
-a teammate. They open it, click **Files changed**, check the change, and click **Review
-changes**, **Approve**. Then merge it on GitHub.
+```text
+# Changes to policies and skills need one of these people to approve.
+/handbook/ @owner-one @owner-two
+/skills/ @owner-one @owner-two
+/.github/CODEOWNERS @owner-one @owner-two
+```
 
-That's the loop for every change from now on: a branch, a pull request, someone else approves,
-merge.
+The last line means nobody can quietly change who the owners are.
+
+After it merges, open the ruleset from step 11 and turn on **Require review from Code
+Owners**.
+
+## Working solo
+
+A founder without a second person can still use most of this:
+
+- Do steps 1 to 9 and 13, using your own username. Git and a private repo give you full history
+  and an off-computer backup of the handbook and skills.
+- Skip steps 10, 11, 12's approval, and 14. A required review you can't satisfy would block
+  every change.
+- If you have an outside accountant or bookkeeper, consider making them your reviewer with
+  Write access. That restores "the author is never the approver."
 
 ## Add a teammate
 
-1. **The champion invites them:** the organization's **People** page, **Invite member**, then
-   give them access to the `finance-brain` repo.
-2. **The teammate does steps 1 to 5 and step 9** on their own computer.
-3. **They get the team's copy** (somewhere permanent, such as Documents):
+The champion pairs with each teammate the first time (in person or on a screen share).
+
+1. **The champion invites them** as in step 10. They accept the email invitation.
+2. **The teammate does steps 1 to 5 and step 13** on their own computer.
+3. **They get the team's copy** in their home folder (not a synced folder):
 
    ```bash
-   cd ~/Documents
+   cd ~
    gh repo clone your-org/finance-brain
    cd finance-brain
    code .
    ```
 
-   On Windows, use `cd $HOME\Documents` for the first line. The last line opens the folder in
-   VS Code.
-4. **They start Claude Code in that folder** (`claude`). It reads `CLAUDE.md`, and saying
-   "use the setup-finance-brain skill" (or any skill's name) works right away.
-5. **Optional, Mac:** for slash commands such as `/usage-accrual`, link the skills folder once:
+   On Windows, use `cd $HOME` for the first line. The last line opens the folder in VS Code.
+4. **They start Claude Code in that folder** (`claude`). It reads `CLAUDE.md`, and naming a
+   skill works right away, for example "use the bank-reconciliation skill for September."
+5. **Optional:** for slash commands such as `/usage-accrual`, link the skills folder once.
+   Mac:
 
    ```bash
    mkdir -p .claude && ln -s ../skills .claude/skills
    ```
 
-   On Windows this needs Developer Mode, so skip it; naming the skill works the same.
+   Windows (a "junction," which needs no special permissions):
 
-Teammates who prefer Cowork can open this same folder in Cowork for daily work. Their changes
-still go through a pull request, so they'll use Claude Code (or GitHub Desktop) for that step.
+   ```powershell
+   New-Item -ItemType Directory -Force .claude
+   New-Item -ItemType Junction -Path .claude\skills -Target "$PWD\skills"
+   ```
+
+   Without it, naming the skill works the same.
+
+Teammates who prefer Cowork can open their own copy (`~/finance-brain`) in Cowork for daily
+work. Changes still go through a pull request, so they use Claude Code for that step.
 
 ## The daily rhythm
 
@@ -328,8 +482,12 @@ still go through a pull request, so they'll use Claude Code (or GitHub Desktop) 
 ## If something goes wrong
 
 - **"Command not found" or "not recognized":** open a new terminal window. On a Mac, rerun the
-  Homebrew "Next steps" lines.
-- **GitHub sign-in problems:** run `gh auth login` again.
+  three Homebrew lines from step 1. For `claude`, follow the PATH note the installer printed,
+  or run `claude doctor`.
+- **GitHub sign-in problems:** run `gh auth login` again and answer Yes to authenticating Git.
+- **"Repository already exists"** in step 9: someone created it. Use path B.
+- **"Remote origin already exists"** in step 9: the remote is already set. Run
+  `git push -u origin main`.
 - **"Rejected" when uploading:** someone merged first. Say "get the latest, then try again,"
   and Claude sorts it out.
 - **Claude Code won't start or sign in:** run `claude doctor` and share what it prints.
@@ -341,6 +499,7 @@ happens in the browser.
 
 ## When this rung is done
 
-The repository is private, review is on (or agreed), the first pull request was approved by
-someone other than its author, and each teammate can get the latest and open a pull request.
-Record the team as on rung 4 in "Level-up progress" in `CLAUDE.md`.
+The repository is private, review is on (or agreed, until the plan is upgraded), the first pull
+request was approved by someone other than its author, the old shared-drive copy is retired,
+and each teammate can get the latest and open a pull request. Record the team as on rung 4 in
+"Level-up progress" in `CLAUDE.md`.

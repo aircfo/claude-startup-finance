@@ -1,6 +1,6 @@
 ---
 name: level-up
-description: "Coach a finance team up the ladder for AI in finance: work out where the team is today, pick the next one or two moves, walk through the first one step by step, and keep track of progress in CLAUDE.md. Covers rolling the Finance Brain out to a team and the full GitHub and Claude Code setup for reviewing changes. Use when someone says \"help me level up,\" \"what should we do next,\" \"how do I get my team using this,\" \"roll this out to the team,\" \"set up GitHub,\" \"install Claude Code,\" or asks how to get better at using Claude for finance work."
+description: "Coach a finance team up the ladder for AI in finance: work out where the team is today, pick the next one or two moves, walk through the first one step by step, and keep track of progress in CLAUDE.md. Covers rolling the Finance Brain out to a team and the full GitHub and Claude Code setup for reviewing changes. Use when someone says \"help me level up,\" \"what's our next rung,\" \"what should our team do next with Claude,\" \"how do I get my team using this,\" \"roll this out to the team,\" \"set up GitHub,\" \"install Claude Code,\" or asks how to get better at using Claude for finance work."
 ---
 
 # Level up
@@ -39,10 +39,14 @@ The people using this are accountants, controllers, and founders, not engineers.
 
 ### 1. Read where they are
 
+If this folder is a GitHub repository (the team is on rung 4 or above), get the latest first
+(`git pull`), so you read the team's current progress, not an old copy.
+
 Read the "Level-up progress" section of `CLAUDE.md` and the Changelog. "Setup stage" lines
-tell you how far the handbook setup has got. If progress shows a rung and a next step, say it
-back in one line ("Last time you were on rung 2, and the next step was connecting the bank.
-Pick up there?") and go to step 4.
+tell you how far the handbook setup has got. If Rung says "not assessed yet," go to step 2.
+Otherwise say it back in one line ("Last time you were on rung 1, and the next step was
+connecting the bank. Pick up there?"), use the Team line instead of asking again, and go to
+step 4. If the last step was partway through `github-setup.md`, pick up at the next step there.
 
 ### 2. Check in (first time only)
 
@@ -53,7 +57,9 @@ Ask these, a couple at a time, in plain words:
 2. How many people are on the finance team, and who reviews whose work?
 3. Which systems hold the numbers (accounting system, bank, card platform, billing,
    spreadsheets)?
-4. Mac or Windows? Claude Cowork, Claude Code, or both?
+4. Mac or Windows? And do you use Claude Cowork (the desktop app's Cowork tab), Claude Code
+   (Claude working in a folder from the terminal or VS Code), or both? It's fine not to know
+   yet.
 5. Which task eats the most time every month?
 
 ### 3. Place the team on a rung
@@ -83,15 +89,18 @@ If they can't do it now, write the move as the next step in progress and stop.
 
 Update the "Level-up progress" section of `CLAUDE.md`:
 
+- **Team:** size, Mac or Windows, Cowork or Claude Code, and the task that takes the most
+  time, from the check-in, so nobody has to answer twice.
 - **Rung:** the rung the team is on now.
 - **Last step:** what you just did, with the date.
 - **Next step:** the one thing to do next, specific enough that anyone on the team could start
   it.
 - **Wins:** when a move saved time or caught a mistake, add one line, for example
-  "2026-10: usage accrual skill, 2 hours to 20 minutes." Keep the five most recent; move older
-  ones to the Changelog.
+  "2026-10: usage accrual skill, 2 hours to 20 minutes." Keep the five most recent.
 
-Add a Changelog line too. Then tell them how to come back: "Say 'help me level up' any time,
+Add a Changelog line too. If the folder is a GitHub repository, make these updates on a
+branch and open a pull request (or add them to the pull request for the change you just made),
+so the team's copy stays the one source of truth. Then tell them how to come back: "Say 'help me level up' any time,
 and I'll pick up from here."
 
 ## Never
