@@ -17,6 +17,14 @@ forward.
 
 ## [Unreleased]
 
+### Removed
+
+- **`ai-cfo-lab` and its `ai-spend-analysis` skill (v0.3.0).** The skill moved into its
+  engine's repo, [aircfo/aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis),
+  which installs as its own plugin. Few if any outside installs used it here. The CI job
+  that tested its scripts went with it, so this repo has no test workflow until another
+  plugin ships tests.
+
 ### Added
 
 - Root README reworked into a hub: badge row, a one-line hook with three "what you get"

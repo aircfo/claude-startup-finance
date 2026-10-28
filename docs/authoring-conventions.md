@@ -52,9 +52,11 @@ this if the list gets long enough to be a browsing problem — grouping *retired
 an archive plugin is the escape hatch, since renaming or moving a live plugin breaks
 existing installs.
 
-**Never retroactively split or rename a published plugin.** `ai-cfo-lab` keeps
-`ai-spend-analysis` where it is, permanently. Moving it would break every install that
-already points at it. This repo has already migrated users once (the old `startup-finance`
+**Never retroactively split or rename a published plugin.** Moving one breaks every install
+that already points at it. The one exception so far: `ai-cfo-lab` and its only skill,
+`ai-spend-analysis`, were withdrawn on 2026-10-28, when the skill moved into its engine's own
+repo, [aircfo/aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis), and few
+if any outside installs used it. This repo has already migrated users once (the old `startup-finance`
 plugin split into `finance-contextos` + `all-systems-go`); a second forced migration would
 spend trust we don't need to spend.
 
@@ -100,13 +102,13 @@ plugin root:
 
 ```json
 {
-  "name": "ai-cfo-lab",
-  "source": "./plugins/ai-cfo-lab",
+  "name": "board-pack",
+  "source": "./plugins/board-pack",
   "description": "…",
   "version": "0.1.0",
   "category": "finance",
   "keywords": ["finance", "newsletter"],
-  "skills": ["./skills/ai-spend-analysis"]
+  "skills": ["./skills/board-pack"]
 }
 ```
 
@@ -150,7 +152,7 @@ the signal that anything changed.
    published writing, so a reader can get the exact version the piece described.
 
 Repo-wide tags cover the repo, not one plugin. When a release touches a single plugin, say
-so in the release title (`v1.2.0 — ai-cfo-lab`).
+so in the release title (`v1.2.0 — finance-contextos`).
 
 ## Before opening a pull request
 
