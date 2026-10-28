@@ -17,11 +17,41 @@ forward.
 
 ## [Unreleased]
 
+### Added
+
+- **The Finance Brain Starter Kit** (`templates/finance-brain/`): a copy-ready folder, no
+  plugin install, that gives Claude a finance handbook it reads every session (`CLAUDE.md` +
+  seven `handbook/` pages), commands organized by workflow (setup, JEs, recs, publish), a JE
+  and reconciliation workpaper standard, a `testing/` convention for new commands, a
+  static-site template for publishing the handbook, and a synthetic usage-accrual workpaper.
+  Its setup interview (`commands/setup/build-handbook.md`) drafts the handbook from your docs
+  and books and asks only what they can't answer; `commands/setup/follow-up-interview.md` is a
+  30-minute session with whoever owns the numbers. The kit's `metrics-and-reporting.md` page
+  (metric definitions, burn and runway, people, plan, audiences) and the Reporting rollups in
+  `chart-of-accounts.md` carry over what the ContextOS finance profile held.
+- `docs/finance-brain.md`: the kit's guide page, first in the docs nav.
+- `docs/handbook-example/`: the kit filled in for a fictional company and published with the
+  kit's own site command. `_source/` holds the markdown; `_build.py` rebuilds the pages.
+- `docs/downloads/finance-brain-starter-kit.zip`: the kit as a download; `_build_zip.py`
+  rebuilds it after any change to the kit.
+
 ### Changed
+
+- **`all-systems-go` 0.10.0 reads the Finance Brain instead of the ContextOS.** Every
+  workflow's first step reads the named handbook pages from the Finance Brain folder (or asks
+  where it is) instead of `finance-profile.md`. QuickBooks now comes from a QuickBooks
+  connector readers add in Claude's connector settings, such as Intuit's, rather than an
+  airCFO-hosted server. The skill-plugin scaffold follows the same pattern.
+- **The README and docs home lead with the Finance Brain Starter Kit.** Tool pages replace
+  "build your ContextOS first" with a pointer to the kit, and list a "connect QuickBooks in
+  Claude" step for tools that read it (`needs_contextos` is now `needs_finance_brain`).
+  *Data handling and security*, *Known limitations*, *Prompts*, `SECURITY.md`, and the issue
+  templates are rewritten for the kit and vendor-run connectors. The social card is
+  re-rendered.
 
 - **The docs site is now a tool library organized by theme.** The homepage groups every
   tool by the job it does (Foundation, Connected stack, Cash & runway, Revenue & close,
-  Reporting, Build your own), with ContextOS still the place to start. Each tool has its
+  Reporting, Build your own). Each tool has its
   own page at `/tools/<name>/` saying what it does, what it reads, and exactly which plugins
   to install, in order. That page is the link a newsletter issue points at. Themes live in
   `docs/_data/themes.yml` and tools in `docs/_tools/`, so new themes and tools are added
@@ -47,6 +77,12 @@ forward.
 
 ### Removed
 
+- **`finance-contextos` and its `finance-context-builder` skill.** The QuickBooks MCP server
+  it depended on is no longer public. Its setup interview and finance profile now live in the
+  Finance Brain Starter Kit. The ContextOS tool page, *First-session guide*, *What is a
+  ContextOS?*, *Self-hosting*, and *Early access brief* pages are gone with it. Existing
+  installs should uninstall `finance-contextos`; a ContextOS folder you built is still yours,
+  and its contents can be pasted into the kit's handbook pages.
 - **`ai-cfo-lab` and its `ai-spend-analysis` skill (v0.3.0).** The skill moved into its
   engine's repo, [aircfo/aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis),
   which installs as its own plugin. Few if any outside installs used it here. The CI job

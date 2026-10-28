@@ -51,12 +51,13 @@ a skill deserves its own plugin versus joining an existing one.
 
 ## If the plugin bundles a connector
 
-First check that no plugin already provides it: QuickBooks ships with `finance-contextos`,
-and Stripe, Ramp, and Mercury with `all-systems-go`. If one does, don't bundle it. List the
+First check that no plugin already provides it: Stripe, Ramp, and Mercury ship with
+`all-systems-go`, and QuickBooks isn't bundled at all (readers add a QuickBooks connector in
+Claude's connector settings). If either is true, don't bundle it. List the
 system in your tool page's `reads` instead, and the page will tell readers which plugin to
 install. See "Shared connectors" in the authoring conventions.
 
 Otherwise, add a `.mcp.json` alongside `.claude-plugin/`, following
-`plugins/finance-contextos/.mcp.json`. Connectors must be **read-only** wherever they touch
+`plugins/all-systems-go/.mcp.json`. Connectors must be **read-only** wherever they touch
 money or accounting records, and must authenticate as the user (their own OAuth login) —
 never a shared airCFO credential.

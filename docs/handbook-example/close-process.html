@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Close process · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html" aria-current="page">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li class="group">Reference</li>
+<li><a href="commands.html">Commands</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Close process</h1>
+<p><strong>What this page is for:</strong> when the books are trustworthy, what "closed" means, and who signs
+off.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<h2>Calendar</h2>
+<p>Business days (BD) after month end.</p>
+<table>
+<thead>
+<tr>
+<th>BD</th>
+<th>Task</th>
+<th>Owner</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BD1</td>
+<td>Ramp and bank feeds categorized in QuickBooks</td>
+<td>Accounting firm</td>
+<td></td>
+</tr>
+<tr>
+<td>BD2</td>
+<td>Stripe revenue and deferred revenue entries</td>
+<td>Accounting firm</td>
+<td></td>
+</tr>
+<tr>
+<td>BD3</td>
+<td>Bank and card reconciliations</td>
+<td>Accounting firm</td>
+<td><code>commands/recs/bank-reconciliation.md</code></td>
+</tr>
+<tr>
+<td>BD4</td>
+<td>Accruals and prepaid amortization</td>
+<td>Accounting firm</td>
+<td><code>commands/jes/usage-accrual.md</code>, <code>commands/jes/prepaid-amortization.md</code></td>
+</tr>
+<tr>
+<td>BD5</td>
+<td>Payroll and stock comp entries</td>
+<td>Accounting firm</td>
+<td></td>
+</tr>
+<tr>
+<td>BD6</td>
+<td>Flux review</td>
+<td>Head of Finance</td>
+<td></td>
+</tr>
+<tr>
+<td>BD8</td>
+<td>Close sign-off, period locked, reporting package to CEO</td>
+<td>Head of Finance</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>What "closed" means</h2>
+<p>Every balance-sheet account reconciled, every manual JE approved, clearing accounts at zero,
+flux explained, and the period locked in QuickBooks.</p>
+<p>Claude treats a month as <strong>open</strong> until all of that is true, and says so when asked about an
+open month's numbers.</p>
+<h2>Flux review</h2>
+<ul>
+<li><strong>Threshold:</strong> Any P&amp;L line that moves more than $5,000 and 10% month over month.</li>
+<li><strong>Comparison:</strong> Prior month, and the 2026 Operating Plan v3.</li>
+<li><strong>Who reviews:</strong> Head of Finance.</li>
+</ul>
+<h2>Sign-off</h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Who</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Each JE and rec approved</td>
+<td>Head of Finance (never the preparer)</td>
+<td>Sign-off block on the workpaper</td>
+</tr>
+<tr>
+<td>Close signed off</td>
+<td>Head of Finance</td>
+<td>Note in the close checklist</td>
+</tr>
+<tr>
+<td>Period locked</td>
+<td>Head of Finance</td>
+<td>QuickBooks closing date set</td>
+</tr>
+</tbody>
+</table>
+<h2>Where the close lives</h2>
+<ul>
+<li><strong>Checklist:</strong> Google Sheets, <code>Finance/Close/Close Checklist 2026</code></li>
+<li><strong>Workpapers:</strong> Google Drive, <code>Finance/Close/YYYY-MM/</code></li>
+<li><strong>Reporting package:</strong> Google Slides, sent to the CEO by BD8 and to the board quarterly</li>
+</ul>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    <code>commands/publish/build-handbook-site.md</code>.
+  </footer>
+</body>
+</html>

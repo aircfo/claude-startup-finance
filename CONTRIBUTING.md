@@ -37,8 +37,7 @@ claude-startup-finance/
 └── SECURITY.md
 ```
 
-MCP servers and webapps live in their **own repositories** (for example
-[`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp)) and are indexed in the root README's
+MCP servers and webapps live in their **own repositories** and are indexed in the root README's
 "What's in this repo" table. The marketplace pulls this entire repo on install, so nothing
 that doesn't need to ship to users belongs in it.
 
@@ -127,7 +126,7 @@ install path for most users.
 - Branch names: `feat/description`, `fix/description`, `docs/description`,
   `chore/description`.
 - [Conventional commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`,
-  `chore:`, `refactor:`, with a scope where it helps (`feat(finance-contextos): …`). Include
+  `chore:`, `refactor:`, with a scope where it helps (`feat(all-systems-go): …`). Include
   a body for anything non-trivial.
 - Bump `plugin.json` and the matching `marketplace.json` entry in lockstep, and add a
   `CHANGELOG.md` entry, when behavior changes.

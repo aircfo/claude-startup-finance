@@ -10,19 +10,23 @@ Tie Stripe activity to the revenue recorded in QuickBooks and explain any differ
 ## When to use this
 Trigger when the user wants to compare Stripe to their books, tie out revenue, or chase down why the two don't match — typically during month-end close, board prep, or audit prep.
 
-## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). It gives you the prebuilt bridge structure: which Stripe revenue maps to which QBO revenue account, how processing fees and refunds book, the recognition method (cash vs. ratable), and how deferred revenue, annual prepays, and coupons are treated — so you reconcile against known mappings instead of rediscovering them each time.
+## Step 0: Read the Finance Brain
+Read the company's Finance Brain first: the folder from the airCFO Finance Brain Starter Kit (a `CLAUDE.md` plus `handbook/`). It gives you the prebuilt bridge structure, so you reconcile against known mappings instead of rediscovering them each time:
+- `handbook/accounting-policies.md` (Revenue recognition): cash vs. ratable, annual prepays, deferred revenue, discounts, credits, and refunds.
+- `handbook/chart-of-accounts.md` (Reporting rollups): which QuickBooks accounts are recurring revenue and which are contra-revenue.
+- `handbook/systems-and-data.md` (Same thing, different names): customers that appear under different names in Stripe and QuickBooks, and known data issues such as payouts landing net of fees.
 
-Find the profile in this order:
-1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include a **ContextOS** pointer (the bounded block is labeled `airCFO Finance Context` in older installs), use the profile path it names.
-2. Else if `.aircfo-finance-context.json` exists in the current workspace, read `financeProfile` from it.
-3. Else check the default location: `~/Desktop/ContextOS/finance-profile.md` — then the legacy default `~/Desktop/airCFO Finance Context/finance-profile.md`.
-4. Else check the current workspace for `finance-profile.md`.
-5. If you still can't find it, run `finance-context-builder` first (or tell the user to). **Do not guess** the revenue mappings or recognition method — without the profile they're guesswork.
+Find it in this order:
+1. The current workspace, if it holds a `CLAUDE.md` and a `handbook/` folder. In Cowork the user usually works in that folder, so `CLAUDE.md` is already loaded.
+2. Otherwise, ask the user where their Finance Brain folder is. Don't search the disk at random.
+3. If there's no Finance Brain, say so and point the user to the free kit (https://aircfo.github.io/claude-startup-finance/finance-brain.html), where `commands/setup/build-handbook.md` builds one.
+
+**Do not guess** the revenue mappings or recognition method. Without the Finance Brain, or where a page you need still says `[PLACEHOLDER`, treat that definition as unknown: either stop, or label every number that depends on it as an assumption the user must confirm, and list it as an open question.
 
 ## Data to gather (for the same period — confirm the month or range with the user first)
 1. **Stripe**: gross volume, refunds, disputes, processing fees, and **net** payout volume for the period.
 2. **QuickBooks**: recognized revenue for the period (P&L revenue accounts), plus any deferred-revenue movement if the company recognizes ratably.
+   - QuickBooks comes from a QuickBooks connector the user adds in Claude's connector settings (for example, Intuit's), read-only with their own login. If it isn't connected, ask for the specific export instead: the report name and the exact date range.
 
 ## Why they differ (check each)
 - **Timing**: Stripe is cash-in; QBO revenue may be accrual or recognized over time — deferred revenue is the bridge.

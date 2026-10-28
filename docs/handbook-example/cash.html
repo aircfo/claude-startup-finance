@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Cash · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html" aria-current="page">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li class="group">Reference</li>
+<li><a href="commands.html">Commands</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Cash</h1>
+<p><strong>What this page is for:</strong> every place the company holds or spends money, how each maps to the
+general ledger, and what counts as cash for runway.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<h2>Accounts</h2>
+<table>
+<thead>
+<tr>
+<th>Account</th>
+<th>Institution</th>
+<th>Last 4</th>
+<th>GL account</th>
+<th>Purpose</th>
+<th>Counts as runway cash?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operating checking</td>
+<td>Mercury</td>
+<td>4821</td>
+<td>1010</td>
+<td>Payroll, bills, Ramp payments, Stripe payouts</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Treasury</td>
+<td>Mercury</td>
+<td>7710</td>
+<td>1020</td>
+<td>Excess cash</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Corporate card</td>
+<td>Ramp</td>
+<td>n/a</td>
+<td>2010 Ramp Card Payable</td>
+<td>Employee spend</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Stripe balance</td>
+<td>Stripe</td>
+<td>n/a</td>
+<td>1960 Stripe Clearing</td>
+<td>Pending payouts</td>
+<td>No (in transit)</td>
+</tr>
+</tbody>
+</table>
+<h2>Rules</h2>
+<ul>
+<li><strong>Runway cash:</strong> Operating plus treasury. Funds in transit from Stripe don't count until they land.</li>
+<li><strong>Restricted cash:</strong> None.</li>
+<li><strong>Transfers between our own accounts:</strong> Recorded as transfers between 1010 and 1020. They never count as spend or revenue.</li>
+<li><strong>Card and processor clearing:</strong> Ramp is paid in full from operating checking every week. Stripe payouts land net of fees; fees are grossed up through 1960 Stripe Clearing.</li>
+</ul>
+<h2>Statement timing</h2>
+<table>
+<thead>
+<tr>
+<th>Account</th>
+<th>Statement period</th>
+<th>Where statements are saved</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mercury operating and treasury</td>
+<td>Calendar month</td>
+<td><code>Finance/Close/YYYY-MM/Statements/</code></td>
+</tr>
+<tr>
+<td>Ramp card</td>
+<td>Calendar month</td>
+<td>Same folder</td>
+</tr>
+</tbody>
+</table>
+<h2>Reconciliations</h2>
+<p>Every account above gets reconciled monthly with <code>commands/recs/bank-reconciliation.md</code>.</p>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    <code>commands/publish/build-handbook-site.md</code>.
+  </footer>
+</body>
+</html>

@@ -5,7 +5,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Documentation
     url: https://aircfo.github.io/claude-startup-finance/
-    about: Install steps, the first-session guide, what a ContextOS is, security details, self-hosting, and known limitations.
+    about: The Finance Brain Starter Kit, install steps, prompts, security details, and known limitations.
 
   - name: Report a security vulnerability (private)
     url: https://github.com/aircfo/claude-startup-finance/blob/main/SECURITY.md

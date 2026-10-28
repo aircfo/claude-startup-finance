@@ -1,12 +1,13 @@
 # all-systems-go (plugin)
 
-The **enrichment pack** for your ContextOS — named for airCFO's *All Systems Go* series on
-the startup back-office stack. Where [`finance-contextos`](../finance-contextos/) builds
-your finance context from QuickBooks, this plugin connects the rest of that stack and adds
-cross-system workflows that read your ContextOS first.
+Cross-system finance workflows, named for airCFO's *All Systems Go* series on the startup
+back-office stack. This plugin connects Stripe, Ramp, and Mercury and adds workflows that
+read your company's definitions before they touch a number.
 
-**Install [`finance-contextos`](../finance-contextos/) first** — every workflow here reads
-the finance profile it produces. Without one, the workflows will tell you to build it.
+**Pairs with the [Finance Brain Starter Kit](https://aircfo.github.io/claude-startup-finance/finance-brain.html).**
+Every workflow here reads your Finance Brain first: the `CLAUDE.md` and `handbook/` folder
+the free kit helps you build. Without one, the workflows say so and won't guess at your
+definitions.
 
 ## Connectors
 
@@ -17,13 +18,16 @@ the finance profile it produces. Without one, the workflows will tell you to bui
 | Mercury | Remote (HTTP) | Per-user OAuth in your browser |
 
 You authenticate into **your own** accounts in your browser. API keys and OAuth tokens are
-not stored in this repository. The QuickBooks connector ships with `finance-contextos`,
-not here — the two plugins never double-register a connector.
+not stored in this repository.
 
-Connecting these systems enriches your ContextOS: re-run the context builder after
-authorizing and it maps each Mercury account, Ramp clearing account, and Stripe payout
-stream onto your GL (the money-flow graph), and fills the revenue, spend, and cash
-sections that QuickBooks alone can't.
+**QuickBooks** isn't bundled here. Revenue reconciliation and board metrics read it through
+a QuickBooks connector you add in Claude's connector settings (for example, Intuit's), with
+your own login. Without one, those workflows ask for the specific QuickBooks export they
+need instead.
+
+Connected these systems after building your Finance Brain? Re-run the kit's
+`commands/setup/build-handbook.md` and it folds each bank account, card, and payout stream
+into `handbook/cash.md` and `handbook/systems-and-data.md`.
 
 ## Skills
 
@@ -31,15 +35,15 @@ sections that QuickBooks alone can't.
 - **revenue-reconciliation** — tie Stripe revenue to QuickBooks recognized revenue and explain the gap.
 - **board-metrics** — a board-ready KPI pack (ARR/MRR, cash, burn, runway, AR/AP aging).
 
-Every workflow reads your ContextOS first — using the saved pointer when available and
-falling back to the default Desktop folder — so they all share one consistent model of
-the company: your definitions of burn and MRR, your account map, your judgment calls.
+Every workflow reads your Finance Brain first (the folder you're working in, or the one
+you point it to), so they all share one consistent model of the company: your definitions
+of burn and MRR, your reporting rollups, your judgment calls.
 
 ### Build your own
 
 The shipped workflows are starting points — every finance team runs its own. Two
 **meta-skills** turn *your* workflow into a reusable skill that follows the same house
-conventions (loads the ContextOS first, read-only, computation-checked math, confirms the
+conventions (reads the Finance Brain first, read-only, computation-checked math, confirms the
 period, paste-ready output):
 
 - **finance-skill-builder** — author a new skill, either by capturing a workflow you just
@@ -57,9 +61,9 @@ Just ask in plain English — the right skill runs automatically (e.g. "what's o
 → `runway-and-burn`). Each skill is also invocable by name (e.g. `/board-metrics`).
 
 Setup expectations:
-- **Best experience:** a built ContextOS plus Stripe, Ramp, and Mercury.
-- Missing connectors aren't blockers — their workflows and profile sections stay as
-  explicit placeholders until connected, never guesses.
+- **Best experience:** a built Finance Brain plus Stripe, Ramp, Mercury, and QuickBooks.
+- Missing connectors aren't blockers: whatever a workflow couldn't read stays an explicit
+  open question until connected, never a guess.
 
 ## Data handling & security
 
@@ -69,12 +73,12 @@ Setup expectations:
   Mercury.
 - Outputs are analysis for human review; every number cites its source, and unsourced
   values are flagged rather than filled.
-- Do not place secrets, tokens, or full account numbers in your ContextOS files.
+- Do not place secrets, tokens, or full account numbers in your Finance Brain files.
 
 ## Disclaimer
 
-Unofficial. Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury, or
-Anthropic. All trademarks belong to their respective owners.
+Unofficial. Not affiliated with, endorsed by, or sponsored by Stripe, Ramp, Mercury,
+Intuit (QuickBooks), or Anthropic. All trademarks belong to their respective owners.
 
 ---
 

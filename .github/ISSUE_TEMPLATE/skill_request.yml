@@ -54,7 +54,7 @@ body:
       description: >
         The company-specific decisions a person makes while doing this — which accounts count
         as cash, which costs are one-time, how you define the metric. These are what a
-        ContextOS captures, and they're usually the difference between a useful skill and a
+        Finance Brain captures, and they're usually the difference between a useful skill and a
         wrong one.
 
   - type: dropdown

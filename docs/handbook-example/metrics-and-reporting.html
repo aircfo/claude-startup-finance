@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Metrics and reporting · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html" aria-current="page">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li class="group">Reference</li>
+<li><a href="commands.html">Commands</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Metrics and reporting</h1>
+<p><strong>What this page is for:</strong> the numbers the company runs on, defined exactly, plus who reads
+them and when.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<blockquote>
+<p>Which accounts feed each metric lives in <a href="chart-of-accounts.html"><code>handbook/chart-of-accounts.md</code></a> (Reporting
+rollups), and which accounts count as cash lives in <a href="cash.html"><code>handbook/cash.md</code></a>.</p>
+</blockquote>
+<h2>The numbers we run on</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Exact definition</th>
+<th>Source</th>
+<th>Target or benchmark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MRR</td>
+<td>Subscription revenue recognized in the month (4000). Excludes onboarding fees (4100). ARR is MRR times 12.</td>
+<td>QuickBooks P&amp;L, closed months only</td>
+<td>2026 Operating Plan v3</td>
+</tr>
+<tr>
+<td>Gross margin</td>
+<td>Revenue less cost of revenue (5000-5999), as a % of revenue</td>
+<td>QuickBooks P&amp;L</td>
+<td>75% or better</td>
+</tr>
+<tr>
+<td>Net burn</td>
+<td>See Burn and runway below</td>
+<td>Mercury, checked against QuickBooks</td>
+<td>Plan v3</td>
+</tr>
+<tr>
+<td>Runway</td>
+<td>See Burn and runway below</td>
+<td>Mercury</td>
+<td>24 months or more</td>
+</tr>
+<tr>
+<td>Net revenue retention</td>
+<td>MRR this month from customers who existed 12 months ago, divided by their MRR then</td>
+<td>Stripe</td>
+<td>110% or better</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Boundary cases:</strong> Annual prepays count toward MRR as they're recognized, not when billed. Free
+trials are not revenue. Onboarding fees are services revenue, never MRR.</p>
+<h2>Burn and runway</h2>
+<ul>
+<li><strong>Gross burn:</strong> All cash out of Mercury operating checking, excluding transfers to treasury.</li>
+<li><strong>Net burn:</strong> Gross burn less cash collected from customers (Stripe payouts and wires).</li>
+<li><strong>Financing inflows:</strong> The Series A and any future equity or debt proceeds are excluded from net burn.</li>
+<li><strong>One-time items:</strong> Left out of run-rate burn when the Head of Finance says so, and listed in the monthly package. Current list: the November 2026 offsite.</li>
+<li><strong>Lookback window:</strong> Trailing three full closed months.</li>
+<li><strong>Runway:</strong> Runway cash (operating plus treasury, per <a href="cash.html"><code>handbook/cash.md</code></a>) divided by average monthly net burn over the lookback window.</li>
+</ul>
+<h2>Customers and revenue</h2>
+<ul>
+<li><strong>Customer list of record:</strong> Stripe.</li>
+<li><strong>Collections versus revenue:</strong> About 35% of ARR is billed annually in advance, so cash collected runs ahead of revenue in renewal months. Deferred revenue (2400) is the bridge.</li>
+<li><strong>Customer concentration:</strong> Flag any customer over 10% of ARR. Today none is.</li>
+</ul>
+<h2>People and payroll</h2>
+<ul>
+<li><strong>Headcount of record:</strong> Gusto. Contractors are listed separately.</li>
+<li><strong>Loaded cost:</strong> Salary plus 22% for payroll taxes and benefits.</li>
+<li><strong>Contractors:</strong> Engaged through Ramp bills, coded to 6150 Contractors by team, and not counted in headcount.</li>
+<li><strong>Bonuses and commissions:</strong> Quarterly bonuses accrued monthly at target and paid the month after quarter end. Sales commissions paid monthly on collected cash.</li>
+</ul>
+<h2>Plan and forecast</h2>
+<ul>
+<li><strong>Budget or forecast of record:</strong> Google Sheets, "2026 Operating Plan v3", board-approved March 2026. Variance is measured against it.</li>
+<li><strong>Hiring plan:</strong> Four roles in Q4 2026 (two engineers, one AE, one support lead), tracked in the plan's Headcount tab.</li>
+<li><strong>Known changes coming:</strong> The November 2026 offsite (about $60,000, one-time). A per-seat price increase for new customers in January 2027.</li>
+<li><strong>Seasonality:</strong> Annual renewals cluster in December and January, so collections spike then while MRR doesn't.</li>
+</ul>
+<h2>Who reads the numbers</h2>
+<table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>What they get</th>
+<th>Cadence</th>
+<th>What they always ask</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CEO</td>
+<td>Reporting package (Google Slides)</td>
+<td>Monthly, by BD8</td>
+<td>Runway, and burn against plan</td>
+</tr>
+<tr>
+<td>Board</td>
+<td>Board pack: the reporting package plus a KPI page</td>
+<td>Quarterly</td>
+<td>Net revenue retention, gross margin trend</td>
+</tr>
+<tr>
+<td>Investors</td>
+<td>Update email</td>
+<td>Monthly, by BD10</td>
+<td>MRR growth and runway</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Preferred format:</strong> Lead with MRR, net burn, and runway, then one paragraph of commentary per material variance. The September 2026 package is the model; it's saved in <code>handbook/sources/</code>.</li>
+<li><strong>Reporting only on closed months:</strong> numbers for a month that isn't closed (per
+  <a href="close-process.html"><code>handbook/close-process.md</code></a>) are labeled preliminary.</li>
+</ul>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    <code>commands/publish/build-handbook-site.md</code>.
+  </footer>
+</body>
+</html>

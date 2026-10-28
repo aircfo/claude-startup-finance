@@ -18,7 +18,7 @@ Either way, the skill inherits the house rubric below whether or not the user me
 
 ## The house rubric (always injected)
 Every finance skill this builder writes must:
-1. **Load `finance-profile.md` as Step 0** — read the company's semantic map before pulling data, so the skill never re-derives the account topology, the operating-vs-treasury split, or the pinned definitions. The skill should locate it via the saved **ContextOS** pointer (a workspace `CLAUDE.md` note or `.aircfo-finance-context.json`), then the default `~/Desktop/ContextOS/` folder (or the legacy `~/Desktop/airCFO Finance Context/`), then the current workspace. If it still can't be found, the skill tells the user to run `finance-context-builder` first and does not guess.
+1. **Read the Finance Brain as Step 0**: the company's `CLAUDE.md` and the `handbook/` pages the skill depends on (from the airCFO Finance Brain Starter Kit), read before pulling data, so the skill never re-derives the account setup, the operating-vs-treasury split, or the company's definitions. The skill looks in the current workspace for `CLAUDE.md` plus `handbook/`, otherwise asks the user where the folder is. If there's no Finance Brain, or a page it needs still says `[PLACEHOLDER`, it says so, points to the kit, and does not guess.
 2. **Be read-only** against every connector — never write to QuickBooks, Stripe, Ramp, or Mercury.
 3. **Use a computation step for aggregates** — never eyeball totals across many transactions.
 4. **Cite the source of every figure** — name the connector, report, and pull date behind each number, so it traces back to the system of record.
@@ -83,8 +83,8 @@ description: <what it does + concrete trigger phrases in the user's own words: "
 ## When to use this
 <Trigger conditions.>
 
-## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). <Name the specific definitions/accounts this skill relies on.> Find it in this order: (1) a **ContextOS** pointer in this session's instructions (e.g. a workspace `CLAUDE.md`; the bounded block is labeled `airCFO Finance Context` in older installs); (2) `.aircfo-finance-context.json` in the current workspace (`financeProfile`); (3) the default `~/Desktop/ContextOS/finance-profile.md`, then the legacy `~/Desktop/airCFO Finance Context/finance-profile.md`; (4) the current workspace. If you still can't find it, run `finance-context-builder` first — do not guess.
+## Step 0: Read the Finance Brain
+Read the company's Finance Brain first (`CLAUDE.md` plus `handbook/`). <Name the specific handbook pages and sections this skill relies on, e.g. `handbook/cash.md` for runway cash.> Find it in this order: (1) the current workspace, if it holds `CLAUDE.md` and `handbook/`; (2) otherwise ask the user where their Finance Brain folder is. If there's no Finance Brain, say so and point to the kit (https://aircfo.github.io/claude-startup-finance/finance-brain.html). Treat any `[PLACEHOLDER` on a page you need as unknown: do not guess.
 
 ## Data to gather
 <Connectors, reports, window.>

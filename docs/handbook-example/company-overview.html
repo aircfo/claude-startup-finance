@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Company overview · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html" aria-current="page">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li class="group">Reference</li>
+<li><a href="commands.html">Commands</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Company overview</h1>
+<p><strong>What this page is for:</strong> the facts Claude needs before it touches any number.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<h2>The business in two sentences</h2>
+<p>Honestly is per-seat software for finance teams that run on spreadsheets, sold to startups and
+mid-market companies. Customers pay monthly or annually in advance through Stripe; about 35% of
+ARR is annual prepaid.</p>
+<h2>Stage and team</h2>
+<ul>
+<li><strong>Stage and last raise:</strong> Series A, $12M, closed December 15, 2025.</li>
+<li><strong>Headcount:</strong> 38. Roster of record is the payroll provider.</li>
+<li><strong>Finance team:</strong> Head of Finance (owns the close and signs off). Outsourced accounting firm (categorization, recs, first-pass JEs). CEO approves anything over $25,000.</li>
+</ul>
+<h2>Entities</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Country</th>
+<th>Currency</th>
+<th>What it does</th>
+<th>Books kept in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Honestly Just Spreadsheets, Inc.</td>
+<td>US (Delaware)</td>
+<td>USD</td>
+<td>Everything</td>
+<td>QuickBooks Online</td>
+</tr>
+</tbody>
+</table>
+<h2>Systems: who owns which number</h2>
+<table>
+<thead>
+<tr>
+<th>Number</th>
+<th>System of record</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>General ledger / financial statements</td>
+<td>QuickBooks Online</td>
+<td></td>
+</tr>
+<tr>
+<td>Cash balances</td>
+<td>Mercury</td>
+<td>Operating and treasury accounts</td>
+</tr>
+<tr>
+<td>Card spend and reimbursements</td>
+<td>Ramp</td>
+<td>Syncs to QuickBooks daily</td>
+</tr>
+<tr>
+<td>Billing and subscriptions</td>
+<td>Stripe</td>
+<td>Payouts land in Mercury net of fees</td>
+</tr>
+<tr>
+<td>Payroll and headcount</td>
+<td>Gusto</td>
+<td>Not connected; export the payroll journal report</td>
+</tr>
+<tr>
+<td>Equity and stock comp</td>
+<td>Carta</td>
+<td></td>
+</tr>
+<tr>
+<td>Budget / forecast</td>
+<td>Google Sheets, "2026 Operating Plan v3"</td>
+<td>Board-approved March 2026</td>
+</tr>
+</tbody>
+</table>
+<h2>Who approves what</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Approver</th>
+<th>Threshold</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manual journal entries</td>
+<td>Head of Finance</td>
+<td>All</td>
+<td>CEO also approves entries over $25,000. Never the preparer.</td>
+</tr>
+<tr>
+<td>Bills and vendor payments</td>
+<td>Head of Finance</td>
+<td>Up to $10,000</td>
+<td>CEO above $10,000</td>
+</tr>
+<tr>
+<td>New vendors</td>
+<td>Head of Finance</td>
+<td></td>
+<td>Ramp vendor onboarding</td>
+</tr>
+<tr>
+<td>Card limit increases</td>
+<td>Head of Finance</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Month-end close sign-off</td>
+<td>Head of Finance</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Things the books won't tell you</h2>
+<ul>
+<li>Our largest customer always pays its annual invoice about 45 days late. It's their AP cycle, not a collections problem. Don't flag it until day 60.</li>
+<li>Our cloud credits ran out in August 2026, so the jump in hosting cost in September is expected, not a spike.</li>
+<li>The November 2026 offsite (about $60,000) is one-time. Exclude it from run-rate burn.</li>
+<li>Stripe payouts are net of fees. Fees are grossed up through Stripe clearing, so revenue is never understated.</li>
+</ul>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    <code>commands/publish/build-handbook-site.md</code>.
+  </footer>
+</body>
+</html>
