@@ -3,18 +3,25 @@ layout: default
 ---
 {%- comment -%}
   One page per tool in docs/_tools/. Front matter drives everything above and below the body:
-  theme, summary, plugin, skill, ask, reads, needs_contextos, time, and an optional issue.
-  The install order is derived, not written by hand: finance-contextos first when the tool
-  reads the ContextOS, then the plugin that provides each connector it reads
-  (docs/_data/connectors.yml), then the tool's own plugin.
+  theme, summary, plugin, skill, ask, reads, needs_finance_brain, time, and an optional issue.
+  The install order is derived, not written by hand: the plugin that provides each connector
+  the tool reads (docs/_data/connectors.yml), then the tool's own plugin. Systems with no
+  plugin are connected in Claude's connector settings instead, and listed as their own step.
 {%- endcomment -%}
 {%- assign theme = site.data.themes | where: "key", page.theme | first -%}
 {%- capture install_csv -%}
-  {%- if page.needs_contextos -%}finance-contextos,{%- endif -%}
-  {%- for system in page.reads -%}{{ site.data.connectors[system].plugin }},{%- endfor -%}
+  {%- for system in page.reads -%}
+    {%- if site.data.connectors[system].plugin -%}{{ site.data.connectors[system].plugin }},{%- endif -%}
+  {%- endfor -%}
   {{- page.plugin -}}
 {%- endcapture -%}
 {%- assign install_plugins = install_csv | split: "," | uniq -%}
+{%- capture direct_csv -%}
+  {%- for system in page.reads -%}
+    {%- unless site.data.connectors[system].plugin -%}{{ system }},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign direct_systems = direct_csv | split: "," -%}
 
 <article class="tool-page">
   <p class="eyebrow"><a href="{{ '/' | relative_url }}#{{ theme.key }}">{{ theme.name }}</a></p>
@@ -48,10 +55,10 @@ layout: default
       <dd>{{ page.reads | join: ", " }} <span class="glance-note">— read-only, with your own login</span></dd>
     </div>
     {%- endif %}
-    {%- if page.needs_contextos %}
+    {%- if page.needs_finance_brain %}
     <div>
-      <dt>Before you start</dt>
-      <dd>A built <a href="{{ '/tools/contextos/' | relative_url }}">ContextOS</a> — this tool reads your definitions first</dd>
+      <dt>Works best with</dt>
+      <dd>A <a href="{{ '/finance-brain.html' | relative_url }}">Finance Brain</a>: this tool reads your definitions first</dd>
     </div>
     {%- endif %}
     {%- if page.time %}
@@ -70,7 +77,7 @@ layout: default
 
   {{ content }}
 
-  {% include install-steps.html plugins=install_plugins ask=page.ask needs_contextos=page.needs_contextos %}
+  {% include install-steps.html plugins=install_plugins direct_systems=direct_systems ask=page.ask needs_finance_brain=page.needs_finance_brain %}
 
   {%- assign theme_tools = site.tools | where: "theme", page.theme | sort: "order" %}
   {%- if theme_tools.size > 1 %}

@@ -4,32 +4,13 @@
     "name": "airCFO",
     "email": "alex@aircfo.com"
   },
-  "description": "Read-only Claude tools for startup finance from The AI CFO newsletter, organized by theme at aircfo.github.io/claude-startup-finance. Start with finance-contextos to build your ContextOS; all-systems-go connects Stripe, Ramp, and Mercury and adds the workflows that use them. Not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
+  "description": "Read-only Claude tools for startup finance from The AI CFO newsletter, organized by theme at aircfo.github.io/claude-startup-finance. Start with the free Finance Brain Starter Kit (a download on the docs site, no install); all-systems-go connects Stripe, Ramp, and Mercury and adds the workflows that read it. Not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
   "plugins": [
-    {
-      "name": "finance-contextos",
-      "source": "./plugins/finance-contextos",
-      "description": "Start here. Build your company's ContextOS — the finance context Claude loads before touching your numbers. One QuickBooks connector (read-only, your own login), a guided account-map + finance-profile build with human review gates, and a tie-out that proves the result against your live books.",
-      "version": "0.9.0",
-      "category": "finance",
-      "keywords": [
-        "finance",
-        "contextos",
-        "startup",
-        "accounting",
-        "fpa",
-        "quickbooks",
-        "context"
-      ],
-      "skills": [
-        "./skills/finance-context-builder"
-      ]
-    },
     {
       "name": "all-systems-go",
       "source": "./plugins/all-systems-go",
-      "description": "The enrichment pack for your ContextOS, named for airCFO's All Systems Go series on the startup back-office stack. Adds Stripe, Ramp, and Mercury connectors plus cross-system workflows (runway & burn, revenue reconciliation, board metrics) and meta-skills to author your own. Install finance-contextos first.",
-      "version": "0.9.0",
+      "description": "Cross-system finance workflows, named for airCFO's All Systems Go series on the startup back-office stack. Adds Stripe, Ramp, and Mercury connectors plus workflows that read your Finance Brain first (runway & burn, revenue reconciliation, board metrics) and meta-skills to author your own. Pairs with the free Finance Brain Starter Kit.",
+      "version": "0.10.0",
       "category": "finance",
       "keywords": [
         "finance",
@@ -38,8 +19,7 @@
         "fpa",
         "stripe",
         "ramp",
-        "mercury",
-        "contextos"
+        "mercury"
       ],
       "skills": [
         "./skills/runway-and-burn",

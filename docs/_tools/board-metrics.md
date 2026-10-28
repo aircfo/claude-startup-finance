@@ -7,7 +7,7 @@ plugin: all-systems-go
 skill: board-metrics
 ask: Give me board metrics for last month.
 reads: [Stripe, Mercury, Ramp, QuickBooks]
-needs_contextos: true
+needs_finance_brain: true
 time: A few minutes per month
 ---
 
@@ -36,7 +36,7 @@ highlights from Ramp and month-over-month changes wherever a prior period exists
 | AR and AP aging | QuickBooks |
 | Spend highlights | Ramp |
 
-Every metric uses your ContextOS definitions, so board MRR means what *you* mean by MRR,
+Every metric uses the definitions in your Finance Brain, so board MRR means what *you* mean by MRR,
 and it matches the other tools.
 
 ## Try asking

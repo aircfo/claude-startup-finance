@@ -19,8 +19,9 @@ this page is the detail behind it.
 | Product type | Home | Why |
 | --- | --- | --- |
 | Plugin (skills + bundled connectors) | `plugins/<name>/` in this repo | The Cowork marketplace installs from this repo's `.claude-plugin/marketplace.json`. |
+| Template (a folder readers copy, no install) | `templates/<name>/` in this repo, plus a guide page and a `.zip` under `docs/` | Readers download it and own it. The Finance Brain Starter Kit is the first; `docs/downloads/_build_zip.py` rebuilds its zip, so run it after any change to the kit. |
 | Standalone skill | A plugin directory in this repo (see below) | Skills need a plugin wrapper to appear in the marketplace; they also install directly via the `skills` CLI. |
-| MCP server | **Its own repository** (e.g. [`aircfo/qbo-mcp`](https://github.com/aircfo/qbo-mcp)) | Servers deploy and version on their own cadence, and the marketplace pulls this whole repo on install — server code would bloat every user's install. |
+| MCP server | **Its own repository** | Servers deploy and version on their own cadence, and the marketplace pulls this whole repo on install — server code would bloat every user's install. |
 | Micro webapp / demo | **Its own repository**, or the docs site if it's a static page | Same reason: build artifacts and deploy pipelines don't belong in an install payload. |
 
 **Everything airCFO publishes for Claude gets a row in the root README's "What's in this
@@ -60,7 +61,7 @@ newsletter drop.
 **Add it to an existing plugin when it's a supporting part of that plugin's job.** A skill
 that only makes sense with a sibling skill's output, or a small utility inside an existing
 workflow family, belongs in that plugin. `all-systems-go` is a deliberate bundle: its
-workflows share connectors and all read the ContextOS first.
+workflows share connectors and all read the reader's Finance Brain first.
 
 **The trade-off, stated plainly.** One plugin per skill means a reader who wants five drops
 performs five installs, and the marketplace list grows with every issue. Bundling means new
@@ -74,20 +75,26 @@ existing installs.
 that already points at it. The one exception so far: `ai-cfo-lab` and its only skill,
 `ai-spend-analysis`, were withdrawn on 2026-10-28, when the skill moved into its engine's own
 repo, [aircfo/aicfo-spend-analysis](https://github.com/aircfo/aicfo-spend-analysis), and few
-if any outside installs used it. This repo has already migrated users once (the old `startup-finance`
-plugin split into `finance-contextos` + `all-systems-go`); a second forced migration would
-spend trust we don't need to spend.
+if any outside installs used it. The second: `finance-contextos` and its
+`finance-context-builder` skill, withdrawn on 2026-10-28 when the QuickBooks MCP server it
+depended on went private. Its setup interview and finance profile were folded into the Finance
+Brain Starter Kit (`templates/finance-brain/`), which needs no install. Before that, this repo
+migrated users once (the old `startup-finance` plugin split into `finance-contextos` +
+`all-systems-go`). Each forced migration spends trust, so treat withdrawal as the exception.
 
 ## Shared connectors
 
-**A connector lives in exactly one plugin.** Plugin-declared connectors are namespaced per
+**A connector lives in at most one plugin.** Plugin-declared connectors are namespaced per
 plugin, so bundling the same system twice gives readers two copies to authorize and keep
 straight. The current owners:
 
 | System | Provided by |
 | --- | --- |
-| QuickBooks | `finance-contextos` |
 | Stripe, Ramp, Mercury | `all-systems-go` |
+| QuickBooks | No plugin. Readers add a QuickBooks connector (such as Intuit's) in Claude's connector settings. |
+
+A system with no plugin is listed in `connectors.yml` with an empty `plugin`, and tool pages
+that read it show a "connect it in Claude's connector settings" step instead of an install.
 
 A new plugin that reads one of these systems **does not bundle it**. It declares the system
 in its tool page's `reads` list instead, and the page tells readers to install the plugin
@@ -217,7 +224,7 @@ newsletter link might point at: a skill, or a plugin that's mostly connectors (l
    skill: runway-and-burn          # omit for a connector-pack page
    ask: What's our runway?         # the first thing to say to it
    reads: [Mercury, Ramp, Stripe]  # systems it reads; names from _data/connectors.yml
-   needs_contextos: true           # true if it reads the ContextOS first
+   needs_finance_brain: true       # true if it reads the reader's Finance Brain first
    time: A minute or two per run
    issue:                          # optional, once an AI CFO issue features it
      title: Issue title
@@ -226,9 +233,10 @@ newsletter link might point at: a skill, or a plugin that's mostly connectors (l
    ```
 
    The page layout turns this into the "at a glance" panel and the install steps. The
-   install order is **derived**, never typed by hand: `finance-contextos` first if
-   `needs_contextos`, then the plugin providing each system in `reads`, then the tool's own
-   plugin. Set `plugin_home: true` on the one page that introduces a plugin, so other pages
+   install order is **derived**, never typed by hand: the plugin providing each system in
+   `reads`, then the tool's own plugin. Systems with no plugin (QuickBooks) get a "connect it
+   in Claude's connector settings" step, and `needs_finance_brain` adds a step pointing to the
+   starter kit. Set `plugin_home: true` on the one page that introduces a plugin, so other pages
    link to it.
 3. **Write the body** in the house shape: *What you get*, how it works (in terms a finance
    reader cares about, not implementation), and *Try asking* with one or two prompts.
@@ -238,9 +246,9 @@ newsletter link might point at: a skill, or a plugin that's mostly connectors (l
    request. Any Jekyll 3.10 setup works, the version GitHub Pages runs:
 
    ```bash
-   docker run --rm -v "$PWD/docs:/site:ro" -v "$PWD/_site:/out" ruby:3.3-slim sh -c \
-     'gem install --no-document jekyll -v 3.10.0 jekyll-relative-links kramdown-parser-gfm >/dev/null \
-      && jekyll build --source /site --destination /out'
+   docker run --rm -v "$PWD/docs:/site:ro" -v "$PWD/_site:/out" ruby:3.3 sh -c \
+     "gem install --no-document 'jekyll:3.10.0' 'jekyll-relative-links:0.6.1' kramdown-parser-gfm >/dev/null \
+      && jekyll _3.10.0_ build --source /site --destination /out"
    ```
 
 ## Release process
@@ -259,7 +267,7 @@ the signal that anything changed.
    published writing, so a reader can get the exact version the piece described.
 
 Repo-wide tags cover the repo, not one plugin. When a release touches a single plugin, say
-so in the release title (`v1.2.0 — finance-contextos`).
+so in the release title (`v1.2.0 — all-systems-go`).
 
 ## Before opening a pull request
 

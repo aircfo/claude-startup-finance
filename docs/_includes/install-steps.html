@@ -1,6 +1,7 @@
 {%- comment -%}
   Install steps shared by every tool page. Takes the ordered plugin list the tool layout
-  derives, plus the tool's first prompt and whether it reads the ContextOS.
+  derives, the systems connected directly in Claude, the tool's first prompt, and whether it
+  reads a Finance Brain.
 {%- endcomment -%}
 <h2 id="install">Install</h2>
 <p>You'll need <a href="https://claude.com/product/cowork">Claude Cowork</a> (the Cowork tab in the Claude desktop app, on a Pro, Max, Team, or Enterprise plan). Everything installs from inside Cowork — no command line.</p>
@@ -9,8 +10,11 @@
   <li><strong>Install</strong>
     {%- for plugin_name in include.plugins %} <code>{{ plugin_name }}</code>{% unless forloop.last %}, then{% endunless %}{% endfor -%}
     . Already installed? Click <strong>Update</strong> on the marketplace instead, so you have the latest version.</li>
-  {%- if include.needs_contextos %}
-  <li><strong>Build your ContextOS</strong> if you haven't yet: say <code>build my ContextOS</code>. It takes about 20 minutes, once — the <a href="{{ '/first-session-guide.html' | relative_url }}">first-session guide</a> walks through it.</li>
+  {%- if include.direct_systems.size > 0 %}
+  <li><strong>Connect {{ include.direct_systems | join: " and " }}</strong> in Claude's connector settings, read-only, with your own login, using the vendor's own connector (Intuit's, for QuickBooks). Not connected? The tool asks for the export it needs instead.</li>
+  {%- endif %}
+  {%- if include.needs_finance_brain %}
+  <li><strong>Work from your Finance Brain</strong> if you have one: open the folder with <strong>Work in a folder</strong> so the tool reads your definitions. No Finance Brain yet? <a href="{{ '/finance-brain.html' | relative_url }}">Download the free starter kit</a>.</li>
   {%- endif %}
   {%- if include.ask %}
   <li><strong>Ask:</strong> <code>{{ include.ask }}</code></li>

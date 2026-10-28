@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Systems and data · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html" aria-current="page">Systems and data</a></li>
+<li><a href="workpaper-standard.html">Workpaper standard</a></li>
+<li class="group">Reference</li>
+<li><a href="skills.html">Skills</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Systems and data</h1>
+<p><strong>What this page is for:</strong> what Claude can read directly, and the habits that keep inputs
+consistent enough for a skill to run the same way every month.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<h2>What Claude is connected to</h2>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Connected?</th>
+<th>Access</th>
+<th>What Claude uses it for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QuickBooks Online</td>
+<td>Yes</td>
+<td>Read-only</td>
+<td>GL detail, trial balance, account list</td>
+</tr>
+<tr>
+<td>Mercury</td>
+<td>Yes</td>
+<td>Read-only</td>
+<td>Balances and transactions for recs</td>
+</tr>
+<tr>
+<td>Ramp</td>
+<td>Yes</td>
+<td>Read-only</td>
+<td>Card transactions, receipts, vendors</td>
+</tr>
+<tr>
+<td>Stripe</td>
+<td>Yes</td>
+<td>Read-only</td>
+<td>Invoices, subscriptions, payouts</td>
+</tr>
+<tr>
+<td>Google Drive</td>
+<td>Yes</td>
+<td>Read and write to <code>Finance/Close/</code> only</td>
+<td>Prior-period workpapers, saving new ones</td>
+</tr>
+<tr>
+<td>Gusto</td>
+<td>No</td>
+<td>Export</td>
+<td>Payroll journal report, saved to the period folder</td>
+</tr>
+<tr>
+<td>Stratus Cloud, Lattice Inference</td>
+<td>No</td>
+<td>Export</td>
+<td>Monthly usage CSV from each vendor's billing page</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Read-only is the rule.</strong> Skills never post, pay, or edit records. A person posts what Claude
+prepares.</p>
+<h2>The clean-inputs checklist</h2>
+<ul>
+<li>☑ Last month's version of every automated task exists and has been reviewed.</li>
+<li>☑ Same workpaper shape every month (the standard in <a href="workpaper-standard.html"><code>handbook/workpaper-standard.md</code></a>).</li>
+<li>☑ Predictable file names: <code>{GL} - {account} - {description} {YYYY.MM}.xlsx</code>.</li>
+<li>☑ One folder per period: <code>Finance/Close/YYYY-MM/</code> with <code>JEs/</code>, <code>Recs/</code>, <code>Statements/</code>.</li>
+<li>☑ Schedules live in one place: <code>Finance/Schedules/</code>.</li>
+<li>☐ Chart of accounts current. 6990 Ask My Accountant still has a $412 balance to clear.</li>
+<li>☑ Exports are saved into the period folder, not pasted.</li>
+</ul>
+<h2>Same thing, different names</h2>
+<table>
+<thead>
+<tr>
+<th>In QuickBooks Online</th>
+<th>In another system</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stratus Cloud</td>
+<td><code>STRATUS*CLOUD SVCS</code> on the Ramp card feed</td>
+<td>Same vendor. Production and staging split by project tag.</td>
+</tr>
+<tr>
+<td>Lattice Inference</td>
+<td><code>LATTICE AI INC</code> on the Ramp card feed</td>
+<td>Same vendor.</td>
+</tr>
+<tr>
+<td>Gusto</td>
+<td><code>GUSTO NET</code>, <code>GUSTO TAX</code> in Mercury transactions</td>
+<td>Net pay and payroll taxes debit separately.</td>
+</tr>
+<tr>
+<td>Customer legal names</td>
+<td>Stripe customer display names</td>
+<td>Stripe is the customer list of record. Match on the Stripe customer ID in the QuickBooks customer notes.</td>
+</tr>
+</tbody>
+</table>
+<h2>Known data issues</h2>
+<ul>
+<li>Ramp occasionally syncs a refund twice. The card rec catches it; delete the duplicate in QuickBooks after review.</li>
+<li>Stratus Cloud's usage export splits production and staging by project tag. Untagged usage goes to production until someone tags it.</li>
+</ul>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    the <code>build-handbook-site</code> skill.
+  </footer>
+</body>
+</html>

@@ -26,17 +26,20 @@ REPLACE: the non-negotiables for this skill. Keep the ones that apply:
   what you can and mark the rest.
 - **Always pass explicit date ranges** on dated report pulls — both a start and an end date.
 
-## Step 0 · Load the ContextOS
+## Step 0 · Read the Finance Brain
 
-REPLACE or delete. If this skill reasons about company-specific finance definitions, load
-the finance profile first so it uses the company's own definitions of burn, runway, and
-revenue:
+REPLACE or delete. If this skill reasons about company-specific finance definitions, read
+the company's Finance Brain first (the `CLAUDE.md` and `handbook/` folder from the airCFO
+Finance Brain Starter Kit) so it uses the company's own definitions of burn, runway, and
+revenue. Name the handbook pages this skill depends on:
 
-> Look for the pointer file `.aircfo-finance-context.json` in the workspace; fall back to
-> `~/Desktop/ContextOS/finance-profile.md`, then to the legacy
-> `~/Desktop/airCFO Finance Context/finance-profile.md`. If no profile exists, say so and
-> offer to run `/finance-context-builder` first — then continue with stated assumptions
-> rather than silently inventing definitions.
+> Read `CLAUDE.md` and REPLACE: the pages this skill needs, e.g.
+> `handbook/metrics-and-reporting.md` and `handbook/cash.md`. Look in the current workspace
+> first; if there's no `CLAUDE.md` plus `handbook/` there, ask the user where their Finance
+> Brain folder is. If there's none, say so and point to the kit
+> (https://aircfo.github.io/claude-startup-finance/finance-brain.html), then continue with
+> stated assumptions rather than silently inventing definitions. Treat any
+> `[PLACEHOLDER` on a page you need as unknown.
 
 ## Steps
 

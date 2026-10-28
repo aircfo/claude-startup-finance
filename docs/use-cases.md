@@ -4,11 +4,11 @@ title: Use Cases And Prompts
 
 # Use Cases And Prompts
 
-Use these prompts after you have created a first version of `finance-profile.md`.
+Use these prompts after you've built a first version of your [Finance Brain]({{ '/finance-brain.html' | relative_url }}) and opened its folder in Cowork.
 
 Each use case lists the connectors that make the workflow strongest. If a connector is missing, Claude should say what is incomplete and leave open questions rather than guessing.
 
-Some of these map to a dedicated workflow that ships with the plugin — runway and burn, board metrics, revenue reconciliation, and the account-map review. Others, like explaining a burn change or finding recurring vendors, are ad-hoc analyses Claude runs using your finance profile and connected systems. Either way you just ask; the ad-hoc ones are marked below.
+Some of these map to a dedicated workflow: runway and burn, board metrics, and revenue reconciliation. Others, like explaining a burn change or finding recurring vendors, are ad-hoc analyses Claude runs using your handbook and connected systems. Either way you just ask; the ad-hoc ones are marked below.
 
 Each dedicated workflow also has its own page in the [tool library]({{ '/' | relative_url }}#tools), with what it reads and exactly what to install.
 
@@ -97,25 +97,24 @@ Try asking:
 Show me the bridge from Stripe gross revenue to QuickBooks recognized revenue.
 ```
 
-## 4. Add Context To The Finance Profile
+## 4. Add Context To Your Handbook
 
 Prompt:
 
 ```text
-Add this board deck to my ContextOS.
+Add this board deck to the handbook.
 ```
 
 Best with:
 
 - any shared document or pasted context;
-- existing Finance Context folder.
+- your Finance Brain folder open in Cowork.
 
 Expected output:
 
-- source material saved in `context/`;
-- relevant profile sections updated;
-- open questions reduced where possible;
-- changelog entry added.
+- the source saved in `handbook/sources/`;
+- the relevant handbook pages updated, placeholders replaced where the document answers them;
+- a changelog line in `CLAUDE.md`.
 
 Try sharing:
 
@@ -125,30 +124,28 @@ Try sharing:
 - revenue policy;
 - finance team notes.
 
-## 5. Review The Account Map
+## 5. Define Your Metrics
 
 Prompt:
 
 ```text
-Review the account map and show me which classifications still need a human decision.
+Use the follow-up-interview skill with me.
 ```
 
 Best with:
 
-- QuickBooks
-- existing `account-map.csv`
+- whoever owns the numbers (founder, CEO, or controller);
+- a past board deck or monthly package.
 
 Expected output:
 
-- a count of rule-mapped (`auto`) and human-verified (`confirmed`) rows;
-- the `needs-review` queue with each row's reason;
-- the current `mrr` tag set (the accounts that define your P&L-based MRR);
-- accounts whose name conflicts with their type;
-- recommended questions for review.
+- `handbook/metrics-and-reporting.md` filled in: your metric definitions, burn and runway rules,
+  plan, and who reads the numbers;
+- anything unanswered listed as an open question with an owner.
 
 ## 6. Explain A Burn Change
 
-*Ad-hoc — no dedicated workflow yet; Claude runs this using your profile.*
+*Ad-hoc — no dedicated workflow yet; Claude runs this using your handbook.*
 
 Prompt:
 
@@ -171,7 +168,7 @@ Expected output:
 
 ## 7. Find Recurring Vendor Themes
 
-*Ad-hoc — no dedicated workflow yet; Claude runs this using your profile.*
+*Ad-hoc — no dedicated workflow yet; Claude runs this using your handbook.*
 
 Prompt:
 
@@ -216,7 +213,7 @@ Expected output:
 
 Good outputs should:
 
-- use your finance profile;
+- use your handbook's definitions;
 - name missing assumptions;
 - avoid inventing values;
 - show enough work for you to review;
@@ -225,6 +222,6 @@ Good outputs should:
 If an answer feels generic, ask:
 
 ```text
-Which part of finance-profile.md did you use for this answer?
+Which handbook pages did you use for this answer?
 ```
 

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Skills · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li><a href="workpaper-standard.html">Workpaper standard</a></li>
+<li class="group">Reference</li>
+<li><a href="skills.html" aria-current="page">Skills</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Skills</h1>
+<p>Recurring tasks Claude runs the same way every month. Run them from the finance folder.</p>
+<h2>Setup</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skills/build-handbook/</code></td>
+<td>Build or refresh the company's finance handbook. Reads the documents you share and any connected finance systems, drafts every page in handbook/ and the at-a-glance section of CLAUDE.md, then asks only the questions they couldn't answer. Use on first setup (when the Company at a glance section of CLAUDE.md is still placeholders), or when someone says "set up the handbook," "build my finance brain," "refresh the handbook," or "add this to the handbook."</td>
+</tr>
+<tr>
+<td><code>skills/follow-up-interview/</code></td>
+<td>A 30-minute follow-up with whoever owns the numbers (founder, CEO, or controller) that fills the metric definitions, plan, reporting, and people sections the books can't answer. Use after build-handbook, when handbook/metrics-and-reporting.md is mostly placeholders, or when someone says "define our metrics," "interview our CEO," or "finish the handbook questions."</td>
+</tr>
+<tr>
+<td><code>skills/new-skill/</code></td>
+<td>Turn one recurring finance task someone knows cold into a reusable skill. Rebuilds last month's version in testing/, compares it to the real one until they match, then writes the skill from what worked. Use when someone says "automate my monthly [task]," "make this a skill," "turn this rec or JE into something repeatable," or "add a new skill."</td>
+</tr>
+</tbody>
+</table>
+<h2>Journal entries</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skills/prepaid-amortization/</code></td>
+<td>Prepare the monthly prepaid amortization journal entry from the prepaid schedule, add new prepaids from the month's bills, and tie the schedule to the GL. Use when someone asks to amortize prepaids, book prepaid expense, or prepare the prepaid JE for a month-end close.</td>
+</tr>
+<tr>
+<td><code>skills/usage-accrual/</code></td>
+<td>Prepare the month-end accrual for usage-billed vendors (cloud, APIs, data) whose invoice hasn't arrived yet, as a reversing journal entry. Use when someone asks to accrue usage, book the cloud or API accrual, or prepare unbilled vendor accruals for a month-end close.</td>
+</tr>
+</tbody>
+</table>
+<h2>Reconciliations</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skills/bank-reconciliation/</code></td>
+<td>Reconcile a bank or card account's GL balance to its statement, classify every reconciling item, roll forward last month's open items, and propose entries for anything unrecorded. Use when someone asks to reconcile a bank or card account, do the bank recs, or tie the GL to a statement for a month-end close.</td>
+</tr>
+</tbody>
+</table>
+<h2>Publish</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skills/build-handbook-site/</code></td>
+<td>Publish the finance handbook as a small internal website (static HTML, nothing to install), so people who never open this folder can still read the policies. Use when someone says "publish the handbook," "build the handbook site," or "share the handbook with the team."</td>
+</tr>
+</tbody>
+</table>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    the <code>build-handbook-site</code> skill.
+  </footer>
+</body>
+</html>

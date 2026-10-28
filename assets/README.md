@@ -33,8 +33,3 @@ Check the result at a small size before shipping it — in most feeds this rende
 wide, so the headline has to carry the card on its own. Re-upload in Settings after any change;
 GitHub does not pick up the file from the repository automatically.
 
-## `demo-contextos.gif` — not yet recorded
-
-Reserved for a short screen recording of a ContextOS build, referenced from an HTML comment
-near the top of the root `README.md`. Keep it under ~10 MB so it loads on the README, and
-scrub or use sandbox data — **never real company books**.

@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "aircfo-quickbooks": {
-      "type": "http",
-      "url": "https://qbo-mcp-production-5667.up.railway.app/mcp"
-    }
-  }
-}

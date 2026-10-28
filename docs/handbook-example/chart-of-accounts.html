@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Chart of accounts · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html" aria-current="page">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li><a href="workpaper-standard.html">Workpaper standard</a></li>
+<li class="group">Reference</li>
+<li><a href="skills.html">Skills</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Chart of accounts</h1>
+<p><strong>What this page is for:</strong> how the chart of accounts is organized, so Claude codes things the
+way the team would and never invents an account.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<h2>Source of truth</h2>
+<p>The full account list lives in QuickBooks Online. Claude reads it from there. This page
+explains the structure and the judgment calls.</p>
+<p><strong>Rule:</strong> Claude only uses accounts that exist in QuickBooks. If a task seems to need an account
+that doesn't exist, stop and ask. Never create or rename accounts.</p>
+<h2>Numbering</h2>
+<table>
+<thead>
+<tr>
+<th>Range</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1000-1999</td>
+<td>Assets</td>
+<td>Cash 1010-1030, prepaids 1300, fixed assets 1500s, clearing 1950s</td>
+</tr>
+<tr>
+<td>2000-2999</td>
+<td>Liabilities</td>
+<td>Ramp card 2010, accrued expenses 2101, deferred revenue 2400</td>
+</tr>
+<tr>
+<td>3000-3999</td>
+<td>Equity</td>
+<td></td>
+</tr>
+<tr>
+<td>4000-4999</td>
+<td>Revenue</td>
+<td>4000 subscription, 4100 services</td>
+</tr>
+<tr>
+<td>5000-5999</td>
+<td>Cost of revenue</td>
+<td>Hosting, AI inference, support, payment processing</td>
+</tr>
+<tr>
+<td>6000-7999</td>
+<td>Operating expenses</td>
+<td>By department class: R&amp;D, S&amp;M, G&amp;A</td>
+</tr>
+<tr>
+<td>8000-9999</td>
+<td>Other income and expense</td>
+<td>Interest income, FX</td>
+</tr>
+</tbody>
+</table>
+<h2>Departments, classes, and other dimensions</h2>
+<p>Every expense line on a JE needs a <strong>Class</strong>: R&amp;D, S&amp;M, G&amp;A, or COGS. No locations or projects.</p>
+<h2>The judgment calls</h2>
+<table>
+<thead>
+<tr>
+<th>Spend or activity</th>
+<th>Account</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stratus Cloud, production</td>
+<td>5100 Hosting (COGS)</td>
+<td>Serves customers</td>
+</tr>
+<tr>
+<td>Stratus Cloud, dev and staging</td>
+<td>6420 Software &amp; Tools, class R&amp;D</td>
+<td>Internal use</td>
+</tr>
+<tr>
+<td>Lattice Inference API</td>
+<td>5110 AI Inference (COGS)</td>
+<td>Powers product features customers use</td>
+</tr>
+<tr>
+<td>Contractors</td>
+<td>6150 Contractors, class by team</td>
+<td>Not payroll; 1099s at year end</td>
+</tr>
+<tr>
+<td>Stripe fees</td>
+<td>5300 Payment Processing (COGS)</td>
+<td>Grossed up from net payouts</td>
+</tr>
+<tr>
+<td>Laptops under $2,500</td>
+<td>6410 Computer Equipment (expensed)</td>
+<td>Under the capitalization threshold</td>
+</tr>
+</tbody>
+</table>
+<h2>Reporting rollups</h2>
+<p>The definitions behind these live in <a href="metrics-and-reporting.html"><code>handbook/metrics-and-reporting.md</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Rollup</th>
+<th>What it's for</th>
+<th>Accounts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recurring revenue (MRR)</td>
+<td>The accounts that add up to recurring revenue</td>
+<td>4000 Subscription Revenue</td>
+</tr>
+<tr>
+<td>Contra-revenue</td>
+<td>Discounts, credits, and refunds netted against revenue</td>
+<td>None separate. Booked directly against 4000.</td>
+</tr>
+<tr>
+<td>Excluded from burn</td>
+<td>One-time or non-operating activity left out of run-rate burn</td>
+<td>8000s (interest income, FX). One-time items named in <a href="metrics-and-reporting.html"><code>handbook/metrics-and-reporting.md</code></a>.</td>
+</tr>
+<tr>
+<td>Sales and marketing spend (for CAC)</td>
+<td>What counts as acquisition cost</td>
+<td>Every 6000-7999 line with class S&amp;M</td>
+</tr>
+<tr>
+<td>Clearing</td>
+<td>Accounts money passes through, which should net to zero (also listed below)</td>
+<td>1950 Ramp Clearing, 1960 Stripe Clearing, 2150 Payroll Clearing</td>
+</tr>
+</tbody>
+</table>
+<h2>Accounts that should always be zero</h2>
+<ul>
+<li>1950 Ramp Clearing</li>
+<li>1960 Stripe Clearing</li>
+<li>2150 Payroll Clearing</li>
+</ul>
+<h2>Accounts to leave alone</h2>
+<ul>
+<li>6990 Ask My Accountant (legacy, from the pre-Series A bookkeeper). Must stay at zero.</li>
+</ul>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    the <code>build-handbook-site</code> skill.
+  </footer>
+</body>
+</html>

@@ -5,9 +5,9 @@ title: Tool Library
 <div class="hero" markdown="0">
   <p class="eyebrow">From The AI CFO newsletter · by airCFO</p>
   <h1>Build an AI-powered finance function.</h1>
-  <p class="lede">Free, read-only Claude tools for startup finance and accounting, organized by the job they do. Every one starts from your <strong>ContextOS</strong> — your definitions, mapped once and proven against your live books — so Claude uses your numbers the way your team means them.</p>
+  <p class="lede">Free, read-only Claude tools for startup finance and accounting, organized by the job they do. Start with the <strong>Finance Brain Starter Kit</strong>: a folder that gives Claude your handbook, your recurring skills, and a review step, so it works the way your team does.</p>
   <div class="hero-ctas">
-    <a class="btn btn-primary" href="{{ '/tools/contextos/' | relative_url }}">Start with your ContextOS</a>
+    <a class="btn btn-primary" href="{{ '/finance-brain.html' | relative_url }}">Get the starter kit</a>
     <a class="btn btn-secondary" href="#tools">Browse the tools</a>
   </div>
 </div>
@@ -17,10 +17,10 @@ title: Tool Library
 ## How it fits together
 
 <div class="card-grid card-grid-steps" markdown="0">
-  <a class="card tool-card" href="#foundation">
+  <a class="card tool-card" href="{{ '/finance-brain.html' | relative_url }}">
     <span class="step-no">1</span>
-    <h3>Teach Claude your numbers</h3>
-    <p>Build your ContextOS from QuickBooks: your definitions, your account map, and a tie-out that proves it against your live books.</p>
+    <h3>Build your Finance Brain</h3>
+    <p>Download the free starter kit. Claude drafts your handbook from your docs and books, then asks you only what they can't answer.</p>
   </a>
   <a class="card tool-card" href="#connected-stack">
     <span class="step-no">2</span>
@@ -30,7 +30,7 @@ title: Tool Library
   <a class="card tool-card" href="#cash-and-runway">
     <span class="step-no">3</span>
     <h3>Run the workflows</h3>
-    <p>Runway, revenue tie-outs, board metrics, and more as they ship. Each reads your ContextOS before it touches a number.</p>
+    <p>Runway, revenue tie-outs, board metrics, and more as they ship. Each reads your Finance Brain before it touches a number.</p>
   </a>
   <a class="card tool-card" href="#build-your-own">
     <span class="step-no">4</span>
@@ -60,25 +60,23 @@ Every tool reads your systems with your own login and never writes to them. No j
 entries, no payments, no subscription changes. Outputs are analysis for a human to review,
 and anything a tool couldn't verify shows up as an open question instead of a confident guess.
 
-The QuickBooks connector is operated by airCFO, open source (MIT), and documented in full:
-what it stores, where it runs, and who can touch your data.
-[Data handling and security]({{ '/data-handling-security.html' | relative_url }}) ·
-[Self-host it instead]({{ '/self-hosting.html' | relative_url }})
+Every connector is the vendor's own, authorized with your own login. airCFO runs no server
+in between, and your Finance Brain is a folder on your machine.
+[Data handling and security]({{ '/data-handling-security.html' | relative_url }})
 
 ## Install once, add tools anytime
 
-Everything installs inside [Claude Cowork](https://claude.com/product/cowork), the Cowork tab
-in the Claude desktop app, on Pro, Max, Team, and Enterprise plans. Add the airCFO
-marketplace once, and every tool after that is a one-click install. Each tool's page lists
-exactly which plugins it needs, in order.
+Everything runs in [Claude Cowork](https://claude.com/product/cowork), the Cowork tab in the
+Claude desktop app, on Pro, Max, Team, and Enterprise plans. The starter kit is a download:
+nothing to install. For the tools, add the airCFO marketplace once, and every tool after that
+is a one-click install. Each tool's page lists exactly which plugins it needs, in order.
 
 ## Documentation
 
-- [First-session guide]({{ '/first-session-guide.html' | relative_url }}): install to first useful output.
-- [What is a ContextOS?]({{ '/finance-profile-explainer.html' | relative_url }}): how the context model works.
+- [Finance Brain Starter Kit]({{ '/finance-brain.html' | relative_url }}): download it and get set up in Cowork.
+- [Example handbook]({{ '/handbook-example/' | relative_url }}): the kit filled in for a fictional Series A company.
 - [Prompts to try]({{ '/use-cases.html' | relative_url }}): including ad-hoc analyses with no dedicated tool yet.
 - [Data handling and security]({{ '/data-handling-security.html' | relative_url }}): read before you connect anything.
-- [Self-hosting the QuickBooks connector]({{ '/self-hosting.html' | relative_url }}): run it on your own infrastructure.
 - [Known limitations]({{ '/known-limitations.html' | relative_url }}): the honest list.
 
 <div class="section-note newsletter-note" markdown="0">

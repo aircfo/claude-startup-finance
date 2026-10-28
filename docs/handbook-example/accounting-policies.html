@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Accounting policies · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html" aria-current="page">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li><a href="workpaper-standard.html">Workpaper standard</a></li>
+<li class="group">Reference</li>
+<li><a href="skills.html">Skills</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Accounting policies</h1>
+<p><strong>What this page is for:</strong> the rules behind every entry Claude prepares.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<blockquote>
+<p>Sample policies for a fictional company, shown for format only. Your policies are set by your
+team and your advisors.</p>
+</blockquote>
+<h2>Capitalization</h2>
+<ul>
+<li><strong>Threshold:</strong> Assets over $2,500 with a useful life over one year.</li>
+<li><strong>Useful lives:</strong> Computers 3 years. Furniture 5 years.</li>
+<li><strong>Method:</strong> Straight-line, starting the month after the asset is placed in service.</li>
+<li><strong>Internal-use software:</strong> <span class="placeholder">[PLACEHOLDER: decision pending on the 2026 website rebuild. See Open questions.]</span></li>
+</ul>
+<h2>Prepaid expenses</h2>
+<ul>
+<li><strong>Threshold:</strong> Invoices over $5,000 that cover more than one month.</li>
+<li><strong>Method:</strong> Straight-line by month over the service period. The final month takes any rounding difference.</li>
+<li><strong>Where the schedule lives:</strong> Google Drive, <code>Finance/Schedules/Prepaid Schedule.xlsx</code>.</li>
+<li><strong>Skill:</strong> <code>skills/prepaid-amortization/</code></li>
+</ul>
+<h2>Accruals</h2>
+<ul>
+<li><strong>Threshold:</strong> Accrue unbilled expenses over $2,500.</li>
+<li><strong>Recurring accruals:</strong> Stratus Cloud and Lattice Inference usage (billed in arrears); the outsourced accounting firm (billed the 5th of the following month); quarterly bonuses, accrued monthly at target.</li>
+<li><strong>Reversal:</strong> Auto-reverse on the first day of the next month.</li>
+<li><strong>Skill:</strong> <code>skills/usage-accrual/</code></li>
+</ul>
+<h2>Revenue recognition</h2>
+<ul>
+<li><strong>Model:</strong> Subscriptions recognized ratably over the service period.</li>
+<li><strong>Annual prepays:</strong> Booked to 2400 Deferred Revenue on invoice, released monthly.</li>
+<li><strong>Discounts, credits, and refunds:</strong> Recognized as a reduction of revenue in the period granted.</li>
+<li><strong>Services revenue:</strong> Onboarding fees recognized when onboarding is complete.</li>
+</ul>
+<h2>Stock-based compensation</h2>
+<ul>
+<li><strong>Source:</strong> Carta expense report.</li>
+<li><strong>Booking cadence:</strong> <span class="placeholder">[PLACEHOLDER: monthly or quarterly. Owner: Head of Finance.]</span></li>
+</ul>
+<h2>Formal policy documents</h2>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Location</th>
+<th>Approved by</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Expense and card policy</td>
+<td>Ramp, Policy tab</td>
+<td>Head of Finance</td>
+<td>2026-01-10</td>
+</tr>
+<tr>
+<td>Revenue recognition memo</td>
+<td>Google Drive, <code>Finance/Policies/</code></td>
+<td>Head of Finance, outside accountants</td>
+<td>2026-02-01</td>
+</tr>
+</tbody>
+</table>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    the <code>build-handbook-site</code> skill.
+  </footer>
+</body>
+</html>

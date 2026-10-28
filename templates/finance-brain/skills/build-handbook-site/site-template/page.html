@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{{PAGE_TITLE}} · {{SITE_TITLE}}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">{{SITE_TITLE}}</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      {{NAV}}
+    </nav>
+    <main class="content">
+      {{CONTENT}}
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on {{BUILD_DATE}}. Edit the markdown, then rebuild with
+    the <code>build-handbook-site</code> skill.
+  </footer>
+</body>
+</html>

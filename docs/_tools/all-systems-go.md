@@ -6,7 +6,7 @@ summary: Connects Stripe, Ramp, and Mercury to Claude — read-only, with your o
 plugin: all-systems-go
 plugin_home: true
 reads: [Stripe, Ramp, Mercury]
-needs_contextos: true
+needs_finance_brain: true
 time: A few minutes to authorize each system you use
 ---
 
@@ -14,9 +14,8 @@ time: A few minutes to authorize each system you use
 
 Every tool in this library that reads Stripe, Ramp, or Mercury uses the connectors in this
 plugin. You authorize each system once, and each tool page tells you exactly which plugins
-it needs. QuickBooks is the one exception: it ships with
-[the ContextOS]({{ '/tools/contextos/' | relative_url }}), because that's where every setup
-starts.
+it needs. QuickBooks is the one exception: connect it in Claude's connector settings with
+your own login (for example, Intuit's QuickBooks connector).
 
 | System | What tools read from it |
 | --- | --- |
@@ -37,8 +36,9 @@ Authorize the systems you use and decline the rest. Declining never blocks anyth
 {%- endfor %}
 </div>
 
-## Enrich your ContextOS
+## Fill in your Finance Brain
 
-After you authorize, say `build my ContextOS` again. The refresh maps each Mercury account,
-Ramp clearing account, and Stripe payout stream onto your ledger, and fills in the revenue,
-spend, and cash sections that QuickBooks alone can't.
+Working from a [Finance Brain]({{ '/finance-brain.html' | relative_url }})? After you
+authorize, use the kit's `build-handbook` skill again. The refresh reads your bank, card,
+and billing accounts and fills in the cash, systems, and metrics pages your books alone
+can't.

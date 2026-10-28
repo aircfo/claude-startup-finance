@@ -7,7 +7,7 @@ plugin: all-systems-go
 skill: revenue-reconciliation
 ask: Do Stripe and QuickBooks revenue tie out for last month?
 reads: [Stripe, QuickBooks]
-needs_contextos: true
+needs_finance_brain: true
 time: A few minutes per period
 ---
 
@@ -28,7 +28,7 @@ time: A few minutes per period
 - **Non-revenue Stripe activity**, like transfers, top-ups, and balance adjustments.
 - **Revenue outside Stripe**, like ACH, wires, and invoices paid another way.
 
-Your ContextOS already knows how your revenue maps and books, so the bridge starts from your
+Your Finance Brain already knows how your revenue maps and books, so the bridge starts from your
 mappings instead of rediscovering them each month. It confirms the period and your
 recognition method before it starts.
 

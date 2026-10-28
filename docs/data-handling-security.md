@@ -4,131 +4,74 @@ title: Data Handling And Security
 
 # Data Handling And Security
 
-Finance tools require trust. This page explains what the beta plugin accesses, what it writes to your workspace, and what to avoid sharing — with full detail on the airCFO-operated QuickBooks connector.
+Finance tools require trust. This page explains what the Finance Brain Starter Kit and the
+tools in this library access, what they write, and what to avoid storing.
 
-This is a plain-English beta guide. It is not legal advice and not a substitute for a published privacy policy or terms of service — both are required before any public, non-gated launch. Confirm your company's internal data policies before connecting production systems.
+This is a plain-English guide. It is not legal advice. Confirm your company's internal data
+policies before connecting production systems.
 
-## What The Plugin Connects To
+## Where Your Data Lives
 
-The plugin can connect Claude to:
+**The Finance Brain is a folder on your machine.** It's plain markdown (plus the workpapers you
+save there). airCFO never sees it: nothing in the kit sends it anywhere. You decide where it
+lives and who it's shared with, for example a private Git repository or a shared drive with
+your team's normal permissions.
 
-- QuickBooks
-- Stripe
-- Ramp
-- Mercury
+**Connectors are the vendors' own.** Stripe, Ramp, and Mercury connect through each vendor's own
+remote connector, bundled in the `all-systems-go` plugin. QuickBooks connects through a
+QuickBooks connector you add in Claude's connector settings, such as Intuit's. You authorize
+each one with your own login, directly with that vendor. airCFO runs no server in between and
+never holds your tokens or your data.
 
-Authentication is handled through per-user OAuth in your browser as workflows invoke each connector.
+**Claude sees what it reads.** When a skill or tool reads a connected system, that data goes
+into your own Claude conversation to produce the answer. How Anthropic handles it is governed
+by the terms of your Claude account and workspace settings.
 
 ## Read-Only Product Intent
 
-The plugin is designed for read-only finance analysis.
+Everything here is designed for read-only finance work. The kit's skills and the tools read your systems
+and prepare workpapers, analysis, and import files. They never post journal entries, pay,
+transfer, or edit records. A person reviews and posts.
 
-Workflow skills should not write to QuickBooks, Stripe, Ramp, or Mercury. They are intended to read data, summarize it, map it into your finance profile, and produce analysis for human review.
+Some connectors offer write access. The kit's rules and every tool's instructions tell Claude
+not to use it. If Claude ever proposes a write action, stop and review before proceeding.
 
-If Claude ever proposes a writeback action, stop and review before proceeding.
+## What Gets Written
 
-## What Gets Written To Your Workspace
+- **The kit** writes handbook pages, drafts in `testing/`, and the changelog in `CLAUDE.md`
+  inside its own folder. Final workpapers go to the close folder you name in `CLAUDE.md` (for
+  example a shared drive). It never deletes or moves files you put there.
+- **The tools** write nothing by default. Their outputs appear in your conversation unless you
+  ask Claude to save them.
 
-The plugin creates a ContextOS folder in a location you approve, usually:
-
-```text
-~/Desktop/ContextOS/
-```
-
-That folder may include:
-
-- `finance-profile.md`
-- `account-map.csv`
-- `context/`
-- `CHANGELOG.md`
-
-The builder also saves a small **pointer** so future workflows can find this folder without loading your whole profile every session, and — only with your OK — may add a short note to your workspace configuration. It never writes the full profile into your configuration.
-
-These files may contain sensitive business context: account names, vendor names, reporting definitions, and financial judgment calls. Store the folder according to your company's data policies.
+These files can hold sensitive business context: account names, vendor names, reporting
+definitions, and judgment calls. Store them according to your company's data policies.
 
 ## What Not To Store
 
-Do not place the following in `finance-profile.md`, `account-map.csv`, or shared context docs:
+Do not put any of these in your Finance Brain or in documents you share with Claude:
 
-- API keys;
-- OAuth tokens;
-- passwords;
-- full bank account numbers;
-- full card numbers;
+- API keys, OAuth tokens, or passwords;
+- full bank or card numbers (last four digits only);
 - sensitive personal employee data;
-- customer PII that is not needed for the workflow.
-
-Use names, last-four identifiers, and internal IDs only where needed.
-
-## Connector Note For Beta
-
-Stripe, Ramp, and Mercury use their own configured remote MCP endpoints — you authorize each directly with that vendor.
-
-QuickBooks uses an **airCFO-operated** MCP server during beta. Because that server is run by airCFO (not Intuit), the section below documents exactly what it does and does not do with your data.
-
-If you are not ready to authorize production finance data, use a sandbox or test company file while evaluating the plugin.
-
-## The QuickBooks Connector (Beta): Security And Privacy
-
-The QuickBooks connector is a multi-user, remote MCP server, currently in gated beta. You connect your own QuickBooks Online company through Intuit's OAuth, which gives Claude read-only access to that company's accounting data (P&L, balance sheet, cash flow, general ledger, AR/AP aging, vendor spend, and individual transactions).
-
-*Verified against the connector's source code and deployment on 2026-06-25.*
-
-### The core guarantees
-
-- **Read-only.** No write tools exist. Claude cannot create, edit, delete, or send anything in QuickBooks.
-- **Your financial data is not stored.** Your books are fetched live from QuickBooks for each question, returned to Claude to produce the answer, and not persisted in the connector's database. Only your connection tokens and minimal metadata are kept.
-- **Per-user isolation.** Each connection can reach only the one company tied to that login — there is no path, accidental or intentional, to another user's data.
-- **Self-service disconnect.** You can disconnect anytime; the connector deletes the stored connection and attempts to revoke the Intuit token. You can also revoke the app directly inside your Intuit account.
-
-### Hosting and who touches your data
-
-- **Host:** Railway, US East (Virginia) — a single instance with one persistent, encrypted volume.
-- **The only third parties that touch your data:**
-  - **Railway** — hosting and compute, plus the encrypted volume that stores connection tokens.
-  - **Intuit / QuickBooks Online** — the data source you authorize directly.
-  - **Anthropic (Claude)** — receives the QuickBooks data needed to answer your question, inside your own Claude conversation.
-- **AI training:** Your data is never used to train any AI model — not by us. It's sent to Claude (Anthropic) only to answer your question; how Anthropic handles it is governed by the terms of your own Claude account and workspace settings.
-
-### Encryption
-
-- **In transit:** TLS/HTTPS on every hop — Claude ↔ connector and connector ↔ QuickBooks. No user data crosses an unencrypted connection.
-- **At rest:** Your Intuit access and refresh tokens are encrypted with AES-256-GCM, with the key held in the environment, separate from the database volume. The Claude-to-connector credentials are stored only as SHA-256 hashes.
-
-### Logging
-
-- **What's logged:** one short structured line per request, plus connect/disconnect events — a timestamp, an internal connection ID, the tool name, the response status, latency, and (on connect/disconnect) the email you self-report.
-- **What's never logged:** your financial data and your tokens.
-- **Retention:** up to 30 days, then rotated out.
-- **Access:** limited to airCFO engineering staff with access to the hosting environment.
-
-### Good to know
-
-- The email you enter when connecting is self-reported and unverified — a soft accountability signal, not identity.
-- This beta documentation is not legal advice; a published privacy policy and terms of service are still required before any public launch.
-
-**Security or privacy questions:** email **alex@aircfo.com** with "Security" in the subject line.
+- customer personal data the work doesn't need.
 
 ## What If A Connector Is Missing?
 
-The plugin can continue with partial setup. Missing systems should become placeholders and open questions in the finance profile.
-
-Example:
+Nothing breaks. The kit marks the gap as a placeholder and asks for the specific export it
+needs. Tools skip what they can't read and list it as an open question:
 
 ```text
-[PLACEHOLDER: Ramp is not connected, so recurring vendor rules still need to be mapped.]
+[PLACEHOLDER: Ramp is not connected, so card spend by vendor still needs an export.]
 ```
 
-That is preferable to Claude guessing.
+That's preferable to Claude guessing.
 
 ## Human Review Required
 
-Outputs should be reviewed before they are used in:
+Review outputs before they're used in board materials, investor updates, audit support, lender
+reporting, or operational decisions. The kit builds this in: the person who runs a skill
+never approves its output.
 
-- board materials;
-- investor updates;
-- audit support;
-- lender reporting;
-- operational decisions.
-
-The plugin helps gather and interpret context. It does not replace finance judgment.
+**Security or privacy questions:** email **alex@aircfo.com** with "Security" in the subject
+line.

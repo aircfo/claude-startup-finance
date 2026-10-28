@@ -4,108 +4,63 @@ title: Known Limitations
 
 # Known Limitations
 
-This early-access release is intentionally narrow. The goal is to learn whether a persistent ContextOS makes Claude more useful for startup finance workflows.
+The Finance Brain Starter Kit and the tools here are intentionally narrow. This is the honest
+list of what they don't do yet.
 
-## Best With A Specific Stack
+## The Handbook Is Only As Good As Its Inputs
 
-The full experience is best with:
+The kit's setup interview drafts your handbook from your documents and any systems you've
+connected. It gets better when you share:
 
-- QuickBooks
-- Stripe
-- Ramp
-- Mercury
+- a close checklist or SOP;
+- policy documents;
+- last month's reporting package or board deck;
+- a few finished workpapers.
 
-You can continue with a partial stack, but missing connectors will create placeholders and open questions.
+Without them, more of the handbook stays as placeholders until someone answers the questions.
+That's by design: a placeholder is better than a guess.
 
-## QuickBooks Is Important For Setup
+## Worked Examples Are Starting Points
 
-The account map is drafted from the QuickBooks chart of accounts.
+The kit ships three worked skills (prepaid amortization, a usage accrual, a bank
+reconciliation), and the tool library ships runway and burn, revenue reconciliation, and board
+metrics. Expect to adjust each one to match how your team works. Test a changed skill in
+`testing/` against a known-good result before you rely on it.
 
-If QuickBooks is missing, disconnected, or poorly configured, the initial finance profile will be much less complete.
+## Best With A Connected Stack
+
+The kit's skills and the tools work from exports, but they work best when Claude can read your accounting
+system, bank, card platform, and billing system directly. The tools in this library are built
+around QuickBooks, Stripe, Ramp, and Mercury. Other systems work through exports.
 
 ## Connector Sessions Expire
 
-Connector sessions lapse after a few idle days. On a later run, a connector that worked before may ask you to sign in again — that is normal, not a failure. Re-authorize and continue; the skills are written to expect it.
-
-## Some Workflows Are Early Examples
-
-The plugin includes workflows for:
-
-- runway and burn;
-- revenue reconciliation;
-- board metrics.
-
-These are starting points, not final packaged finance products. Expect them to improve based on early-access feedback.
-
-## Human Review Is Required
-
-Claude can misread account names, misunderstand source-system behavior, or surface incomplete data.
-
-Review:
-
-- account classifications;
-- KPI definitions;
-- revenue recognition assumptions;
-- cash account inclusions;
-- any board-ready output.
-
-Do not use outputs in final board, investor, audit, or lender materials without human review.
-
-## Missing Connectors Mean Missing Context
-
-If a connector is not available:
-
-- related sections in `finance-profile.md` may stay placeholder;
-- workflows that rely on that connector may be incomplete;
-- Claude should tell you what is missing instead of guessing.
-
-Example:
-
-```text
-Ramp is not connected, so vendor recurrence and card spend rules are still unresolved.
-```
-
-## The Finance Profile Is Only As Good As Its Inputs
-
-The profile improves when you share:
-
-- board materials;
-- KPI definitions;
-- close procedures;
-- revenue policies;
-- account mapping decisions;
-- known exceptions.
-
-If none of that context is available, Claude will rely more heavily on system data and placeholders.
-
-## No Writeback Workflows
-
-The plugin is designed for read-only analysis.
-
-The plugin should not create journal entries, update accounts, change customers, modify subscriptions, or write back to connected finance systems.
+Connector sessions lapse after a few idle days. On a later run, a connector that worked before
+may ask you to sign in again. That's normal, not a failure: re-authorize and continue.
 
 ## Payroll And Forecasting May Be Manual
 
-The profile includes sections for people, payroll, planning, and forecast assumptions.
+The handbook has sections for people, payroll, and the plan, but no tool here connects to a
+payroll or planning system. Those sections are filled from documents or the follow-up
+interview.
 
-The bundled connector set does not include every payroll or planning system. Those sections may need to be filled from documents, spreadsheets, or user-provided context.
+## No Writeback
 
-## Security And Data Policies Are Still Maturing
+Everything here is read-only. Nothing creates journal entries, updates accounts, changes
+customers or subscriptions, or writes to a connected system. A person posts.
 
-Use sandbox or test-company data if you are not ready to authorize production systems.
+## Human Review Is Required
 
-Review the [Data Handling and Security](data-handling-security.md) page before connecting sensitive finance data.
+Claude can misread account names, misunderstand how a system behaves, or work from incomplete
+data. Review classifications, metric definitions, revenue recognition assumptions, which
+accounts count as cash, and anything board-ready. Don't use outputs in board, investor, audit,
+or lender materials without review by someone other than the person who ran the skill.
 
-## Unsupported Or Unclear Behavior
+Review the [Data Handling and Security]({{ '/data-handling-security.html' | relative_url }}) page before connecting
+sensitive finance data.
 
-Please report:
+## Report Problems
 
-- auth issues;
-- stale or missing profile location;
-- incorrect account mappings;
-- unsupported connector combinations;
-- outputs that feel overconfident;
-- workflows that do not use the finance profile.
-
-Email these to alex@aircfo.com.
-
+Please report sign-in issues, wrong account mappings, outputs that feel overconfident, and
+skills or tools that ignored your handbook. Email alex@aircfo.com or
+[open an issue](https://github.com/aircfo/claude-startup-finance/issues).

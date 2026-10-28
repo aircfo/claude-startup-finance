@@ -18,9 +18,9 @@ body:
   - type: dropdown
     id: plugin
     attributes:
-      label: Which plugin?
+      label: Which part?
       options:
-        - finance-contextos
+        - Finance Brain Starter Kit
         - all-systems-go
         - Not sure / repo-wide (docs, install, marketplace)
     validations:
@@ -30,7 +30,7 @@ body:
     id: skill
     attributes:
       label: Which skill or command?
-      placeholder: "/finance-context-builder, /runway-and-burn, or the phrase you typed"
+      placeholder: "the build-handbook skill, /runway-and-burn, or the phrase you typed"
 
   - type: textarea
     id: what-happened
@@ -46,9 +46,9 @@ body:
       label: Steps to reproduce
       description: What you said to Claude, in order, and where it went wrong.
       placeholder: |
-        1. Installed finance-contextos, said "build my ContextOS"
+        1. Opened the Finance Brain folder in Cowork, said "Use the build-handbook skill"
         2. Connected QuickBooks
-        3. At the account-map review step, …
+        3. At the report card step, …
     validations:
       required: true
 
@@ -68,8 +68,7 @@ body:
       label: Which connectors were authorized at the time?
       multiple: true
       options:
-        - QuickBooks (airCFO-hosted)
-        - QuickBooks (self-hosted)
+        - QuickBooks
         - Stripe
         - Ramp
         - Mercury
@@ -80,7 +79,7 @@ body:
     attributes:
       label: Environment
       description: How you're running it, and the plugin version if you know it.
-      placeholder: "Claude Cowork, desktop app on macOS · finance-contextos 0.9.0"
+      placeholder: "Claude Cowork, desktop app on macOS · all-systems-go 0.10.0"
 
   - type: dropdown
     id: data

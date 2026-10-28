@@ -1,8 +1,8 @@
 {
   "name": "all-systems-go",
   "displayName": "All Systems Go by airCFO",
-  "description": "The enrichment pack for your ContextOS — named for airCFO's All Systems Go series on the startup back-office stack. Connects the rest of that stack (Stripe, Ramp, Mercury; each read-only with your own login) and adds cross-system workflows that read your ContextOS first: runway & burn, revenue reconciliation, board metrics — plus meta-skills to author and refine your own. Install finance-contextos first. Unofficial — not affiliated with or endorsed by Stripe, Ramp, Mercury, or Anthropic.",
-  "version": "0.9.0",
+  "description": "Cross-system finance workflows, named for airCFO's All Systems Go series on the startup back-office stack. Connects Stripe, Ramp, and Mercury (each read-only with your own login) and adds workflows that read your Finance Brain first: runway & burn, revenue reconciliation, board metrics, plus meta-skills to author and refine your own. Pairs with the free Finance Brain Starter Kit. Unofficial: not affiliated with or endorsed by Stripe, Ramp, Mercury, Intuit, or Anthropic.",
+  "version": "0.10.0",
   "author": {
     "name": "airCFO",
     "email": "alex@aircfo.com"
@@ -17,7 +17,6 @@
     "fpa",
     "stripe",
     "ramp",
-    "mercury",
-    "contextos"
+    "mercury"
   ]
 }

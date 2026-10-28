@@ -7,7 +7,7 @@ plugin: all-systems-go
 skill: runway-and-burn
 ask: What's our runway?
 reads: [Mercury, Ramp, Stripe]
-needs_contextos: true
+needs_finance_brain: true
 time: A minute or two per run
 ---
 
@@ -24,7 +24,7 @@ time: A minute or two per run
 - **The bank is the source of truth for burn.** Mercury sees every dollar out: payroll,
   taxes, card settlements, wires. Card spend alone understates burn, often badly, so Ramp is
   used to *explain* the burn, never to total it.
-- **Your definitions come from the ContextOS:** which accounts count as runway cash, which
+- **Your definitions come from your Finance Brain:** which accounts count as runway cash, which
   transfers are internal, how you define burn.
 - **Trailing three full months** by default. Net burn is outflows minus inflows, and runway
   is current cash divided by net burn.

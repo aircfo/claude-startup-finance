@@ -1,10 +1,11 @@
-# Which plugin provides each shared connector. A tool lists the systems it reads, and its page
-# tells readers to install the plugin that provides each one. A connector lives in exactly one
-# plugin: a new plugin declares the systems it reads instead of bundling its own copy (see
-# docs/authoring-conventions.md).
+# Where each system's connector comes from. A tool lists the systems it reads, and its page
+# tells readers how to connect each one: by installing the plugin that bundles it, or (for a
+# system with no `plugin`) by adding the vendor's own connector in Claude's connector settings.
+# A connector lives in at most one plugin: a new plugin declares the systems it reads instead
+# of bundling its own copy (see docs/authoring-conventions.md).
 
 QuickBooks:
-  plugin: finance-contextos
+  plugin:
 Stripe:
   plugin: all-systems-go
 Ramp:

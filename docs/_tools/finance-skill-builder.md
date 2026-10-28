@@ -7,7 +7,7 @@ plugin: all-systems-go
 skill: finance-skill-builder
 ask: Turn what we just did into a skill.
 reads: []
-needs_contextos: true
+needs_finance_brain: true
 time: 10 to 20 minutes per skill
 ---
 
@@ -24,7 +24,7 @@ time: 10 to 20 minutes per skill
 
 Every skill it writes follows the same rules as the tools here:
 
-1. **Reads your ContextOS first**, so it never re-derives your accounts or definitions.
+1. **Reads your Finance Brain first**, so it never re-derives your accounts or definitions.
 2. **Read-only** against every connected system.
 3. **Computes, never eyeballs.** Totals run in a computation step.
 4. **Ties out to a control total** wherever one exists, and reports the match or the variance.

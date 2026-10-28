@@ -10,22 +10,26 @@ Produce a concise, board-ready financial summary by pulling the key metrics from
 ## When to use this
 Trigger when the user is preparing a board deck, investor update, or monthly metrics summary and wants the core financial KPIs in one place.
 
-## Step 0 — Load the finance profile
-Read `finance-profile.md` first (the company's semantic map). Use its pinned definitions (MRR, revenue recognition, burn, internal transfers), the cash account set, and the AR/AP account mappings so every metric here is consistent with the other workflows.
+## Step 0: Read the Finance Brain
+Read the company's Finance Brain first: the folder from the airCFO Finance Brain Starter Kit (a `CLAUDE.md` plus `handbook/`). Use its definitions so every metric here is consistent with the other workflows:
+- `handbook/metrics-and-reporting.md` (The numbers we run on, Burn and runway, Who reads the numbers): the company's exact metric definitions (MRR and its boundary cases), the burn and runway method, and what the board expects to see.
+- `handbook/cash.md`: which accounts count as cash on hand and runway cash, and how internal transfers are recorded.
+- `handbook/chart-of-accounts.md` (Reporting rollups): which accounts add up to recurring revenue and contra-revenue, and which are excluded from burn.
 
-Find the profile in this order:
-1. If this session's instructions (e.g. a workspace `CLAUDE.md`) include a **ContextOS** pointer (the bounded block is labeled `airCFO Finance Context` in older installs), use the profile path it names.
-2. Else if `.aircfo-finance-context.json` exists in the current workspace, read `financeProfile` from it.
-3. Else check the default location: `~/Desktop/ContextOS/finance-profile.md` — then the legacy default `~/Desktop/airCFO Finance Context/finance-profile.md`.
-4. Else check the current workspace for `finance-profile.md`.
-5. If you still can't find it, run `finance-context-builder` first (or tell the user to). **Do not guess** the metric definitions or account set — without the profile they're guesswork.
+Find it in this order:
+1. The current workspace, if it holds a `CLAUDE.md` and a `handbook/` folder. In Cowork the user usually works in that folder, so `CLAUDE.md` is already loaded.
+2. Otherwise, ask the user where their Finance Brain folder is. Don't search the disk at random.
+3. If there's no Finance Brain, say so and point the user to the free kit (https://aircfo.github.io/claude-startup-finance/finance-brain.html), where its `build-handbook` skill builds one.
+
+**Do not guess** the metric definitions or account set. Without the Finance Brain, or where a page you need still says `[PLACEHOLDER`, treat that definition as unknown: either stop, or label every number that depends on it as an assumption the user must confirm, and list it as an open question.
 
 ## Metrics to assemble (confirm the reporting month with the user first)
 1. **Revenue (Stripe)**: MRR and ARR, new vs. churned MRR if available, month-over-month growth %.
-2. **Cash (Mercury)**: total cash across operating and treasury accounts, as of period end.
+2. **Cash (Mercury)**: total cash across the accounts `handbook/cash.md` counts as cash, as of period end.
 3. **Burn & runway (Mercury + Ramp)**: net monthly burn and months of runway — reuse the `runway-and-burn` logic.
 4. **AR aging (QuickBooks)**: total receivables and amount past due (current / 30 / 60 / 90+).
 5. **AP aging (QuickBooks)**: total payables and amount past due.
+   - QuickBooks comes from a QuickBooks connector the user adds in Claude's connector settings (for example, Intuit's), read-only with their own login. If it isn't connected, ask for the specific export instead: the report name and the exact date range.
 6. **Spend highlights (Ramp)**: top spend categories or vendors for the month, and the biggest movers vs. the prior month.
 
 ## Always
