@@ -21,7 +21,7 @@ forward.
 
 - **The Finance Brain Starter Kit** (`templates/finance-brain/`): a copy-ready folder, no
   plugin install, that gives Claude a finance handbook it reads every session (`CLAUDE.md` +
-  eight `handbook/` pages, including a JE and reconciliation workpaper standard), five Claude
+  eight `handbook/` pages, including a JE and reconciliation workpaper standard), six Claude
   skills in `skills/<name>/SKILL.md` folders, a `testing/` convention for new skills, and a
   synthetic usage-accrual workpaper. The `setup-finance-brain` skill runs the whole setup flow
   in three stages: an interview that drafts the handbook from your docs and books and asks
@@ -38,10 +38,18 @@ forward.
 
 ### Changed
 
+- **The kit gains a `level-up` skill** that coaches a finance team up the ladder for AI in
+  finance. It checks where the team is, plans the next one or two moves, and does the first
+  one step by step. `ladder.md` holds the team track rung by rung. `github-setup.md` walks a
+  champion through the rung 3 to 4 setup: Git, the GitHub CLI, Node.js, Python, VS Code,
+  Claude Code, a private repository that keeps financial data out by default, review rules so
+  the author never approves their own change, and onboarding each teammate. A new
+  "Level-up progress" section in `CLAUDE.md` keeps the team's rung, last and next step, and
+  recent wins, which `new-skill` also adds to. The kit now has six skills.
 - **The kit's setup flow is one skill.** `build-handbook`, `follow-up-interview`, and
   `build-handbook-site` became the stages of `setup-finance-brain` (stage files `interview.md`,
   `follow-up-questions.md`, `publish-site.md`, plus `site-template/`), taking the kit from seven
-  skills to five. Copies downloaded before this change have the three separate skills; the
+  skills to five (six with `level-up`). Copies downloaded before this change have the three separate skills; the
   steps inside them are the same.
 - **`all-systems-go` 0.10.1** points readers without a Finance Brain to the kit's
   `setup-finance-brain` skill, and `finance-skill-tuner` keeps a kit skill's own shape and fixes

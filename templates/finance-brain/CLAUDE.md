@@ -73,8 +73,20 @@ When the user asks for one of these tasks, or names a skill, read its `SKILL.md`
 | `skills/prepaid-amortization/` | Monthly prepaid amortization JE from the prepaid schedule |
 | `skills/usage-accrual/` | Month-end accrual for usage-billed vendors not yet invoiced |
 | `skills/bank-reconciliation/` | Bank rec: GL to statement, reconciling items, sign-off |
+| `skills/level-up/` | Coaches the team up the AI-in-finance ladder, including the GitHub and Claude Code setup, and keeps Level-up progress below |
 
 Add a row whenever a new skill is created.
+
+## Level-up progress
+
+Where the team is on the ladder for AI in finance. The `level-up` skill reads and updates this
+section. When someone asks what to do next, or how to get the team using Claude, use that
+skill and start from here.
+
+- **Rung:** not assessed yet. Say "help me level up" to start.
+- **Last step:** none yet
+- **Next step:** say "help me level up"
+- **Wins:** (the five most recent, for example "2026-10: usage accrual skill, 2 hours to 20 minutes")
 
 ## Where outputs go
 

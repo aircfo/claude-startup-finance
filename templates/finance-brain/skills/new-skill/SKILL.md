@@ -85,6 +85,10 @@ the person who ran it reviews it.
 When it has passed review (we suggest two clean months), change the skill's output location
 from `testing/` to the real close folder.
 
+If the new skill saves time or catches mistakes, add a line to Wins under "Level-up progress"
+in `CLAUDE.md`, for example "2026-11: software accrual skill, 90 minutes to 15 minutes." Keep
+the five most recent.
+
 ## Never
 
 - Never skip the comparison in step 4. A skill that hasn't matched a known-good result isn't
