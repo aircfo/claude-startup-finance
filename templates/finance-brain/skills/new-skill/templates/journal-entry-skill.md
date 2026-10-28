@@ -33,7 +33,7 @@ description: {What entry this prepares and when, in one or two sentences. Then t
 
 ## Output
 A workbook following `handbook/workpaper-standard.md`, named
-`{GL} - {account} - {description} {YYYY.MM}.xlsx`, saved to {testing/ or the close folder}.
+`{GL} - {account} - {description} {YYYY.MM}.xlsx`, saved to `testing/` until this skill has passed review; then the close folder in `CLAUDE.md`.
 
 ## Checks before handoff
 The five standard JE checks, plus: {anything specific to this entry}.

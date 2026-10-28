@@ -32,7 +32,7 @@ forward.
   `chart-of-accounts.md` carry over what the ContextOS finance profile held.
 - `docs/finance-brain.md`: the kit's guide page, first in the docs nav.
 - `docs/handbook-example/`: the kit filled in for a fictional company and published with the
-  kit's own site skill. `_source/` holds the markdown; `_build.py` rebuilds the pages.
+  kit's own publish step. `_source/` holds the markdown; `_build.py` rebuilds the pages.
 - `docs/downloads/finance-brain-starter-kit.zip`: the kit as a download; `_build_zip.py`
   rebuilds it after any change to the kit.
 
@@ -44,7 +44,8 @@ forward.
   skills to five. Copies downloaded before this change have the three separate skills; the
   steps inside them are the same.
 - **`all-systems-go` 0.10.1** points readers without a Finance Brain to the kit's
-  `setup-finance-brain` skill (copy only).
+  `setup-finance-brain` skill, and `finance-skill-tuner` keeps a kit skill's own shape and fixes
+  policy errors in the handbook page the skill reads.
 - **`all-systems-go` 0.10.0 reads the Finance Brain instead of the ContextOS.** Every
   workflow's first step reads the named handbook pages from the Finance Brain folder (or asks
   where it is) instead of `finance-profile.md`. QuickBooks now comes from a QuickBooks

@@ -4,6 +4,10 @@
 handbook file, so anyone at the company can read how finance works without opening a folder of
 markdown files. Rebuild it whenever the handbook changes.
 
+**Check first:** if the Company at a glance section of `CLAUDE.md` is still mostly
+placeholders, the site would be mostly empty. Say so and offer the interview (stage 1) before
+publishing.
+
 The site is plain HTML and CSS in a folder called `site/`. No installs, no build tools, no
 external scripts. Open `site/index.html` in a browser to view it.
 
@@ -87,6 +91,8 @@ Never publish it to the open internet.
 
 ## Never
 
+- Never write to a connected system. This stage reads only the files in this folder.
+- Never fill in or guess at a placeholder while publishing. It appears on the site as it is.
 - Never change the wording of a handbook page while building the site. Edit the markdown, then
   rebuild.
 - Never include files from `handbook/sources/` or `testing/`.

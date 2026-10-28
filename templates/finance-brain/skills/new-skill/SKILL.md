@@ -27,7 +27,8 @@ reconciliation. Start simple. The goal of the first session is one skill that wo
 
 Ask the user for:
 
-- Last month's finished workpaper for this task.
+- Last month's finished workpaper for this task. If you just ran the task together in this
+  conversation and the user confirmed the result, that result can be the answer key instead.
 - The inputs it was built from: exports, or which connected system and report.
 - Where the final version gets saved.
 
@@ -42,7 +43,10 @@ language, step by step, and ask about anything you couldn't infer:
 
 > "Here's how I think this works: [steps]. A few things I can't tell from the file: [questions]."
 
-You can usually figure out more than the user expects. Ask only about the gaps.
+You can usually figure out more than the user expects. Ask only about the gaps. When an
+answer is a policy (a threshold, a reversal convention, which account something maps to),
+write it into the handbook page it belongs on and have the skill read it from there, so the
+policy lives in one place.
 
 ### 3. Recreate last month
 
@@ -58,7 +62,9 @@ or until every remaining difference is one the user agrees the original got wron
 
 ### 5. Write the skill
 
-Pick a short, specific name in lowercase with hyphens, for example `software-accrual`, and
+First check `skills/` for an existing skill that covers the same task. If one is close, extend
+it instead of adding a second. Otherwise pick a short, specific name in lowercase with hyphens,
+for example `software-accrual`, whose description doesn't overlap another skill's, and
 create `skills/{name}/SKILL.md` from the closest template in this skill's folder:
 `skills/new-skill/templates/journal-entry-skill.md` or
 `skills/new-skill/templates/reconciliation-skill.md`. For anything else, use the same

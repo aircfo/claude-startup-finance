@@ -32,7 +32,7 @@ description: {Which account this reconciles and to what, in one or two sentences
 1. {Specific step.}
 
 ## Output
-A workbook following `handbook/workpaper-standard.md`, saved to {testing/ or the close folder}.
+A workbook following `handbook/workpaper-standard.md`, saved to `testing/` until this skill has passed review; then the close folder in `CLAUDE.md`.
 
 ## Checks before handoff
 The five standard rec checks, plus: {anything specific}.

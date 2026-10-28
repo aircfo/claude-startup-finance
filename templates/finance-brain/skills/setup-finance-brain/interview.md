@@ -32,7 +32,9 @@ prompts make sense:
 > time. The path: (1) confirm I can save to this folder, (2) check which finance systems I can
 > read, (3) you share any docs you have handy (optional), (4) I read your books and draft every
 > page, (5) I show you what I could fill on my own, (6) I ask you only the questions I couldn't
-> answer, (7) I run a few checks to make sure the handbook matches your books. Ready?"
+> answer, (7) I run a few checks to make sure the handbook matches your books. After that
+> there's a short follow-up with whoever owns the numbers, and an optional internal website.
+> Ready?"
 
 Give a one-line status update at each step.
 
@@ -50,7 +52,12 @@ the right company: for the accounting system, read the company name and show it 
 
 Show a short table: system, status (connected, partial, not connected), and what that means for
 the handbook. A missing system is never a blocker. Its sections stay as placeholders, or you
-ask for a specific export later.
+work from exports instead.
+
+**No accounting system connected?** Ask for these exports, each with its date range, and save
+them in `handbook/sources/`: the account list (chart of accounts), a trial balance and balance
+sheet at the last month end, and a monthly P&L for the last three closed months. Use them in
+step 4 and step 7 wherever these steps say "the books" or "the account list."
 
 ### 3. Invite documents (lightly)
 
@@ -105,6 +112,8 @@ ask the most valuable first, and keep each one answerable in under a minute. Typ
 - **Materiality:** "What size of month-over-month change deserves a sentence of explanation?"
 - **Burn:** "What do you leave out when you talk about burn: transfers, fundraising, one-time
   costs?"
+- **Rec aging:** "How old can a reconciling item get before it's flagged?" Answer goes in
+  `workpaper-standard.md`.
 - **The last question, always:** "What do you know about this business that the books would never
   tell me?" Answers go in "Things the books won't tell you" in `company-overview.md`.
 
@@ -124,6 +133,8 @@ calculation step for any arithmetic; never eyeball it.
   (Report it; don't fix it.)
 - Count of placeholders remaining, by page.
 
+If you had neither a connected system nor exports, say which checks were skipped and why.
+
 Anything that doesn't match becomes an open question in `CLAUDE.md`. A mismatch you find here is
 the handbook doing its job, so say so.
 
@@ -132,14 +143,17 @@ the handbook doing its job, so say so.
 - Update the "Last reviewed" line on every page you touched.
 - Update `CLAUDE.md`: the at-a-glance section, open questions, and a Changelog line saying what
   was built and what's still open.
-- Offer the next stage, as `SKILL.md` describes: the follow-up (stage 2) if
-  `handbook/metrics-and-reporting.md` is mostly placeholders.
+- During first setup, add "Setup stage 1 (interview) done. Next: follow-up." to the Changelog
+  and offer the next stage as `SKILL.md` describes.
 
 ## Refreshing later
 
-Run this again any time. Re-read the systems, update what changed, and never overwrite something
-the user wrote or confirmed without asking. If the user says "add this to the handbook," fold it
-into the right page and log it in the Changelog.
+Run this again any time. A refresh skips the orientation message (step 0), logs "handbook
+refresh started" instead of "setup started" in step 1, reruns steps 2, 4, 5, and 7, and in step 6
+asks only questions that are new since the last run. Never overwrite something the user wrote or
+confirmed without asking. If the user says "add this to the handbook," save the document in
+`handbook/sources/`, fold what it says into the right pages, log it in the Changelog, and stop
+there. A refresh doesn't lead into the other stages.
 
 ## Never
 

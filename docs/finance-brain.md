@@ -26,7 +26,7 @@ description: A free starter kit for building a finance brain that turns Claude i
   <div class="card">
     <span class="step-no">2</span>
     <h3>Skills</h3>
-    <p>One Claude skill per recurring task, each in its own folder. Setup skills that build your handbook, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
+    <p>One Claude skill per recurring task, each in its own folder. A setup skill that builds your handbook, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
   </div>
   <div class="card">
     <span class="step-no">3</span>
@@ -68,7 +68,7 @@ Using Claude Code instead? Open the folder as a project and link `skills/` as `.
 
 ## See it finished
 
-The [example handbook](handbook-example/) is this kit filled in for Honestly Just Spreadsheets, Inc., a fictional Series A company, and published with the kit's own website skill. The kit also includes a finished, synthetic usage-accrual workpaper in `examples/workpapers/`.
+The [example handbook](handbook-example/) is this kit filled in for Honestly Just Spreadsheets, Inc., a fictional Series A company, and published with the kit's own publish step. The kit also includes a finished, synthetic usage-accrual workpaper in `examples/workpapers/`.
 
 ---
 

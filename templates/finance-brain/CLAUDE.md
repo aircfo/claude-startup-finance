@@ -5,9 +5,10 @@ This folder is the finance team's shared brain. It holds how the company does it
 handbook pages a task needs, before doing any finance work here.
 
 > **First time here?** If the Company at a glance section below is still mostly
-> `[PLACEHOLDER` lines, the handbook isn't set up yet. Offer to run the `setup-finance-brain` skill
-> before anything else. A few open placeholders elsewhere are normal after setup; they're
-> listed under Open questions.
+> `[PLACEHOLDER` lines, the handbook isn't set up yet. Offer to run the `setup-finance-brain`
+> skill, or, for a quick start, the `new-skill` skill on one task the user knows cold. If they
+> asked for something else, do that and mention setup once. A few open placeholders elsewhere
+> are normal after setup; they're listed under Open questions.
 
 ## Company at a glance
 

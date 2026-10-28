@@ -79,7 +79,7 @@ body:
     attributes:
       label: Environment
       description: How you're running it, and the plugin version if you know it.
-      placeholder: "Claude Cowork, desktop app on macOS · all-systems-go 0.10.0"
+      placeholder: "Claude Cowork, desktop app on macOS · all-systems-go 0.10.1"
 
   - type: dropdown
     id: data

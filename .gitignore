@@ -15,3 +15,6 @@ _site/
 
 # claude plugin eval run output (reports, transcripts)
 plugins/*/evals/results/
+
+# Office lock files (never ship in the kit or its zip)
+~$*
