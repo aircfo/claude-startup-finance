@@ -30,5 +30,5 @@ Last four digits only. Never full account numbers.
 
 ## Reconciliations
 
-Every account above gets reconciled monthly with `commands/recs/bank-reconciliation.md`
-(cards use the same command against the card statement).
+Every account above gets reconciled monthly with the `bank-reconciliation` skill
+(cards use the same skill against the card statement).

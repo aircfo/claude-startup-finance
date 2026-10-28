@@ -30,4 +30,4 @@ general ledger, and what counts as cash for runway.
 
 ## Reconciliations
 
-Every account above gets reconciled monthly with `commands/recs/bank-reconciliation.md`.
+Every account above gets reconciled monthly with the `bank-reconciliation` skill.

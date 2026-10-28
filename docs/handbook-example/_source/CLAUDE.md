@@ -1,7 +1,7 @@
 # Finance Brain: Honestly Just Spreadsheets, Inc.
 
 This folder is the finance team's shared brain. It holds how the company does its accounting
-(`handbook/`) and the recurring tasks Claude runs (`commands/`). Read this file first, then the
+(`handbook/`) and the recurring tasks Claude runs (`skills/`). Read this file first, then the
 handbook pages a task needs, before doing any finance work here.
 
 > **Sample.** Honestly Just Spreadsheets, Inc. is a fictional company. Every name, number, and
@@ -20,10 +20,10 @@ handbook pages a task needs, before doing any finance work here.
 
 ## How to work in this folder
 
-1. **Read before you work.** Before any task, read the handbook pages it touches. A report, metric, burn, or runway question reads `handbook/metrics-and-reporting.md`.
+1. **Read before you work.** Before any task, read the handbook pages it touches. A JE or rec reads `handbook/workpaper-standard.md`. A report, metric, burn, or runway question reads `handbook/metrics-and-reporting.md`.
 2. **Read-only.** Read connected systems. Never post, approve, pay, transfer, or edit records.
 3. **Placeholder, never guess.** Mark unknowns `[PLACEHOLDER: ...]` and list them below.
-4. **Follow the workpaper standard** in `commands/_templates/`.
+4. **Follow the workpaper standard** in `handbook/workpaper-standard.md`.
 5. **Drafts go to `testing/` first.**
 6. **The author is never the approver.**
 7. **Fix the method, not the output.**
@@ -39,18 +39,23 @@ handbook pages a task needs, before doing any finance work here.
 | Bank and card accounts, what counts as cash, transfers | `handbook/cash.md` |
 | Metric definitions, burn and runway, plan, who reads the numbers | `handbook/metrics-and-reporting.md` |
 | What Claude can read, and the clean-inputs checklist | `handbook/systems-and-data.md` |
+| JE and rec workpaper standard: tabs, naming, checks, sign-off | `handbook/workpaper-standard.md` |
+| How skills work and how to add one | `skills/README.md` |
 
-## Commands
+## Skills
 
-| Command | What it does |
+Each skill is a folder in `skills/` with a `SKILL.md` that says how to do one recurring task.
+When the user asks for one of these tasks, or names a skill, read its `SKILL.md` and follow it.
+
+| Skill | What it does |
 | --- | --- |
-| `commands/setup/build-handbook.md` | Drafts the handbook from docs and systems, then interviews on the gaps |
-| `commands/setup/follow-up-interview.md` | 30 minutes with whoever owns the numbers: metrics, plan, reporting, people |
-| `commands/setup/new-command.md` | Turns one task you know cold into a reusable command |
-| `commands/jes/prepaid-amortization.md` | Monthly prepaid amortization JE from the prepaid schedule |
-| `commands/jes/usage-accrual.md` | Month-end accrual for Stratus Cloud and Lattice Inference usage |
-| `commands/recs/bank-reconciliation.md` | Mercury operating, Mercury treasury, and Ramp card recs |
-| `commands/publish/build-handbook-site.md` | Publishes this handbook as a website |
+| `skills/build-handbook/` | Drafts the handbook from docs and systems, then interviews on the gaps |
+| `skills/follow-up-interview/` | 30 minutes with whoever owns the numbers: metrics, plan, reporting, people |
+| `skills/new-skill/` | Turns one task you know cold into a reusable skill |
+| `skills/prepaid-amortization/` | Monthly prepaid amortization JE from the prepaid schedule |
+| `skills/usage-accrual/` | Month-end accrual for Stratus Cloud and Lattice Inference usage |
+| `skills/bank-reconciliation/` | Mercury operating, Mercury treasury, and Ramp card recs |
+| `skills/build-handbook-site/` | Publishes this handbook as a website |
 
 ## Where outputs go
 
@@ -66,6 +71,6 @@ handbook pages a task needs, before doing any finance work here.
 ## Changelog
 
 - 2026-10-15: Metrics and reporting page filled in from a follow-up interview with the CEO and Head of Finance.
-- 2026-10-15: usage-accrual command graduated from `testing/` after two clean months (approved by Head of Finance).
+- 2026-10-15: usage-accrual skill graduated from `testing/` after two clean months (approved by Head of Finance).
 - 2026-09-30: Added Lattice Inference to the usage accrual. Product launched AI features in September.
-- 2026-09-02: Handbook built with `commands/setup/build-handbook.md`. 9 placeholders open.
+- 2026-09-02: Handbook built with the `build-handbook` skill. 9 placeholders open.

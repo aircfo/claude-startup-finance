@@ -23,13 +23,13 @@ QuickBooks connector you add in Claude's connector settings, such as Intuit's. Y
 each one with your own login, directly with that vendor. airCFO runs no server in between and
 never holds your tokens or your data.
 
-**Claude sees what it reads.** When a command or tool reads a connected system, that data goes
+**Claude sees what it reads.** When a skill or tool reads a connected system, that data goes
 into your own Claude conversation to produce the answer. How Anthropic handles it is governed
 by the terms of your Claude account and workspace settings.
 
 ## Read-Only Product Intent
 
-Everything here is designed for read-only finance work. Commands and tools read your systems
+Everything here is designed for read-only finance work. The kit's skills and the tools read your systems
 and prepare workpapers, analysis, and import files. They never post journal entries, pay,
 transfer, or edit records. A person reviews and posts.
 
@@ -70,7 +70,7 @@ That's preferable to Claude guessing.
 ## Human Review Required
 
 Review outputs before they're used in board materials, investor updates, audit support, lender
-reporting, or operational decisions. The kit builds this in: the person who runs a command
+reporting, or operational decisions. The kit builds this in: the person who runs a skill
 never approves its output.
 
 **Security or privacy questions:** email **alex@aircfo.com** with "Security" in the subject

@@ -1,6 +1,6 @@
 ---
-description: Prepare the monthly prepaid amortization JE from the prepaid schedule, add new prepaids from the month's bills, and tie the schedule to the GL.
-argument-hint: "[period as YYYY-MM]"
+name: prepaid-amortization
+description: "Prepare the monthly prepaid amortization journal entry from the prepaid schedule, add new prepaids from the month's bills, and tie the schedule to the GL. Use when someone asks to amortize prepaids, book prepaid expense, or prepare the prepaid JE for a month-end close."
 ---
 
 # Prepaid amortization
@@ -9,14 +9,15 @@ argument-hint: "[period as YYYY-MM]"
 current, and prove the schedule ties to the GL. Runs once a month during the close (see
 `handbook/close-process.md`).
 
-**Period:** use `$ARGUMENTS` if given (YYYY-MM). Otherwise ask.
+**Period:** use the period the user named (YYYY-MM). Otherwise ask.
 
 > This is a worked example. Before relying on it, adjust the accounts, threshold, and method to
-> match `handbook/accounting-policies.md`, then test it with `commands/setup/new-command.md`
+> match `handbook/accounting-policies.md`, then test it with the `new-skill` skill
 > step 4: recreate a month you've already closed and compare.
 
 ## Read first
 
+- `handbook/workpaper-standard.md` (Journal entries)
 - `handbook/accounting-policies.md`, Prepaid expenses (threshold, method, where the schedule lives)
 - `handbook/chart-of-accounts.md` (the prepaid account and the expense accounts each contract maps to)
 
@@ -52,11 +53,11 @@ current, and prove the schedule ties to the GL. Runs once a month during the clo
 
 ## Output
 
-A workbook following `commands/_templates/journal-entry.md`:
+A workbook following `handbook/workpaper-standard.md`:
 
 - **Name:** `{prepaid GL number} - Prepaid Expenses - Amortization {YYYY.MM}.xlsx`
 - **Tabs:** Summary, Source Data (schedule as read, GL detail), Calculation (per-contract amortization and rollforward), JE, Prior Period
-- **Save to:** `testing/` until this command has passed review; then the close folder in `CLAUDE.md`
+- **Save to:** `testing/` until this skill has passed review; then the close folder in `CLAUDE.md`
 - Also save the updated schedule, if the schedule is a file you were asked to maintain. Never overwrite it without the user's OK.
 
 ## Checks before handoff

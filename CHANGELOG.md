@@ -21,17 +21,17 @@ forward.
 
 - **The Finance Brain Starter Kit** (`templates/finance-brain/`): a copy-ready folder, no
   plugin install, that gives Claude a finance handbook it reads every session (`CLAUDE.md` +
-  seven `handbook/` pages), commands organized by workflow (setup, JEs, recs, publish), a JE
-  and reconciliation workpaper standard, a `testing/` convention for new commands, a
-  static-site template for publishing the handbook, and a synthetic usage-accrual workpaper.
-  Its setup interview (`commands/setup/build-handbook.md`) drafts the handbook from your docs
-  and books and asks only what they can't answer; `commands/setup/follow-up-interview.md` is a
-  30-minute session with whoever owns the numbers. The kit's `metrics-and-reporting.md` page
+  eight `handbook/` pages, including a JE and reconciliation workpaper standard), seven Claude
+  skills in `skills/<name>/SKILL.md` folders (setup, JEs, recs, publish), a `testing/`
+  convention for new skills, and a synthetic usage-accrual workpaper. The `build-handbook`
+  skill drafts the handbook from your docs and books and asks only what they can't answer;
+  `follow-up-interview` is a 30-minute session with whoever owns the numbers; `new-skill`
+  turns a task you know cold into a new skill. The kit's `metrics-and-reporting.md` page
   (metric definitions, burn and runway, people, plan, audiences) and the Reporting rollups in
   `chart-of-accounts.md` carry over what the ContextOS finance profile held.
 - `docs/finance-brain.md`: the kit's guide page, first in the docs nav.
 - `docs/handbook-example/`: the kit filled in for a fictional company and published with the
-  kit's own site command. `_source/` holds the markdown; `_build.py` rebuilds the pages.
+  kit's own site skill. `_source/` holds the markdown; `_build.py` rebuilds the pages.
 - `docs/downloads/finance-brain-starter-kit.zip`: the kit as a download; `_build_zip.py`
   rebuilds it after any change to the kit.
 

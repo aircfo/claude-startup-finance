@@ -1,11 +1,12 @@
 """Rebuild the example handbook site from docs/handbook-example/_source/.
 
-This mirrors what commands/publish/build-handbook-site.md asks Claude to do, so the published
-example matches what a user's own build produces. Maintainers only; users never need it.
+This mirrors what the kit's build-handbook-site skill
+(templates/finance-brain/skills/build-handbook-site/SKILL.md) asks Claude to do, so the
+published example matches what a user's own build produces. Maintainers only; users never need it.
 
-    python3 docs/handbook-example/_build.py
+    uv run --with markdown --with pyyaml python3 docs/handbook-example/_build.py
 
-Requires the `markdown` package. Output: the .html files and style.css in this folder.
+Requires the `markdown` and `pyyaml` packages. Output: the .html files and style.css in this folder.
 """
 from __future__ import annotations
 
@@ -15,12 +16,14 @@ import re
 import shutil
 
 import markdown
+import yaml
 
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 SOURCE = HERE / "_source"
 KIT = REPO / "templates" / "finance-brain"
-TEMPLATE = (KIT / "site-template" / "page.html").read_text()
+SITE_TEMPLATE = KIT / "skills" / "build-handbook-site" / "site-template"
+TEMPLATE = (SITE_TEMPLATE / "page.html").read_text()
 
 HANDBOOK_PAGES = [
     ("company-overview", "Company overview"),
@@ -30,6 +33,15 @@ HANDBOOK_PAGES = [
     ("cash", "Cash"),
     ("metrics-and-reporting", "Metrics and reporting"),
     ("systems-and-data", "Systems and data"),
+    ("workpaper-standard", "Workpaper standard"),
+]
+
+# The skills page groups skills by workflow, in this order, as the kit's skills/README.md does.
+SKILL_WORKFLOWS = [
+    ("Setup", ["build-handbook", "follow-up-interview", "new-skill"]),
+    ("Journal entries", ["prepaid-amortization", "usage-accrual"]),
+    ("Reconciliations", ["bank-reconciliation"]),
+    ("Publish", ["build-handbook-site"]),
 ]
 
 
@@ -40,7 +52,7 @@ def nav(current: str) -> str:
 
     items = [link("index", "Home"), '<li class="group">Handbook</li>']
     items += [link(s, l) for s, l in HANDBOOK_PAGES]
-    items += ['<li class="group">Reference</li>', link("commands", "Commands"), link("changelog", "Changelog")]
+    items += ['<li class="group">Reference</li>', link("skills", "Skills"), link("changelog", "Changelog")]
     return "<ul>\n" + "\n".join(items) + "\n</ul>"
 
 
@@ -69,9 +81,9 @@ def sections(md_text: str) -> dict[str, str]:
     return out
 
 
-def frontmatter_description(path: pathlib.Path) -> str:
-    m = re.search(r"^description:\s*(.+)$", path.read_text(), re.M)
-    return m.group(1).strip() if m else ""
+def skill_frontmatter(path: pathlib.Path) -> dict[str, str]:
+    match = re.match(r"---\n(.*?)\n---\n", path.read_text(), re.S)
+    return yaml.safe_load(match.group(1)) if match else {}
 
 
 def render(slug: str, title: str, site_title: str, body_html: str, build_date: str) -> None:
@@ -113,23 +125,23 @@ def main() -> None:
         md_text = (SOURCE / "handbook" / f"{slug}.md").read_text()
         render(slug, label, site_title, to_html(md_text), build_date)
 
-    # Commands page: path + description, grouped by folder. Paths shown as code, not linked.
-    groups: dict[str, list[str]] = {}
-    for path in sorted((KIT / "commands").rglob("*.md")):
-        rel = path.relative_to(KIT)
-        if rel.parts[1] in ("_templates",) or rel.name == "README.md":
-            continue
-        groups.setdefault(rel.parts[1], []).append(f"| `{rel.as_posix()}` | {frontmatter_description(path)} |")
-    cmd_md = ["# Commands", "Recurring tasks Claude runs the same way every month. Run them from the finance folder."]
-    labels = {"setup": "Setup", "jes": "Journal entries", "recs": "Reconciliations", "publish": "Publishing"}
-    for folder in ("setup", "jes", "recs", "publish"):
-        if folder in groups:
-            cmd_md += [f"## {labels[folder]}", "| Command | What it does |\n| --- | --- |\n" + "\n".join(groups[folder])]
-    render("commands", "Commands", site_title, to_html("\n\n".join(cmd_md)), build_date)
+    # Skills page: each skill's folder + description, grouped by workflow. Folders shown as code, not linked.
+    skills = {}
+    for path in sorted((KIT / "skills").glob("*/SKILL.md")):
+        meta = skill_frontmatter(path)
+        skills[meta.get("name", path.parent.name)] = meta.get("description", "")
+    grouped = [name for _, names in SKILL_WORKFLOWS for name in names]
+    workflows = SKILL_WORKFLOWS + [("Other", [name for name in skills if name not in grouped])]
+    skills_md = ["# Skills", "Recurring tasks Claude runs the same way every month. Run them from the finance folder."]
+    for workflow, names in workflows:
+        rows = [f"| `skills/{name}/` | {skills[name]} |" for name in names if name in skills]
+        if rows:
+            skills_md += [f"## {workflow}", "| Skill | What it does |\n| --- | --- |\n" + "\n".join(rows)]
+    render("skills", "Skills", site_title, to_html("\n\n".join(skills_md)), build_date)
 
     render("changelog", "Changelog", site_title, to_html("# Changelog\n\n" + sec["Changelog"]), build_date)
 
-    shutil.copyfile(KIT / "site-template" / "style.css", HERE / "style.css")
+    shutil.copyfile(SITE_TEMPLATE / "style.css", HERE / "style.css")
     print(f"Built {len(HANDBOOK_PAGES) + 3} pages into {HERE}")
 
 

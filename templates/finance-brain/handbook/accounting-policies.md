@@ -20,14 +20,14 @@ link the formal, approved policy documents where they exist.
 - **Threshold:** [PLACEHOLDER: e.g. prepay invoices over $5,000 covering more than one month]
 - **Method:** [PLACEHOLDER: e.g. straight-line by month over the service period]
 - **Where the schedule lives:** [PLACEHOLDER: e.g. "Prepaid schedule" workbook in the close folder]
-- **Command:** `commands/jes/prepaid-amortization.md`
+- **Skill:** `skills/prepaid-amortization/`
 
 ## Accruals
 
 - **Threshold:** [PLACEHOLDER: e.g. accrue unbilled expenses over $2,500]
 - **Recurring accruals:** [PLACEHOLDER: list them, e.g. usage-billed vendors, payroll for days worked, bonuses]
 - **Reversal:** [PLACEHOLDER: e.g. auto-reverse on the first day of the next month]
-- **Command:** `commands/jes/usage-accrual.md`
+- **Skill:** `skills/usage-accrual/`
 
 ## Revenue recognition
 

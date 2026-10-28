@@ -1,6 +1,6 @@
 ---
-description: Reconcile a bank or card account's GL balance to its statement, classify every reconciling item, roll forward last month's items, and propose entries for anything unrecorded.
-argument-hint: "[period as YYYY-MM] [optional: account name or last 4]"
+name: bank-reconciliation
+description: "Reconcile a bank or card account's GL balance to its statement, classify every reconciling item, roll forward last month's open items, and propose entries for anything unrecorded. Use when someone asks to reconcile a bank or card account, do the bank recs, or tie the GL to a statement for a month-end close."
 ---
 
 # Bank and card reconciliation
@@ -8,7 +8,7 @@ argument-hint: "[period as YYYY-MM] [optional: account name or last 4]"
 **Purpose:** prove each bank and card account's GL balance matches its statement, and explain
 every difference. Runs for every account in `handbook/cash.md` during the close.
 
-**Period:** use `$ARGUMENTS` if given. If no account is named, run every account in
+**Period:** use the period the user named. If no account is named, run every account in
 `handbook/cash.md`, one workbook each.
 
 > This is a worked example. Adjust the matching window and aging threshold to your policy, then
@@ -16,6 +16,7 @@ every difference. Runs for every account in `handbook/cash.md` during the close.
 
 ## Read first
 
+- `handbook/workpaper-standard.md` (Reconciliations)
 - `handbook/cash.md` (the accounts, their GL accounts, statement timing, transfer rules)
 - `handbook/close-process.md` (when recs are due, who signs off)
 
@@ -49,10 +50,10 @@ every difference. Runs for every account in `handbook/cash.md` during the close.
 
 ## Output
 
-A workbook per account following `commands/_templates/reconciliation.md`:
+A workbook per account following `handbook/workpaper-standard.md`:
 
 - **Name:** `{GL number} - {account name} - Rec {YYYY.MM}.xlsx`
-- **Save to:** `testing/` until this command has passed review; then the close folder in `CLAUDE.md`
+- **Save to:** `testing/` until this skill has passed review; then the close folder in `CLAUDE.md`
 - A short summary in chat: each account, unreconciled difference, count of open items, any proposed JEs.
 
 ## Checks before handoff

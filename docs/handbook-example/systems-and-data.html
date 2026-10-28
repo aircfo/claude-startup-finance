@@ -24,15 +24,16 @@
 <li><a href="cash.html">Cash</a></li>
 <li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
 <li><a href="systems-and-data.html" aria-current="page">Systems and data</a></li>
+<li><a href="workpaper-standard.html">Workpaper standard</a></li>
 <li class="group">Reference</li>
-<li><a href="commands.html">Commands</a></li>
+<li><a href="skills.html">Skills</a></li>
 <li><a href="changelog.html">Changelog</a></li>
 </ul>
     </nav>
     <main class="content">
       <h1>Systems and data</h1>
 <p><strong>What this page is for:</strong> what Claude can read directly, and the habits that keep inputs
-consistent enough for a command to run the same way every month.</p>
+consistent enough for a skill to run the same way every month.</p>
 <p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
 <h2>What Claude is connected to</h2>
 <table>
@@ -89,12 +90,12 @@ consistent enough for a command to run the same way every month.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Read-only is the rule.</strong> Commands never post, pay, or edit records. A person posts what Claude
+<p><strong>Read-only is the rule.</strong> Skills never post, pay, or edit records. A person posts what Claude
 prepares.</p>
 <h2>The clean-inputs checklist</h2>
 <ul>
 <li>☑ Last month's version of every automated task exists and has been reviewed.</li>
-<li>☑ Same workpaper shape every month (the standard in <code>commands/_templates/</code>).</li>
+<li>☑ Same workpaper shape every month (the standard in <a href="workpaper-standard.html"><code>handbook/workpaper-standard.md</code></a>).</li>
 <li>☑ Predictable file names: <code>{GL} - {account} - {description} {YYYY.MM}.xlsx</code>.</li>
 <li>☑ One folder per period: <code>Finance/Close/YYYY-MM/</code> with <code>JEs/</code>, <code>Recs/</code>, <code>Statements/</code>.</li>
 <li>☑ Schedules live in one place: <code>Finance/Schedules/</code>.</li>
@@ -142,7 +143,7 @@ prepares.</p>
   </div>
   <footer class="footer">
     Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
-    <code>commands/publish/build-handbook-site.md</code>.
+    the <code>build-handbook-site</code> skill.
   </footer>
 </body>
 </html>

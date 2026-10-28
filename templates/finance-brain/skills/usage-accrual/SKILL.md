@@ -1,6 +1,6 @@
 ---
-description: Prepare the month-end accrual for usage-billed vendors (cloud, APIs, data) whose invoice hasn't arrived yet, as a reversing JE.
-argument-hint: "[period as YYYY-MM] [optional: vendor]"
+name: usage-accrual
+description: "Prepare the month-end accrual for usage-billed vendors (cloud, APIs, data) whose invoice hasn't arrived yet, as a reversing journal entry. Use when someone asks to accrue usage, book the cloud or API accrual, or prepare unbilled vendor accruals for a month-end close."
 ---
 
 # Usage accrual
@@ -9,7 +9,7 @@ argument-hint: "[period as YYYY-MM] [optional: vendor]"
 bill in arrears based on usage: cloud hosting, AI and API providers, data vendors. Runs at month
 end; reverses on the first day of the next month so the real invoice books cleanly.
 
-**Period:** use `$ARGUMENTS` if given. Otherwise ask.
+**Period:** use the period the user named. Otherwise ask.
 
 > This is a worked example. A finished workpaper built on synthetic data is in
 > `examples/workpapers/2101 - Accrued Expenses - Usage Accrual 2026.09.xlsx`. Adjust the accounts
@@ -17,6 +17,7 @@ end; reverses on the first day of the next month so the real invoice books clean
 
 ## Read first
 
+- `handbook/workpaper-standard.md` (Journal entries)
 - `handbook/accounting-policies.md`, Accruals (threshold, which vendors, reversal convention)
 - `handbook/chart-of-accounts.md` (the accrued expenses account, and which expense account each
   vendor maps to: cost of revenue for product infrastructure, operating expense for internal use)
@@ -43,15 +44,15 @@ end; reverses on the first day of the next month so the real invoice books clean
    `Usage Accrual - {vendor} - {YYYY.MM}`.
 5. **True up last month.** Compare last month's accrual to the invoice that arrived for that month.
    If the difference is material, explain it and suggest whether the method or the rates need
-   updating. Fix the command, not just the number.
+   updating. Fix the skill, not just the number.
 
 ## Output
 
-A workbook following `commands/_templates/journal-entry.md`:
+A workbook following `handbook/workpaper-standard.md`:
 
 - **Name:** `{accrued expenses GL number} - Accrued Expenses - Usage Accrual {YYYY.MM}.xlsx`
 - **Tabs:** Summary, Source Data, Calculation, JE, Prior Period (with the true-up)
-- **Save to:** `testing/` until this command has passed review; then the close folder in `CLAUDE.md`
+- **Save to:** `testing/` until this skill has passed review; then the close folder in `CLAUDE.md`
 
 ## Checks before handoff
 

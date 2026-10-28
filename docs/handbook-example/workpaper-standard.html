@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Workpaper standard · Honestly Just Spreadsheets, Inc. Finance Handbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Honestly Just Spreadsheets, Inc. Finance Handbook</a>
+    <span class="tag">Internal</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Handbook">
+      <ul>
+<li><a href="index.html">Home</a></li>
+<li class="group">Handbook</li>
+<li><a href="company-overview.html">Company overview</a></li>
+<li><a href="chart-of-accounts.html">Chart of accounts</a></li>
+<li><a href="accounting-policies.html">Accounting policies</a></li>
+<li><a href="close-process.html">Close process</a></li>
+<li><a href="cash.html">Cash</a></li>
+<li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
+<li><a href="systems-and-data.html">Systems and data</a></li>
+<li><a href="workpaper-standard.html" aria-current="page">Workpaper standard</a></li>
+<li class="group">Reference</li>
+<li><a href="skills.html">Skills</a></li>
+<li><a href="changelog.html">Changelog</a></li>
+</ul>
+    </nav>
+    <main class="content">
+      <h1>Workpaper standard</h1>
+<p><strong>What this page is for:</strong> what every journal entry and reconciliation workpaper looks like, so a
+reviewer can open any one, from any month, and know where to look. Every JE and rec skill in
+<code>skills/</code> follows it.</p>
+<p><strong>Last reviewed:</strong> 2026-10-15, by Head of Finance</p>
+<p>The September 2026 usage accrual, <code>2101 - Accrued Expenses - Usage Accrual 2026.09.xlsx</code>, is the reference JE workpaper.</p>
+<h2>Rules for every workpaper</h2>
+<ul>
+<li><strong>File name:</strong> <code>{GL account number} - {account name} - {description} {YYYY.MM}.xlsx</code>, for
+  example <code>2101 - Accrued Expenses - Usage Accrual 2026.09.xlsx</code> or
+  <code>1010 - Operating Checking - Rec 2026.09.xlsx</code>.</li>
+<li><strong>Formulas, never hardcoded results.</strong> If the source data changes, the result changes.</li>
+<li><strong>Source tabs are never edited.</strong> Inputs stay exactly as pulled or exported.</li>
+<li><strong>Accounts must exist</strong> in the chart of accounts. Never invent one.</li>
+<li><strong>Blue text for inputs, black for formulas.</strong></li>
+<li><strong>Sign-off block</strong> at the bottom of the Summary tab:</li>
+</ul>
+<blockquote>
+<p>Prepared by: Claude (run by [name]) on [date]
+Reviewed and approved by: ______________ Date: ________
+Requires approval by someone other than the preparer, per <a href="company-overview.html"><code>handbook/company-overview.md</code></a>.</p>
+</blockquote>
+<ul>
+<li><strong>Save to</strong> <code>testing/</code> while a skill is new or changed. After it has passed review, Google
+  Drive, <code>Finance/Close/YYYY-MM/JEs/</code> or <code>Finance/Close/YYYY-MM/Recs/</code>.</li>
+</ul>
+<p>If any check below fails, say so plainly and stop. Don't hand off a workpaper with a failed check.</p>
+<h2>Journal entries</h2>
+<p><strong>Tabs, in this order:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>What's on it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Summary</strong></td>
+<td>Purpose, period, the handbook policy it follows, where each input came from (system and report, or export file name, with date range), the result in one sentence, and the sign-off block.</td>
+</tr>
+<tr>
+<td><strong>Source Data</strong></td>
+<td>The raw inputs exactly as pulled or exported.</td>
+</tr>
+<tr>
+<td><strong>Calculation</strong></td>
+<td>The math, as live formulas that reference Source Data. Every assumption (a rate, a threshold, a useful life) in its own labeled cell, with where it came from.</td>
+</tr>
+<tr>
+<td><strong>JE</strong></td>
+<td>The entry: post date, reversal date (if any), account, debit, credit, memo, department or class. Totals row. A balance check that reads BALANCED or OUT OF BALANCE.</td>
+</tr>
+<tr>
+<td><strong>Prior Period</strong> (optional)</td>
+<td>Last month's entry beside this month's, with the change explained if it's material.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Debits equal credits, and the balance check is a formula, not a typed word.</li>
+<li>Memo format: <code>{description} - {vendor or contract} - {YYYY.MM}</code>.</li>
+<li><strong>Optional import file:</strong> if the accounting system accepts a journal entry import, also save a
+  CSV in its import format beside the workbook. A person imports it after approval. Claude never
+  posts.</li>
+</ul>
+<p><strong>Checks before handoff,</strong> shown to the user as a short table:</p>
+<ol>
+<li><strong>Balanced:</strong> total debits equal total credits.</li>
+<li><strong>Ties to source:</strong> the Calculation total equals the JE amount.</li>
+<li><strong>Ties to the schedule or balance:</strong> for entries that roll a balance (prepaids, accruals,
+   deferred revenue), opening + additions - releases = closing, and closing matches what the GL
+   will show after the entry.</li>
+<li><strong>Reasonable vs. last month:</strong> if the amount moved more than the flux threshold in
+   <a href="close-process.html"><code>handbook/close-process.md</code></a>, explain why.</li>
+<li><strong>Accounts valid:</strong> every account exists and is active.</li>
+</ol>
+<h2>Reconciliations</h2>
+<p>The same shape works for a bank account, a credit card, a clearing account, or a balance-sheet
+account tied to a schedule.</p>
+<p><strong>Tabs, in this order:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>What's on it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Summary</strong></td>
+<td>The account, the period, the statement date, the GL balance, the independent balance (statement or schedule), total reconciling items, and the <strong>unreconciled difference</strong>, which must be zero. Sources and the sign-off block.</td>
+</tr>
+<tr>
+<td><strong>GL Detail</strong></td>
+<td>The account's GL activity for the period, as pulled.</td>
+</tr>
+<tr>
+<td><strong>Statement</strong></td>
+<td>The independent source: bank or card statement lines, or the supporting schedule.</td>
+</tr>
+<tr>
+<td><strong>Reconciling Items</strong></td>
+<td>Every item on one side but not the other, each with a type, date, amount, age in days, and what happens next.</td>
+</tr>
+<tr>
+<td><strong>Rollforward</strong></td>
+<td>Last month's open reconciling items: cleared this month, or still open (with age).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reconciling item types:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Meaning</th>
+<th>What happens next</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deposit in transit</td>
+<td>In the GL, not yet on the statement</td>
+<td>Should clear in the first days of next month</td>
+</tr>
+<tr>
+<td>Outstanding payment</td>
+<td>In the GL, not yet on the statement</td>
+<td>Should clear when the payee cashes or the payment settles</td>
+</tr>
+<tr>
+<td>Bank-only item</td>
+<td>On the statement, not in the GL (fees, interest, unrecorded transfers)</td>
+<td>Propose a JE for a person to book</td>
+</tr>
+<tr>
+<td>Error</td>
+<td>Recorded wrong in the GL (amount, account, or duplicate)</td>
+<td>Propose a correcting JE</td>
+</tr>
+<tr>
+<td>Timing</td>
+<td>Statement and GL cut off on different dates (common for cards)</td>
+<td>Explain the cutoff</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The unreconciled difference is a formula, and it must be zero. If it isn't, the rec isn't done.</li>
+<li>Every reconciling item has a type and a next step. "Unknown" is not a type.</li>
+<li>Items older than 60 days get flagged on the Summary tab.</li>
+</ul>
+<p><strong>Checks before handoff:</strong></p>
+<ol>
+<li><strong>Unreconciled difference is zero.</strong></li>
+<li><strong>GL balance matches the trial balance</strong> for the account at the period end.</li>
+<li><strong>Statement ending balance matches the statement</strong> (not a running total Claude computed).</li>
+<li><strong>Last month's items are accounted for:</strong> every prior open item is cleared or carried forward
+   with its age.</li>
+<li><strong>Proposed JEs listed:</strong> any bank-only item or error has a proposed entry for a person to book.</li>
+</ol>
+    </main>
+  </div>
+  <footer class="footer">
+    Built from the <code>handbook/</code> folder on 2026-10-28. Edit the markdown, then rebuild with
+    the <code>build-handbook-site</code> skill.
+  </footer>
+</body>
+</html>

@@ -1,13 +1,13 @@
 ---
-description: A 30-minute follow-up with whoever owns the numbers. Fills the metrics, plan, reporting, and people sections the books can't answer.
-argument-hint: "[optional: who you're interviewing, e.g. 'our CEO']"
+name: follow-up-interview
+description: "A 30-minute follow-up with whoever owns the numbers (founder, CEO, or controller) that fills the metric definitions, plan, reporting, and people sections the books can't answer. Use after build-handbook, when handbook/metrics-and-reporting.md is mostly placeholders, or when someone says \"define our metrics,\" \"interview our CEO,\" or \"finish the handbook questions.\""
 ---
 
 # Follow-up interview
 
 **Purpose:** fill the parts of the handbook that live in someone's head: what the metrics mean,
 what the plan is, how reporting should work, and how people get paid. Run it after
-`commands/setup/build-handbook.md`, with whoever owns the numbers (founder, CEO, controller).
+the `build-handbook` skill, with whoever owns the numbers (founder, CEO, controller).
 The person running the session can also take the questions to that person and bring answers
 back.
 

@@ -22,14 +22,14 @@ That's by design: a placeholder is better than a guess.
 
 ## Worked Examples Are Starting Points
 
-The kit ships three worked commands (prepaid amortization, a usage accrual, a bank
+The kit ships three worked skills (prepaid amortization, a usage accrual, a bank
 reconciliation), and the tool library ships runway and burn, revenue reconciliation, and board
-metrics. Expect to adjust each one to match how your team works. Test a changed command in
+metrics. Expect to adjust each one to match how your team works. Test a changed skill in
 `testing/` against a known-good result before you rely on it.
 
 ## Best With A Connected Stack
 
-Commands and tools work from exports, but they work best when Claude can read your accounting
+The kit's skills and the tools work from exports, but they work best when Claude can read your accounting
 system, bank, card platform, and billing system directly. The tools in this library are built
 around QuickBooks, Stripe, Ramp, and Mercury. Other systems work through exports.
 
@@ -54,7 +54,7 @@ customers or subscriptions, or writes to a connected system. A person posts.
 Claude can misread account names, misunderstand how a system behaves, or work from incomplete
 data. Review classifications, metric definitions, revenue recognition assumptions, which
 accounts count as cash, and anything board-ready. Don't use outputs in board, investor, audit,
-or lender materials without review by someone other than the person who ran the command.
+or lender materials without review by someone other than the person who ran the skill.
 
 Review the [Data Handling and Security]({{ '/data-handling-security.html' | relative_url }}) page before connecting
 sensitive finance data.
@@ -62,5 +62,5 @@ sensitive finance data.
 ## Report Problems
 
 Please report sign-in issues, wrong account mappings, outputs that feel overconfident, and
-commands or tools that ignored your handbook. Email alex@aircfo.com or
+skills or tools that ignored your handbook. Email alex@aircfo.com or
 [open an issue](https://github.com/aircfo/claude-startup-finance/issues).

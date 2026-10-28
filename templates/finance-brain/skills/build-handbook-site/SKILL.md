@@ -1,6 +1,6 @@
 ---
-description: Publish the handbook as a browsable internal website (static HTML, no tools to install), so people who never open this folder can still read the policies.
-argument-hint: "(no arguments)"
+name: build-handbook-site
+description: "Publish the finance handbook as a small internal website (static HTML, nothing to install), so people who never open this folder can still read the policies. Use when someone says \"publish the handbook,\" \"build the handbook site,\" or \"share the handbook with the team.\""
 ---
 
 # Build the handbook website
@@ -14,9 +14,11 @@ external scripts. Open `site/index.html` in a browser to view it.
 
 ## Read first
 
-- `site-template/page.html` (the page layout) and `site-template/style.css` (the look)
+- `skills/build-handbook-site/site-template/page.html` (the page layout) and
+  `skills/build-handbook-site/site-template/style.css` (the look)
 - `CLAUDE.md` and every file in `handbook/`
-- The frontmatter `description` of every command in `commands/` (not `_templates/`)
+- The frontmatter `description` of every `skills/*/SKILL.md`, and the workflow groups in
+  `skills/README.md`
 
 ## Pages to build
 
@@ -24,10 +26,10 @@ external scripts. Open `site/index.html` in a browser to view it.
 | --- | --- | --- |
 | `index.html` (Home) | `CLAUDE.md`: Company at a glance, Map, Open questions | Title it "{Company} Finance Handbook" and open with one line: "How {Company} does its accounting. Start with the page you need." Link each row of the Map to its page. |
 | One page per handbook file | `handbook/{name}.md` | `company-overview.md` becomes `company-overview.html`, and so on. |
-| `commands.html` | Every command's file path and `description` | Group by folder under plain-English headings (Setup, Journal entries, Reconciliations, Publishing, and so on). Don't link to the files; show the paths as code. |
+| `skills.html` | Every skill's name and `description` | Group by workflow, as `skills/README.md` does (Setup, Journal entries, Reconciliations, Publish, and so on). Don't link to the files; show each skill's folder as code. |
 | `changelog.html` | The Changelog section of `CLAUDE.md` | |
 
-Don't publish `handbook/sources/`, `testing/`, or anything in `commands/` beyond the descriptions.
+Don't publish `handbook/sources/`, `testing/`, or anything in `skills/` beyond the descriptions.
 
 ## Steps
 
@@ -58,14 +60,15 @@ Don't publish `handbook/sources/`, `testing/`, or anything in `commands/` beyond
        <li><a href="cash.html">Cash</a></li>
        <li><a href="metrics-and-reporting.html">Metrics and reporting</a></li>
        <li><a href="systems-and-data.html">Systems and data</a></li>
+       <li><a href="workpaper-standard.html">Workpaper standard</a></li>
        <li class="group">Reference</li>
-       <li><a href="commands.html">Commands</a></li>
+       <li><a href="skills.html">Skills</a></li>
        <li><a href="changelog.html">Changelog</a></li>
      </ul>
      ```
 
      Add a link for any extra page the team has added to `handbook/`.
-6. **Copy `site-template/style.css`** into `site/`.
+6. **Copy `skills/build-handbook-site/site-template/style.css`** into `site/`.
 
 ## Checks before handoff
 

@@ -11,8 +11,8 @@ A free folder that turns Claude into a finance teammate who knows how your compa
 
 - **Context.** A handbook of your policies, chart of accounts, close process, cash rules, and
   metric definitions that Claude reads before any finance work.
-- **Commands.** One file per recurring task. Anyone on the team runs it and gets the same
-  workpaper.
+- **Skills.** One Claude skill per recurring task. Anyone on the team runs it and gets the
+  same workpaper.
 - **Review.** Claude prepares, a person approves. Nothing hits the books until someone other
   than the preparer signs off.
 
@@ -70,7 +70,7 @@ own, all reading your Finance Brain first.
 
 | Type | Name | Theme | What it does | Install method | Docs |
 | --- | --- | --- | --- | --- | --- |
-| Template | **`finance-brain`** | Start here | The Finance Brain Starter Kit: a handbook Claude reads every session, a setup interview that drafts it from your docs and books, commands for recurring JEs and recs, a workpaper standard, and a review step. | [Download (.zip)](https://aircfo.github.io/claude-startup-finance/downloads/finance-brain-starter-kit.zip) or copy [`templates/finance-brain/`](./templates/finance-brain/) | [Kit guide](https://aircfo.github.io/claude-startup-finance/finance-brain.html) · [Example handbook](https://aircfo.github.io/claude-startup-finance/handbook-example/) |
+| Template | **`finance-brain`** | Start here | The Finance Brain Starter Kit: a handbook Claude reads every session, a setup interview that drafts it from your docs and books, skills for recurring JEs and recs, a workpaper standard, and a review step. | [Download (.zip)](https://aircfo.github.io/claude-startup-finance/downloads/finance-brain-starter-kit.zip) or copy [`templates/finance-brain/`](./templates/finance-brain/) | [Kit guide](https://aircfo.github.io/claude-startup-finance/finance-brain.html) · [Example handbook](https://aircfo.github.io/claude-startup-finance/handbook-example/) |
 | Plugin | **`all-systems-go`** | Connected stack, plus the workflows that use it | Provides the shared Stripe, Ramp, and Mercury connectors, plus cross-system workflows: runway & burn, revenue reconciliation, board metrics, and the skill builder and tuner. | Cowork marketplace ([below](#get-started)) | [Tool page](https://aircfo.github.io/claude-startup-finance/tools/all-systems-go/) · [Plugin README](./plugins/all-systems-go/README.md) |
 
 Anything airCFO publishes publicly for Claude (templates, plugins, standalone skills) is
@@ -80,8 +80,8 @@ is the index for readers, with one page per tool.
 
 ### Not using Claude Cowork?
 
-The kit works in Claude Code as-is: open the folder as a project and copy `commands/` into
-`.claude/commands/` for slash commands. The skills in `all-systems-go` are plain
+The kit works in Claude Code as-is: open the folder as a project and copy the folders in
+`skills/` into `.claude/skills/`. The skills in `all-systems-go` are plain
 [Agent Skills](https://code.claude.com/docs/en/skills), so they also install into Claude Code
 and other skill-aware agents via the [`skills` CLI](https://github.com/vercel-labs/skills):
 
@@ -98,7 +98,7 @@ your own connector configuration for Stripe, Ramp, Mercury, or QuickBooks.
 **1. Build your Finance Brain.** Download the kit, unzip it somewhere permanent, and add the
 folder in Claude Cowork with **Work in a folder**. Then say:
 
-> "Run `commands/setup/build-handbook.md`."
+> "Use the `build-handbook` skill."
 
 Claude drafts every handbook page from the documents you share and any systems you've
 connected, then asks you only what they can't answer. Gaps stay marked as placeholders, never
@@ -119,7 +119,7 @@ last month."
 
 ## Data handling & security
 
-- **Read-only by design.** Commands and tools read your systems and prepare workpapers and
+- **Read-only by design.** Skills and tools read your systems and prepare workpapers and
   analysis. They never post, pay, transfer, or edit records. A person posts.
 - **Your Finance Brain is a folder on your machine.** Nothing in the kit sends it anywhere.
 - **Every connector is the vendor's own**, authorized with your own login in your browser.
@@ -132,7 +132,7 @@ issue.
 
 ## Requirements
 
-- **The kit:** Claude Cowork or Claude Code. No connectors required to start; commands ask
+- **The kit:** Claude Cowork or Claude Code. No connectors required to start; skills ask
   for exports when a system isn't connected.
 - **The tools:** [Claude Cowork](https://claude.com/product/cowork), in the Claude desktop
   app ([download](https://claude.com/download)), on Pro, Max, Team, and Enterprise plans,

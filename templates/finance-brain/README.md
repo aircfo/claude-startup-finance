@@ -11,8 +11,8 @@ This kit fixes that with three pieces:
 | Piece | Where it lives | What it does |
 | --- | --- | --- |
 | **Context** | `CLAUDE.md` + `handbook/` | How your company works, written once. Claude reads it before any finance work. |
-| **Commands** | `commands/` | One file per recurring task (a JE, a rec, a tie-out). Anyone on the team runs it and gets the same workpaper. |
-| **Review** | `testing/` + the workpaper standard | Claude prepares, a person approves. Nothing Claude builds hits the books until someone else signs off. |
+| **Skills** | `skills/` | One skill per recurring task (a JE, a rec, a tie-out). Anyone on the team runs it and gets the same workpaper. |
+| **Review** | `testing/` + `handbook/workpaper-standard.md` | Claude prepares, a person approves. Nothing Claude builds hits the books until someone else signs off. |
 
 It's plain markdown in a folder you own. No plugin to install, no connector required to start.
 
@@ -30,11 +30,11 @@ part of the kit that gets you to the next one.
 
 | Rung | What it looks like | Start with |
 | --- | --- | --- |
-| **0 · Chat** | Asking Claude questions one at a time. | `commands/setup/new-command.md` |
-| **1 · Skills** | A monthly task Claude can repeat on demand. | `commands/setup/new-command.md`, then `commands/_templates/` |
+| **0 · Chat** | Asking Claude questions one at a time. | the `new-skill` skill |
+| **1 · Skills** | A monthly task Claude can repeat on demand. | the `new-skill` skill |
 | **2 · Clean, connected data** | Claude reads your systems, and the inputs look the same every month. | `handbook/systems-and-data.md` |
-| **3 · Shared context & workflows** | One place your policies and processes live, so the whole team works from the same playbook. | `CLAUDE.md`, `handbook/`, `commands/setup/build-handbook.md` |
-| **4 · Finance engineering** | Version control, review before anything hits the books. | `testing/`, the workpaper standard in `commands/_templates/` |
+| **3 · Shared context & workflows** | One place your policies and processes live, so the whole team works from the same playbook. | `CLAUDE.md`, `handbook/`, the `build-handbook` skill |
+| **4 · Finance engineering** | Version control, review before anything hits the books. | `testing/` and `handbook/workpaper-standard.md` |
 | **5 · The frontier** | New work finance couldn't do before. | Everything above, running. |
 
 ---
@@ -47,36 +47,37 @@ part of the kit that gets you to the next one.
 example `~/Documents/Finance Brain/`), and add it to Cowork with **Work in a folder**. Cowork
 reads `CLAUDE.md` automatically every time you work there.
 
-**Claude Code:** open the folder as your project. To get `/slash-commands`, copy the files in
-`commands/` into `.claude/commands/` (keep the subfolders; skip `_templates/`).
+**Claude Code:** open the folder as your project and copy the folders in `skills/` into
+`.claude/skills/`. Each skill then runs when a request matches it, or directly as a slash
+command such as `/build-handbook`.
 
 ### 2. Pick a path
 
-**30 minutes: your first command.** Say:
+**30 minutes: your first skill.** Say:
 
-> "Run `commands/setup/new-command.md`. I want to automate [one rec, JE, or report you know cold]."
+> "Use the `new-skill` skill. I want to automate [one rec, JE, or report you know cold]."
 
 Claude has you hand it last month's finished version, rebuilds it, compares the two, and
-saves the method as a new command. You end the session with something you'll run again next
+saves the method as a new skill. You end the session with something you'll run again next
 month.
 
 **An afternoon: your handbook.** Say:
 
-> "Run `commands/setup/build-handbook.md`."
+> "Use the `build-handbook` skill."
 
 Claude reads whatever you share (a close checklist, a policy doc, last month's reporting
 package) and any finance systems you've connected, drafts every page in `handbook/`, then
 interviews you only on the things no document or system could tell it. Gaps stay marked as
-`[PLACEHOLDER: ...]`, never guessed. Then run `commands/setup/follow-up-interview.md` with
+`[PLACEHOLDER: ...]`, never guessed. Then use the `follow-up-interview` skill with
 whoever owns the numbers to define your metrics, burn, and runway.
 
-**This month: make it the team's.** Run the worked examples in `commands/jes/` and
-`commands/recs/` on your own books, add your recurring tasks, and publish the handbook as a
-website your whole team can browse (`commands/publish/build-handbook-site.md`).
+**This month: make it the team's.** Run the worked examples (`prepaid-amortization`,
+`usage-accrual`, `bank-reconciliation`) on your own books, add your recurring tasks, and publish the handbook as a
+website your whole team can browse (the `build-handbook-site` skill).
 
 ### 3. Keep it current
 
-When a policy changes, update the page. When a command gets something wrong, fix the command,
+When a policy changes, update the page. When a skill gets something wrong, fix the skill,
 not the output. The folder gets smarter every month, and so does every session that reads it.
 
 ---
@@ -93,35 +94,37 @@ finance-brain/
 │   ├── close-process.md      Close calendar, checklist, flux thresholds, sign-off
 │   ├── cash.md               Bank and card accounts, what counts as cash, transfers
 │   ├── metrics-and-reporting.md  Metric definitions, burn and runway, plan, audiences
-│   └── systems-and-data.md   What Claude can read, and the clean-inputs checklist
-├── commands/                 One file per recurring task
-│   ├── README.md             How commands work and how to add one
-│   ├── setup/                build-handbook.md, follow-up-interview.md, new-command.md
-│   ├── _templates/           journal-entry.md, reconciliation.md (the workpaper standard)
-│   ├── jes/                  prepaid-amortization.md, usage-accrual.md
-│   ├── recs/                 bank-reconciliation.md
-│   └── publish/              build-handbook-site.md
-├── testing/                  Where drafts live until a command is trusted
-├── site-template/            The look of your handbook website
+│   ├── systems-and-data.md   What Claude can read, and the clean-inputs checklist
+│   └── workpaper-standard.md  What every JE and rec workpaper looks like, and its checks
+├── skills/                   One folder per recurring task, each with a SKILL.md
+│   ├── README.md             How skills work, grouped by workflow, and how to add one
+│   ├── build-handbook/       Setup: draft the handbook, then ask only what's left
+│   ├── follow-up-interview/  Setup: metrics, plan, reporting, people
+│   ├── new-skill/            Setup: turn a task you know cold into a skill (+ templates/)
+│   ├── prepaid-amortization/ JE: monthly prepaid amortization
+│   ├── usage-accrual/        JE: month-end usage accrual
+│   ├── bank-reconciliation/  Rec: bank or card account to statement
+│   └── build-handbook-site/  Publish: the handbook as a website (+ site-template/)
+├── testing/                  Where drafts live until a skill is trusted
 └── examples/                 A sample Claude-prepared JE workpaper (synthetic data)
 ```
 
 ## Ground rules baked into the kit
 
-- **Read-only.** Commands read your systems and produce workpapers and import files. A person
+- **Read-only.** Skills read your systems and produce workpapers and import files. A person
   posts entries. Nothing in this kit writes to your accounting system, bank, or card platform.
 - **Placeholder, never guess.** Anything Claude doesn't know is marked
   `[PLACEHOLDER: what's needed and why]` and listed as an open question.
 - **The author is never the approver.** Claude prepares. Someone other than the person who ran
-  the command reviews it before it's posted.
-- **Fix the method, not the output.** If a workpaper is wrong, change the command so next month
+  the skill reviews it before it's posted.
+- **Fix the method, not the output.** If a workpaper is wrong, change the skill so next month
   is right too.
 
 ## Want to see a finished one?
 
 The [example handbook](https://aircfo.github.io/claude-startup-finance/handbook-example/) shows
 this kit filled in for a fictional Series A company, Honestly Just Spreadsheets, Inc., published
-with `commands/publish/build-handbook-site.md`.
+with the `build-handbook-site` skill.
 
 ---
 

@@ -9,12 +9,12 @@ off.
 
 Business days (BD) after month end.
 
-| BD | Task | Owner | Command |
+| BD | Task | Owner | Skill |
 | --- | --- | --- | --- |
 | BD1 | Ramp and bank feeds categorized in QuickBooks | Accounting firm | |
 | BD2 | Stripe revenue and deferred revenue entries | Accounting firm | |
-| BD3 | Bank and card reconciliations | Accounting firm | `commands/recs/bank-reconciliation.md` |
-| BD4 | Accruals and prepaid amortization | Accounting firm | `commands/jes/usage-accrual.md`, `commands/jes/prepaid-amortization.md` |
+| BD3 | Bank and card reconciliations | Accounting firm | `skills/bank-reconciliation/` |
+| BD4 | Accruals and prepaid amortization | Accounting firm | `skills/usage-accrual/`, `skills/prepaid-amortization/` |
 | BD5 | Payroll and stock comp entries | Accounting firm | |
 | BD6 | Flux review | Head of Finance | |
 | BD8 | Close sign-off, period locked, reporting package to CEO | Head of Finance | |

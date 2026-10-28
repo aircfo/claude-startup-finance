@@ -9,11 +9,11 @@ off. Claude uses it to know which numbers it can rely on and which tasks come ne
 
 Business days (BD) after month end.
 
-| BD | Task | Owner | Command |
+| BD | Task | Owner | Skill |
 | --- | --- | --- | --- |
 | [PLACEHOLDER: e.g. BD1] | [PLACEHOLDER: e.g. bank and card feeds categorized] | | |
-| [PLACEHOLDER: e.g. BD3] | [PLACEHOLDER: e.g. bank and card reconciliations] | | `commands/recs/bank-reconciliation.md` |
-| [PLACEHOLDER: e.g. BD4] | [PLACEHOLDER: e.g. accruals and prepaid amortization] | | `commands/jes/usage-accrual.md`, `commands/jes/prepaid-amortization.md` |
+| [PLACEHOLDER: e.g. BD3] | [PLACEHOLDER: e.g. bank and card reconciliations] | | `skills/bank-reconciliation/` |
+| [PLACEHOLDER: e.g. BD4] | [PLACEHOLDER: e.g. accruals and prepaid amortization] | | `skills/usage-accrual/`, `skills/prepaid-amortization/` |
 | [PLACEHOLDER: e.g. BD6] | [PLACEHOLDER: e.g. flux review] | | |
 | [PLACEHOLDER: e.g. BD8] | [PLACEHOLDER: e.g. close sign-off and reporting package] | | |
 

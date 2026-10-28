@@ -19,14 +19,14 @@
 - **Threshold:** Invoices over $5,000 that cover more than one month.
 - **Method:** Straight-line by month over the service period. The final month takes any rounding difference.
 - **Where the schedule lives:** Google Drive, `Finance/Schedules/Prepaid Schedule.xlsx`.
-- **Command:** `commands/jes/prepaid-amortization.md`
+- **Skill:** `skills/prepaid-amortization/`
 
 ## Accruals
 
 - **Threshold:** Accrue unbilled expenses over $2,500.
 - **Recurring accruals:** Stratus Cloud and Lattice Inference usage (billed in arrears); the outsourced accounting firm (billed the 5th of the following month); quarterly bonuses, accrued monthly at target.
 - **Reversal:** Auto-reverse on the first day of the next month.
-- **Command:** `commands/jes/usage-accrual.md`
+- **Skill:** `skills/usage-accrual/`
 
 ## Revenue recognition
 

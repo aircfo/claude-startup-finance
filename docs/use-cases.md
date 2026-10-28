@@ -129,7 +129,7 @@ Try sharing:
 Prompt:
 
 ```text
-Run commands/setup/follow-up-interview.md with me.
+Use the follow-up-interview skill with me.
 ```
 
 Best with:

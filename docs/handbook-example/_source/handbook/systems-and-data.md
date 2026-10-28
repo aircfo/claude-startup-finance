@@ -1,7 +1,7 @@
 # Systems and data
 
 **What this page is for:** what Claude can read directly, and the habits that keep inputs
-consistent enough for a command to run the same way every month.
+consistent enough for a skill to run the same way every month.
 
 **Last reviewed:** 2026-10-15, by Head of Finance
 
@@ -17,13 +17,13 @@ consistent enough for a command to run the same way every month.
 | Gusto | No | Export | Payroll journal report, saved to the period folder |
 | Stratus Cloud, Lattice Inference | No | Export | Monthly usage CSV from each vendor's billing page |
 
-**Read-only is the rule.** Commands never post, pay, or edit records. A person posts what Claude
+**Read-only is the rule.** Skills never post, pay, or edit records. A person posts what Claude
 prepares.
 
 ## The clean-inputs checklist
 
 - [x] Last month's version of every automated task exists and has been reviewed.
-- [x] Same workpaper shape every month (the standard in `commands/_templates/`).
+- [x] Same workpaper shape every month (the standard in `handbook/workpaper-standard.md`).
 - [x] Predictable file names: `{GL} - {account} - {description} {YYYY.MM}.xlsx`.
 - [x] One folder per period: `Finance/Close/YYYY-MM/` with `JEs/`, `Recs/`, `Statements/`.
 - [x] Schedules live in one place: `Finance/Schedules/`.
