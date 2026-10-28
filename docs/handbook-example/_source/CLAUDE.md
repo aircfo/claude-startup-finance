@@ -54,6 +54,22 @@ When the user asks for one of these tasks, or names a skill, read its `SKILL.md`
 | `skills/prepaid-amortization/` | Monthly prepaid amortization JE from the prepaid schedule |
 | `skills/usage-accrual/` | Month-end accrual for Stratus Cloud and Lattice Inference usage |
 | `skills/bank-reconciliation/` | Mercury operating, Mercury treasury, and Ramp card recs |
+| `skills/level-up/` | Coaches the team up the AI-in-finance ladder, including the GitHub and Claude Code setup |
+
+## Level-up progress
+
+Where the team is on the ladder for AI in finance. The `level-up` skill reads and updates this
+section.
+
+- **Team:** Head of Finance plus a two-person outsourced accounting firm. Macs, Cowork today.
+  Biggest time sink: month-end accruals and recs.
+- **Rung:** 3, shared context and workflows. One handbook and one set of skills for the team.
+- **Last step:** 2026-10-15, follow-up interview done with the CEO and Head of Finance.
+- **Next step:** Head of Finance (champion) runs the GitHub and Claude Code setup in the
+  `level-up` skill, then onboards the accounting firm's lead.
+- **Wins:**
+  - 2026-10: usage accrual skill, about 2 hours to 25 minutes, two clean months in review.
+  - 2026-09: bank recs for three accounts, prepared before BD3 instead of BD5.
 
 ## Where outputs go
 

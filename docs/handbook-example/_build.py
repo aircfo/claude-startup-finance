@@ -41,6 +41,7 @@ SKILL_WORKFLOWS = [
     ("Setup", ["setup-finance-brain", "new-skill"]),
     ("Journal entries", ["prepaid-amortization", "usage-accrual"]),
     ("Reconciliations", ["bank-reconciliation"]),
+    ("Level up", ["level-up"]),
 ]
 
 

@@ -30,6 +30,7 @@ Each skill is its own folder, named for what it does. Grouped by workflow:
 | Journal entries | `prepaid-amortization/` | Monthly prepaid amortization JE |
 | Journal entries | `usage-accrual/` | Month-end accrual for usage-billed vendors |
 | Reconciliations | `bank-reconciliation/` | Bank or card account to its statement |
+| Level up | `level-up/` | Coaches the team up the AI-in-finance ladder, including the GitHub and Claude Code setup. Keeps Level-up progress in `CLAUDE.md` |
 
 When you add a skill, add its row here and in `CLAUDE.md`.
 

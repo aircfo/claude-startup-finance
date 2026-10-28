@@ -26,7 +26,7 @@ description: A free starter kit for building a finance brain that turns Claude i
   <div class="card">
     <span class="step-no">2</span>
     <h3>Skills</h3>
-    <p>One Claude skill per recurring task, each in its own folder. A setup skill that builds your handbook, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
+    <p>One Claude skill per recurring task, each in its own folder. A setup skill that builds your handbook, a level-up coach that brings your team along, plus worked examples for prepaid amortization, a usage accrual, and a bank reconciliation.</p>
   </div>
   <div class="card">
     <span class="step-no">3</span>
@@ -37,7 +37,7 @@ description: A free starter kit for building a finance brain that turns Claude i
 
 ## Start where you are
 
-The kit follows the five-rung ladder for AI in finance. Find your rung and start there.
+The kit follows the five-rung ladder for AI in finance. Find your rung and start there, or say "help me level up" and the kit's `level-up` skill works it out with you.
 
 | Rung | What it looks like | Start with |
 | --- | --- | --- |
@@ -45,8 +45,17 @@ The kit follows the five-rung ladder for AI in finance. Find your rung and start
 | **1 · Skills** | A monthly task Claude can repeat on demand | `new-skill` skill |
 | **2 · Clean, connected data** | Claude reads your systems, and the inputs look the same every month | `handbook/systems-and-data.md` |
 | **3 · Shared context & workflows** | One place your policies and processes live | `setup-finance-brain` skill |
-| **4 · Finance engineering** | Version control and review before anything hits the books | `testing/` and `handbook/workpaper-standard.md` |
+| **4 · Finance engineering** | Version control and review before anything hits the books | The `level-up` skill's GitHub and Claude Code setup |
 | **5 · The frontier** | New work finance couldn't do before | Everything above, running |
+
+## Bring your team along
+
+Most finance teams don't start out comfortable with AI tools, and that's fine. Say **"help me level up"** in the kit's folder and the `level-up` skill coaches the team one rung at a time:
+
+- **Checks where you are** with five plain questions, and places the team on the ladder.
+- **Plans the next one or two moves** and does the first one with you, explaining every term and checking each step before the next.
+- **Sets up review, step by step.** When the team is ready for rung 4, it walks a champion through installing Git, Node.js, Python, VS Code, and Claude Code, putting the Finance Brain in a private GitHub repository, and turning on review so every change to a skill or policy is approved by someone other than its author. Then it onboards each teammate.
+- **Remembers progress.** Your rung, last step, next step, and recent wins live in `CLAUDE.md`, so every session picks up where the last one stopped.
 
 ## Get started in Claude Cowork
 

@@ -26,7 +26,8 @@ It's plain markdown in a folder you own. No plugin to install, no connector requ
 ## Where this fits on the ladder
 
 The kit is built around the five-rung ladder for AI in finance. Find your rung, then use the
-part of the kit that gets you to the next one.
+part of the kit that gets you to the next one. Not sure where you are? Say "help me level up"
+and the `level-up` skill works it out with you and plans the next step.
 
 | Rung | What it looks like | Start with |
 | --- | --- | --- |
@@ -34,7 +35,7 @@ part of the kit that gets you to the next one.
 | **1 · Skills** | A monthly task Claude can repeat on demand. | the `new-skill` skill |
 | **2 · Clean, connected data** | Claude reads your systems, and the inputs look the same every month. | `handbook/systems-and-data.md` |
 | **3 · Shared context & workflows** | One place your policies and processes live, so the whole team works from the same playbook. | `CLAUDE.md`, `handbook/`, the `setup-finance-brain` skill |
-| **4 · Finance engineering** | Version control, review before anything hits the books. | `testing/` and `handbook/workpaper-standard.md` |
+| **4 · Finance engineering** | Version control, review before anything hits the books. | The `level-up` skill's GitHub and Claude Code setup, `testing/`, and `handbook/workpaper-standard.md` |
 | **5 · The frontier** | New work finance couldn't do before. | Everything above, running. |
 
 ---
@@ -48,7 +49,8 @@ example `~/Documents/Finance Brain/`), and add it to Cowork with **Work in a fol
 reads `CLAUDE.md` automatically every time you work there.
 
 **Claude Code:** open the folder as your project and link the skills folder so Claude Code
-uses the same files you edit: `mkdir -p .claude && ln -s ../skills .claude/skills`. Each skill
+uses the same files you edit: `mkdir -p .claude && ln -s ../skills .claude/skills` on a Mac (on
+Windows, see "Add a teammate" in `skills/level-up/github-setup.md`). Each skill
 then runs when a request matches it, or directly as a slash command such as `/setup-finance-brain`.
 (Copying the folders also works, but then copy them again after every change.)
 
@@ -75,6 +77,11 @@ the numbers to define your metrics, burn, and runway.
 **This month: make it the team's.** Run the worked examples (`prepaid-amortization`,
 `usage-accrual`, `bank-reconciliation`) on your own books, add your recurring tasks, and publish the handbook as a
 website your whole team can browse (say "publish the handbook").
+
+**Bringing a team along?** Say "help me level up." The `level-up` skill checks where the team
+is, plans the next move, and walks a champion through the GitHub and Claude Code setup that
+puts every change to a skill or policy through review. It keeps track of progress in
+`CLAUDE.md`, so each session picks up where the last one stopped.
 
 ### 3. Keep it current
 
@@ -103,7 +110,8 @@ finance-brain/
 │   ├── new-skill/            Setup: turn a task you know cold into a skill (+ templates/)
 │   ├── prepaid-amortization/ JE: monthly prepaid amortization
 │   ├── usage-accrual/        JE: month-end usage accrual
-│   └── bank-reconciliation/  Rec: bank or card account to statement
+│   ├── bank-reconciliation/  Rec: bank or card account to statement
+│   └── level-up/             Coach: the ladder for a team, plus GitHub and Claude Code setup
 ├── testing/                  Where drafts live until a skill is trusted
 └── examples/                 A sample Claude-prepared JE workpaper (synthetic data)
 ```

@@ -47,7 +47,7 @@ During first setup, or when the user says "continue setup":
   a list of questions to take to them (`follow-up-questions.md` explains both).
 - After stage 2, offer stage 3.
 - After stage 3, suggest a first monthly task: "Pick one task you know cold and use the
-  `new-skill` skill."
+  `new-skill` skill." For a plan for the whole team, mention the `level-up` skill.
 - If the user stops partway, tell them how to come back: "Say 'continue setup' any time."
 
 After a refresh, or a single stage the user asked for by name, don't push them into other
