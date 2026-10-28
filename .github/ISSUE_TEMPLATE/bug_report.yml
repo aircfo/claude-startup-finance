@@ -22,7 +22,6 @@ body:
       options:
         - finance-contextos
         - all-systems-go
-        - ai-cfo-lab
         - Not sure / repo-wide (docs, install, marketplace)
     validations:
       required: true
